@@ -8,6 +8,9 @@
 
 - `features.md` — **REL-01** 새 앨범·싱글 조회 기능 추가 (P1) — 홈 화면 수평 스크롤, ALBUM/SINGLE 타입 배지
 - `features.md` — 검색 기능(SRC-01, SRC-02) 및 `/search` 라우트 제거 — 각 페이지 내 검색으로 대체
+- `features.md` — **CON-07** 티켓팅 임박 공연 제거 — 티켓 오픈일 데이터 취득 경로 없음
+- `pipeline.md` — MusicBrainz 아티스트 수집에 `artist-rels` inc 파라미터 추가 — 멤버 구성(전·현 멤버) 수집 반영
+- `pipeline.md` — 릴리즈 수집 단계 신규 추가 — 초기 구축: `release.py` 컬렉터, 주기적 수집: 주 1회 신보 감지 및 INSERT
 
 
 ## 2026-04-08
