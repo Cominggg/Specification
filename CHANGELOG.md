@@ -6,6 +6,7 @@
 
 ## 2026-04-10
 
+- `features.md` — **REL-01** 새 앨범·싱글 조회 기능 추가 (P1) — 홈 화면 수평 스크롤, ALBUM/SINGLE 타입 배지
 - `features.md` — 검색 기능(SRC-01, SRC-02) 및 `/search` 라우트 제거 — 각 페이지 내 검색으로 대체
 
 
