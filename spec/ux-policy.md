@@ -12,7 +12,6 @@
 | 이미지 로드 실패 | 공연 포스터 / 아티스트 프로필 | Coming 기본 플레이스홀더 이미지로 대체 (React onError 핸들러 사용) |
 | 인증 토큰 만료 (401) | 인증 필요 API 전체 | Refresh Token으로 자동 재발급 시도. 실패 시 로그인 페이지로 이동 후 이전 URL redirect |
 | 네트워크 오프라인 | 전체 페이지 | 브라우저 navigator.onLine 감지 → '인터넷 연결을 확인해 주세요.' 전역 배너 표시 |
-| 검색 결과 없음 | SRC-01 검색 | '검색 결과가 없습니다. 다른 검색어를 입력해 보세요.' empty state UI 표시 |
 | 셋리스트 미등록 | CON-05 셋리스트 | '아직 등록된 셋리스트가 없습니다.' empty state UI. setlist.fm 링크 제공 |
 | 팔로우 / 캘린더 — 비로그인 | ART-04, CAL-02 | 로그인 유도 모달 표시 (현재 URL을 redirect_uri로 포함) |
 | 문의 등록 — 비로그인 | INQ-01 | 로그인 유도 모달 표시 (현재 URL을 redirect_uri로 포함) |
