@@ -35,10 +35,24 @@ jpop-concert-collector/
 |------|------|
 | KOPIS 수집 | 내한 공연 후보 조회. visit=Y, genrenm=대중음악 조건. prfnm·prfcast·날짜·장소·updatedate 저장.<br>`GET /openApi/restful/pblprfr?service={key}&stdate=20200101&eddate={today}&shcate=GGGA&visit=Y&rows=100&cpage={n}`<br>상세: `GET /openApi/restful/pblprfr/{mt20id}?service={key}`<br>상세 API 응답의 `relates` 필드(예매처 링크 목록) 저장. 값이 없는 경우 빈 배열로 처리.<br>※ 주 1회 이상 권장 |
 | 상태 갱신 | updatedate 변화 감지 시 prfstate DB 갱신. 매일 실행. |
-| 매칭 ① | prfcast 기반 매칭 — 출연진 필드 → Artist DB alias 완전 일치. HIGH 신뢰도로 저장. 관리자 승인 없이 즉시 노출. |
-| 매칭 ② | prfnm 기반 매칭 — 공연명 문자열 내 alias 부분 검색. `rapidfuzz.fuzz.partial_ratio` 기준 85점 이상 시 매칭 성공. LOW 신뢰도로 저장. 관리자 승인 후 노출. |
+| 매칭 ① | prfcast 기반 매칭 — 출연진 필드 → Artist DB alias 완전 일치. HIGH 신뢰도로 저장. 관리자 승인 없이 즉시 노출.<br>prfcast에 여러 아티스트가 포함된 경우(`,` · `·` 구분) 각각 개별 매칭 후 모두 `concert_artist`에 INSERT (합동 공연 지원). |
+| 매칭 ② | prfnm 기반 매칭 — 공연명 문자열 내 alias 부분 검색. `rapidfuzz.fuzz.partial_ratio` 기준 85점 이상 시 매칭 성공. LOW 신뢰도로 저장. 관리자 승인 후 노출.<br>복수 아티스트 매칭 시 각각 별도 행으로 `concert_artist`에 INSERT. |
 | 매칭 실패 | 두 매칭 모두 실패 시 검토 큐 등록. 승인 시 alias 학습 → 다음 사이클 자동 매칭률 향상. |
 | 릴리즈 갱신 | 등록된 아티스트의 신보 감지. `first-release-date` 기준 DB에 없는 항목만 INSERT. 주 1회 실행.<br>`GET /ws/2/release-group/?artist={mbid}&type=album%7Csingle%7Cep&limit=100&offset={n}&fmt=json` |
+
+### 공연-아티스트 관계 구조
+
+공연과 아티스트는 **다대다(M:N)** 관계. 합동 공연(페스티벌·조인트 콘서트) 지원을 위해 `concert_artist` 중간 테이블로 관리.
+
+| 컬럼 | 설명 |
+|------|------|
+| `concert_id` | 공연 FK |
+| `artist_id` | 아티스트 FK |
+| `confidence` | `HIGH` (prfcast 완전 일치) / `LOW` (prfnm 퍼지 매칭) |
+| `matched_by` | `prfcast` / `prfnm` / `manual` |
+| `approved` | LOW 매칭의 관리자 승인 여부. HIGH는 항상 `true`. |
+
+> 단독 공연은 `concert_artist` 행이 1개, 합동 공연은 참여 아티스트 수만큼 행이 생성됨.
 
 ### ③ 셋리스트 수집 (스케줄)
 
