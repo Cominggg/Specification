@@ -33,7 +33,6 @@
 | GET | `/api/concerts/{id}` | 공연 상세 정보 조회 | 불필요 | 조회수 +1 처리 |
 | GET | `/api/concerts/{id}/setlist` | 셋리스트 조회 | 불필요 | 공연 완료 후 제공 |
 | GET | `/api/concerts/popular` | 인기 공연 목록 (조회수 기반) | 불필요 | |
-| GET | `/api/concerts/ticketing-soon` | 티켓팅 임박 공연 목록 (D-day 순) | 불필요 | |
 | GET | `/api/concerts/following` | 관심 아티스트 예정 공연 목록 | 필요 | |
 
 ## 캘린더
