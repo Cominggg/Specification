@@ -14,8 +14,8 @@
 | 네트워크 오프라인 | 전체 페이지 | 브라우저 navigator.onLine 감지 → '인터넷 연결을 확인해 주세요.' 전역 배너 표시 |
 | 셋리스트 미등록 | CON-05 셋리스트 | '아직 등록된 셋리스트가 없습니다.' empty state UI. setlist.fm 링크 제공 |
 | 팔로우 / 캘린더 — 비로그인 | ART-04, CAL-02 | 로그인 유도 모달 표시 (현재 URL을 redirect_uri로 포함) |
-| 문의 등록 — 비로그인 | INQ-01 | 로그인 유도 모달 표시 (현재 URL을 redirect_uri로 포함) |
-| 문의 중복 등록 | INQ-01 | '이미 접수된 문의가 있습니다.' 토스트 메시지 표시. 동일 유형+대상 ID로 PENDING 상태 문의 존재 시 |
+| 문의 등록 — 비로그인 | INQ-01~03 | 로그인 유도 모달 표시 (현재 URL을 redirect_uri로 포함) |
+| 문의 중복 등록 | INQ-01~03 | '이미 접수된 문의가 있습니다.' 토스트 메시지 표시. 동일 대상 ID로 PENDING 상태 문의 존재 시 |
 
 > React Query 도입 시 stale-while-revalidate 전략으로 캐시 fallback 처리 권장.
 

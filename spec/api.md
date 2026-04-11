@@ -54,7 +54,7 @@
 
 | 메서드 | 엔드포인트 | 설명 | 인증 | 비고 |
 |--------|------------|------|------|------|
-| POST | `/api/inquiries` | 데이터 문의 등록 | 필요 | type(ARTIST\|CONCERT\|SETLIST), targetId, title, content |
+| POST | `/api/inquiries` | 데이터 문의 등록 (INQ-01~03) | 필요 | type(ARTIST\|CONCERT\|SETLIST), targetId, title, content |
 | GET | `/api/inquiries/my` | 내 문의 내역 조회 | 필요 | page, size, status 필터 |
 | GET | `/api/inquiries/my/{id}` | 내 문의 상세 조회 | 필요 | 처리 결과·반려사유 포함 |
 
