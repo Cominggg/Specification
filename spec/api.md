@@ -18,9 +18,9 @@
 
 | 메서드 | 엔드포인트 | 설명 | 인증 | 비고 |
 |--------|------------|------|------|------|
-| GET | `/api/artists` | 아티스트 목록 조회 (검색·필터) | 불필요 | query, genre, debutYear |
+| GET | `/api/artists` | 아티스트 목록 조회 (검색·필터) | 불필요 | query, genre, debutYear, page, size(기본 24) |
 | GET | `/api/artists/{id}` | 아티스트 상세 정보 조회 | 불필요 | |
-| GET | `/api/artists/{id}/concerts` | 아티스트 내한 공연 목록 | 불필요 | tab: past\|upcoming |
+| GET | `/api/artists/{id}/concerts` | 아티스트 내한 공연 목록 | 불필요 | tab: all\|upcoming\|past, page, size(기본 10) |
 | POST | `/api/artists/{id}/follow` | 관심 아티스트 추가 | 필요 | |
 | DELETE | `/api/artists/{id}/follow` | 관심 아티스트 제거 | 필요 | |
 | GET | `/api/artists/following` | 팔로우한 아티스트 목록 | 필요 | |
@@ -29,7 +29,7 @@
 
 | 메서드 | 엔드포인트 | 설명 | 인증 | 비고 |
 |--------|------------|------|------|------|
-| GET | `/api/concerts` | 내한 공연 목록 조회 (필터) | 불필요 | date, artistId, region |
+| GET | `/api/concerts` | 내한 공연 목록 조회 (필터) | 불필요 | date, artistId, region, page, size(기본 20) |
 | GET | `/api/concerts/{id}` | 공연 상세 정보 조회 | 불필요 | 조회수 +1 처리 |
 | GET | `/api/concerts/{id}/setlist` | 셋리스트 조회 | 불필요 | 공연 완료 후 제공 |
 | GET | `/api/concerts/popular` | 인기 공연 목록 (조회수 기반) | 불필요 | |
@@ -40,7 +40,7 @@
 | 메서드 | 엔드포인트 | 설명 | 인증 | 비고 |
 |--------|------------|------|------|------|
 | GET | `/api/calendar` | 전체 공연 캘린더 목록 | 불필요 | year, month 파라미터 |
-| GET | `/api/calendar/my` | 내 캘린더 공연 목록 | 필요 | |
+| GET | `/api/calendar/my` | 내 캘린더 공연 목록 | 필요 | page, size(기본 10) |
 | POST | `/api/calendar/{concertId}` | 내 캘린더에 공연 추가 | 필요 | |
 | DELETE | `/api/calendar/{concertId}` | 내 캘린더에서 공연 제거 | 필요 | |
 
@@ -48,7 +48,7 @@
 
 | 메서드 | 엔드포인트 | 설명 | 인증 | 비고 |
 |--------|------------|------|------|------|
-| GET | `/api/my/history` | 다녀온 공연 목록 (공연 히스토리) | 필요 | 공연일 지난 캘린더 항목 |
+| GET | `/api/my/history` | 다녀온 공연 목록 (공연 히스토리) | 필요 | page, size(기본 10) |
 
 ## 데이터 문의
 
