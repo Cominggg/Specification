@@ -25,7 +25,7 @@ jpop-concert-collector/
 
 | 작업 | 상세 |
 |------|------|
-| MusicBrainz 아티스트 수집 | JP 아티스트 목록 수집. country=JP, tag=j-pop 조건. 이름·alias(한/영/일)·url-rels·멤버 구성 포함 저장.<br>`GET /ws/2/artist/?query=tag:j-pop AND country:JP&limit=100&offset={n}&fmt=json`<br>개별 상세: `GET /ws/2/artist/{mbid}?inc=aliases+tags+url-rels+artist-rels&fmt=json`<br>응답의 `relations` 배열에서 `type: "member of band"` 항목을 파싱해 멤버 구성 저장. 전·현 멤버 구분은 `ended` 필드 기준.<br>※ Rate Limit: 1 req/sec |
+| MusicBrainz 아티스트 수집 | JP 아티스트 목록 수집. country=JP, tag=j-pop 조건. 이름·alias(한/영/일)·url-rels·멤버 구성·데뷔일 포함 저장.<br>`GET /ws/2/artist/?query=tag:j-pop AND country:JP&limit=100&offset={n}&fmt=json`<br>개별 상세: `GET /ws/2/artist/{mbid}?inc=aliases+tags+url-rels+artist-rels&fmt=json`<br>응답의 `relations` 배열에서 `type: "member of band"` 항목을 파싱해 멤버 구성 저장. 전·현 멤버 구분은 `ended` 필드 기준.<br>데뷔일: `life-span.begin` 필드 저장. 값이 없는 경우 null 허용.<br>※ Rate Limit: 1 req/sec |
 | MusicBrainz 릴리즈 수집 | 등록된 아티스트의 앨범·싱글 초기 수집.<br>`GET /ws/2/release-group/?artist={mbid}&type=album%7Csingle&limit=100&offset={n}&fmt=json`<br>취득 필드: `title`(제목), `first-release-date`(발매일), `primary-type`(Album·Single·EP).<br>※ Rate Limit: 1 req/sec |
 | 관리자 등록 | MusicBrainz 미등록 아티스트를 관리자 UI로 직접 입력. |
 
