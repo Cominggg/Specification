@@ -4,6 +4,12 @@
 
 ---
 
+## 2026-04-15
+
+- `features.md` — **REL-02** 앨범·싱글·EP 상세 조회 신규 추가 (P2) — MusicBrainz + Last.fm 기반 릴리즈 상세 페이지
+- `pipeline.md` — 레포 구조에 `lastfm.py` 추가, 릴리즈 수집에 트랙·크레딧·커버·Last.fm 소개 수집 명세 추가
+- `api.md` — `GET /api/releases/{id}` 엔드포인트 신규 추가 (REL-02)
+
 ## 2026-04-11 (5)
 
 - `ux-policy.md` — 홈 섹션에 이달 공연 통계 배너·다가오는 공연 섹션 추가 (섹션 순서 재정렬)
