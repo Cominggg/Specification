@@ -18,7 +18,7 @@
 
 | 메서드 | 엔드포인트 | 설명 | 인증 | 비고 |
 |--------|------------|------|------|------|
-| GET | `/api/artists` | 아티스트 목록 조회 (검색·필터) | 불필요 | query, genre, debutYear, page, size(기본 25) |
+| GET | `/api/artists` | 아티스트 목록 조회 (검색·필터) | 불필요 | name, genre, debutYear, page, size(기본 25) |
 | GET | `/api/artists/{id}` | 아티스트 상세 정보 조회 | 불필요 | |
 | GET | `/api/artists/{id}/concerts` | 아티스트 내한 공연 목록 | 불필요 | tab: all\|upcoming\|past, page, size(기본 10) |
 | GET | `/api/artists/{id}/releases` | 아티스트 디스코그래피 (앨범·싱글·EP + 수록곡) | 불필요 | type: ALBUM\|SINGLE\|EP (복수 허용), page, size(기본 10) |
