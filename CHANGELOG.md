@@ -6,6 +6,8 @@
 
 ## 2026-04-24
 
+- `api.md` — `GET /api/concerts/stats` 신규 추가 — 홈 이달 공연 통계 배너용. year·month 파라미터, `{ "concertCount": N }` 응답
+- `api.md` — `GET /api/concerts` 파라미터에 `dateFrom`, `dateTo` 추가 — 홈 다가오는 공연 섹션용 날짜 범위 필터. 기존 `date` 파라미터 하위 호환 유지
 - `erd.md` — `artist_member` 테이블 제거 — 그룹 멤버 관계를 DB에서 관리하지 않기로 결정
 - `features.md` — **ART-02** 아티스트 상세 조회 설명에서 "멤버 구성" 문구 제거
 - `features.md` — **INQ-02** 아티스트 정보 문의 대상 목록에서 "멤버 구성" 제거
