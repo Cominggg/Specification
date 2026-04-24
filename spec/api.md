@@ -31,7 +31,8 @@
 
 | 메서드 | 엔드포인트 | 설명 | 인증 | 비고 |
 |--------|------------|------|------|------|
-| GET | `/api/concerts` | 내한 공연 목록 조회 (필터) | 불필요 | date, artistId, region, page, size(기본 20) |
+| GET | `/api/concerts` | 내한 공연 목록 조회 (필터) | 불필요 | dateFrom(YYYY-MM-DD), dateTo(YYYY-MM-DD), artistId, region, page, size(기본 20). 기존 date 파라미터 하위 호환 유지 |
+| GET | `/api/concerts/stats` | 이달 공연 건수 조회 | 불필요 | year(int), month(int) → `{ "concertCount": N }`. 홈 통계 배너용 |
 | GET | `/api/concerts/{id}` | 공연 상세 정보 조회 | 불필요 | 조회수 +1 처리 |
 | GET | `/api/concerts/{id}/setlist` | 셋리스트 조회 | 불필요 | 공연 완료 후 제공 |
 | GET | `/api/concerts/popular` | 인기 공연 목록 (조회수 기반) | 불필요 | |
