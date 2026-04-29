@@ -8,7 +8,7 @@ Python 별도 레포지토리로 구현. Spring 백엔드와 동일한 DB를 공
 jpop-concert-collector/
 ├── collectors/
 │   ├── kopis.py           # KOPIS API 수집
-│   ├── musicbrainz.py     # MusicBrainz 아티스트·멤버 수집
+│   ├── musicbrainz.py     # MusicBrainz 아티스트 수집
 │   ├── release.py         # MusicBrainz 릴리즈(앨범·싱글·EP) + 트랙·커버 수집
 │   └── setlist.py         # setlist.fm 셋리스트 수집
 ├── matchers/
@@ -25,7 +25,7 @@ jpop-concert-collector/
 
 | 작업 | 상세 |
 |------|------|
-| MusicBrainz 아티스트 수집 | JP 아티스트 목록 수집. country=JP, tag=j-pop 조건. 이름·alias(한/영/일)·url-rels·멤버 구성·데뷔일 포함 저장.<br>`GET /ws/2/artist/?query=tag:j-pop AND country:JP&limit=100&offset={n}&fmt=json`<br>개별 상세: `GET /ws/2/artist/{mbid}?inc=aliases+tags+url-rels+artist-rels&fmt=json`<br>응답의 `relations` 배열에서 `type: "member of band"` 항목을 파싱해 멤버 구성 저장. 전·현 멤버 구분은 `ended` 필드 기준.<br>데뷔일: `life-span.begin` 필드 저장. 값이 없는 경우 null 허용.<br>※ Rate Limit: 1 req/sec |
+| MusicBrainz 아티스트 수집 | JP 아티스트 목록 수집. country=JP, tag=j-pop 조건. 이름·alias(한/영/일)·url-rels·데뷔일 포함 저장.<br>`GET /ws/2/artist/?query=tag:j-pop AND country:JP&limit=100&offset={n}&fmt=json`<br>개별 상세: `GET /ws/2/artist/{mbid}?inc=aliases+url-rels&fmt=json`<br>데뷔일: `life-span.begin` 필드 저장. 값이 없는 경우 null 허용.<br>※ Rate Limit: 1 req/sec |
 | MusicBrainz 릴리즈 수집 | 등록된 아티스트의 앨범·싱글·EP 초기 수집.<br>`GET /ws/2/release-group/?artist={mbid}&type=album%7Csingle%7Cep&limit=100&offset={n}&fmt=json`<br>취득 필드: `title`(제목), `first-release-date`(발매일), `primary-type`(Album·Single·EP).<br>▸ **트랙 수집** (REL-02): release-group별 대표 release MBID 취득 후 개별 상세 호출.<br>`GET /ws/2/release/{release-mbid}?inc=recordings+labels&fmt=json`<br>수록곡(`media[].tracks`): 트랙 번호·제목·`length` 저장. 레이블: `label-info[].label.name` 저장.<br>▸ **앨범 커버 URL** (REL-02): Cover Art Archive 존재 여부 확인 후 URL 컬럼 저장.<br>`GET https://coverartarchive.org/release-group/{release-group-mbid}/front` — 404 시 null 허용.<br>※ Rate Limit: 1 req/sec (MusicBrainz), Cover Art Archive 별도 1 req/sec |
 | 관리자 등록 | MusicBrainz 미등록 아티스트를 관리자 UI로 직접 입력. |
 
