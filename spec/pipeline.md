@@ -5,40 +5,63 @@ Python 별도 레포지토리로 구현. Spring 백엔드와 동일한 DB를 공
 ## 레포지토리 구조
 
 ```
-jpop-concert-collector/
+coming-data/
 ├── collectors/
 │   ├── kopis.py           # KOPIS API 수집
 │   ├── musicbrainz.py     # MusicBrainz 아티스트 수집
 │   ├── release.py         # MusicBrainz 릴리즈(앨범·싱글·EP) + 트랙·커버 수집
-│   └── setlist.py         # setlist.fm 셋리스트 수집
+│   ├── setlist.py         # setlist.fm 셋리스트 수집
+│   └── wikipedia.py       # Korean Wikipedia redirect 기반 한국어 alias 수집
 ├── matchers/
 │   └── artist_matcher.py  # alias 기반 매칭 로직 (rapidfuzz)
 ├── db/
 │   └── repository.py      # DB 저장 (SQLAlchemy)
+├── tests/                 # pytest 단위 테스트
 ├── scheduler.py           # APScheduler 진입점
-└── requirements.txt
+└── pyproject.toml
 ```
 
 ## 수집 파이프라인 단계
 
-### ① 초기 구축 (1회성)
+### ① 초기 구축 (1회성 · `python scheduler.py init`)
 
 | 작업 | 상세 |
 |------|------|
-| MusicBrainz 아티스트 수집 | JP 아티스트 목록 수집. country=JP, tag=j-pop 조건. 이름·alias(한/영/일)·url-rels·데뷔일 포함 저장.<br>`GET /ws/2/artist/?query=tag:j-pop AND country:JP&limit=100&offset={n}&fmt=json`<br>개별 상세: `GET /ws/2/artist/{mbid}?inc=aliases+url-rels&fmt=json`<br>데뷔일: `life-span.begin` 필드 저장. 값이 없는 경우 null 허용.<br>※ Rate Limit: 1 req/sec |
-| MusicBrainz 릴리즈 수집 | 등록된 아티스트의 앨범·싱글·EP 초기 수집.<br>`GET /ws/2/release-group/?artist={mbid}&type=album%7Csingle%7Cep&limit=100&offset={n}&fmt=json`<br>취득 필드: `title`(제목), `first-release-date`(발매일), `primary-type`(Album·Single·EP).<br>▸ **트랙 수집** (REL-02): release-group별 대표 release MBID 취득 후 개별 상세 호출.<br>`GET /ws/2/release/{release-mbid}?inc=recordings+labels&fmt=json`<br>수록곡(`media[].tracks`): 트랙 번호·제목·`length` 저장. 레이블: `label-info[].label.name` 저장.<br>▸ **앨범 커버 URL** (REL-02): Cover Art Archive 존재 여부 확인 후 URL 컬럼 저장.<br>`GET https://coverartarchive.org/release-group/{release-group-mbid}/front` — 404 시 null 허용.<br>※ Rate Limit: 1 req/sec (MusicBrainz), Cover Art Archive 별도 1 req/sec |
+| MusicBrainz 아티스트 수집 | JP 아티스트 목록 수집. `tag:j-pop AND country:JP AND (type:Group OR type:Person)` 조건. 이름·alias(한/영/일)·url-rels·데뷔일 포함 저장.<br>`GET /ws/2/artist/?query=tag:j-pop AND country:JP AND (type:Group OR type:Person)&limit=100&offset={n}&fmt=json`<br>개별 상세: `GET /ws/2/artist/{mbid}?inc=aliases+url-rels&fmt=json`<br>데뷔일: `life-span.begin` 필드 저장. 값이 없는 경우 null 허용.<br>url-rels: Instagram·Twitter·YouTube·Spotify·Apple Music 등 허용 도메인만 저장.<br>재개 지원: 이미 DB에 저장된 MBID는 상세 조회 건너뜀.<br>※ Rate Limit: 1 req/sec |
+| Wikipedia 한국어 alias 수집 | Korean Wikipedia redirect 기반으로 아티스트 한국어 alias를 보완 수집.<br>`GET https://ko.wikipedia.org/w/api.php?action=query&prop=redirects&titles={name}&rdlimit=500`<br>리다이렉트 중 한글 포함 제목만 `artist_alias`에 저장. 실패 시 지수 백오프(최대 3회) 재시도.<br>※ Rate Limit: 0.5초 간격 |
+| MusicBrainz 릴리즈 수집 | HIGH confidence 매칭 아티스트의 앨범·싱글·EP 우선 수집. 나머지는 주간 배치가 점진적으로 채운다.<br>`GET /ws/2/release-group/?artist={mbid}&type=album%7Csingle%7Cep&limit=100&offset={n}&fmt=json`<br>취득 필드: `title`(제목), `first-release-date`(발매일), `primary-type`(Album·Single·EP).<br>▸ **트랙 수집**: release-group별 대표 release MBID 취득 후 개별 상세 호출.<br>`GET /ws/2/release/{release-mbid}?inc=recordings+labels&fmt=json`<br>수록곡(`media[].tracks`): 트랙 번호·제목·`length` 저장. 레이블: `label-info[].label.name` 저장.<br>▸ **앨범 커버 URL**: Cover Art Archive 별도 주간 잡(`run_cover_art_update`)에서 미수집 건만 보완.<br>※ Rate Limit: 1 req/sec (MusicBrainz), Cover Art Archive 별도 1 req/sec |
+| KOPIS 수집·매칭 | 초기 수집 중 KOPIS 공연 조회 + alias 매칭 실행 → 내한 확정 아티스트 파악. `--skip-kopis` 플래그로 건너뜀 가능. |
 | 관리자 등록 | MusicBrainz 미등록 아티스트를 관리자 UI로 직접 입력. |
+
+플래그:
+- `--skip-artists`: 아티스트 수집 건너뜀
+- `--skip-kopis`: KOPIS 수집·매칭 건너뜀
+- `--skip-wikipedia`: Wikipedia alias 수집 건너뜀
+- `--force-artists`: 기존 DB 아티스트를 건너뛰지 않고 전체 재수집
 
 ### ② 주기적 수집 (스케줄)
 
-| 작업 | 상세 |
-|------|------|
-| KOPIS 수집 | 내한 공연 후보 조회. visit=Y, genrenm=대중음악 조건. prfnm·prfcast·날짜·장소·updatedate 저장.<br>`GET /openApi/restful/pblprfr?service={key}&stdate=20200101&eddate={today}&shcate=GGGA&visit=Y&rows=100&cpage={n}`<br>상세: `GET /openApi/restful/pblprfr/{mt20id}?service={key}`<br>상세 API 응답의 `relates` 필드(예매처 링크 목록) 저장. 값이 없는 경우 빈 배열로 처리.<br>※ 주 1회 이상 권장 |
-| 상태 갱신 | updatedate 변화 감지 시 prfstate DB 갱신. 매일 실행. |
-| 매칭 ① | prfcast 기반 매칭 — 출연진 필드 → Artist DB alias 완전 일치. HIGH 신뢰도로 저장. 관리자 승인 없이 즉시 노출.<br>prfcast에 여러 아티스트가 포함된 경우(`,` · `·` 구분) 각각 개별 매칭 후 모두 `concert_artist`에 INSERT (합동 공연 지원). |
-| 매칭 ② | prfnm 기반 매칭 — 공연명 문자열 내 alias 부분 검색. `rapidfuzz.fuzz.partial_ratio` 기준 85점 이상 시 매칭 성공. LOW 신뢰도로 저장. 관리자 승인 후 노출.<br>복수 아티스트 매칭 시 각각 별도 행으로 `concert_artist`에 INSERT. |
-| 매칭 실패 | 두 매칭 모두 실패 시 검토 큐 등록. 승인 시 alias 학습 → 다음 사이클 자동 매칭률 향상. |
-| 릴리즈 갱신 | 등록된 아티스트의 신보 감지. `first-release-date` 기준 DB에 없는 항목만 INSERT. 주 1회 실행.<br>`GET /ws/2/release-group/?artist={mbid}&type=album%7Csingle%7Cep&limit=100&offset={n}&fmt=json`<br>▸ 신규 릴리즈 감지 시 트랙·커버 수집도 연속 실행. |
+| 작업 | 스케줄 | 상세 |
+|------|--------|------|
+| KOPIS 수집·매칭 | 월요일 03시 | 내한 공연 후보 조회. `visit=Y, genrenm=GGGA(대중음악)` 조건. `prfnm`·`prfcast`·날짜·장소·`poster_url`·`venue_address`·`price`·`updatedate` 저장.<br>`GET /openApi/restful/pblprfr?service={key}&stdate=20200101&eddate={today}&shcate=GGGA&visit=Y&rows=100&cpage={n}`<br>상세: `GET /openApi/restful/pblprfr/{mt20id}?service={key}`<br>상세 API 응답의 `relates` 필드(예매처 링크 목록) 저장. 값이 없는 경우 빈 배열로 처리.<br>저장 전 `has_match()`로 alias 매칭 공연만 필터링 — 비매칭 공연은 DB에 저장하지 않음.<br>저장 후 미매칭 공연 대상으로 `match_concert()` 실행 → `concert_artist` INSERT.<br>매칭 후 `artist.is_coming` 동기화.<br>※ 주 1회 이상 권장 |
+| 공연 상태 갱신 | 매일 04시 | KOPIS 재조회 후 `updatedate` 변화 감지 시 `status`·`kopis_update_date` 갱신. `artist.is_coming` 동기화. |
+| 릴리즈 갱신 | 화요일 05시 | 등록된 전체 아티스트의 신보 감지. `first-release-date` 기준 DB에 없는 항목만 INSERT. 신규 릴리즈 감지 시 트랙·레이블도 연속 수집. |
+| 커버아트 수집 | 수요일 05시 | `cover_url`이 없는 release_group만 대상으로 Cover Art Archive 호출. 404 시 null 유지. |
+| Wikipedia alias 수집 | 목요일 03시 | 전체 아티스트 대상 Korean Wikipedia redirect 기반 한국어 alias 보완. |
+| setlist 수집 | 매일 06시 | `status=공연완료` 대상. 공연 완료 후 1일 이내 실행. |
+
+#### 매칭 상세
+
+| 단계 | 대상 | 기준 | 신뢰도 | 노출 |
+|------|------|------|--------|------|
+| 매칭 ① | `prfcast` 각 이름 | Artist alias **완전 일치** | HIGH | 관리자 승인 없이 즉시 노출 |
+| 매칭 ② | `prfcast` 각 이름 | `rapidfuzz.fuzz.token_set_ratio` ≥ 85 | LOW | 관리자 승인 후 노출 |
+| 매칭 ③ | `prfnm` (제목) | 구문 일치(`_phrase_match_title`): 단어 경계 exact 또는 다중 단어 구문 포함 | HIGH | 관리자 승인 없이 즉시 노출 |
+
+- 매칭 ③은 `prfcast` 기반 매칭 ①②가 모두 실패한 경우에만 폴백으로 실행된다.
+- `has_match()` 통과 공연은 반드시 매칭 ①~③ 중 하나가 성공하므로 별도 검토 큐 없음.
+- `prfcast` 구분자: `,` `·` `&` `×` `・` `/` — feat/featuring/ft 표기 자동 제거.
+- `prfcast`에 여러 아티스트 포함 시 각각 개별 매칭 후 모두 `concert_artist`에 INSERT.
 
 ### 공연-아티스트 관계 구조
 
@@ -48,14 +71,32 @@ jpop-concert-collector/
 |------|------|
 | `concert_id` | 공연 FK |
 | `artist_id` | 아티스트 FK |
-| `confidence` | `HIGH` (prfcast 완전 일치) / `LOW` (prfnm 퍼지 매칭) |
+| `confidence` | `HIGH` (prfcast 완전 일치 또는 prfnm 구문 일치) / `LOW` (prfcast 퍼지 매칭) |
 | `matched_by` | `prfcast` / `prfnm` / `manual` |
 | `approved` | LOW 매칭의 관리자 승인 여부. HIGH는 항상 `true`. |
 
 > 단독 공연은 `concert_artist` 행이 1개, 합동 공연은 참여 아티스트 수만큼 행이 생성됨.
 
-### ③ 셋리스트 수집 (스케줄)
+### ③ 셋리스트 수집 (스케줄 · 매일 06시)
 
 | 작업 | 상세 |
 |------|------|
-| setlist.fm 수집 | prfstate=공연완료 대상. 공연 완료 후 1일 이내 실행.<br>`GET https://api.setlist.fm/rest/1.0/search/setlists?artistMbid={mbid}&countryCode=KR&p={n}`<br>Header: `x-api-key`, `Accept: application/json`<br>데이터 미존재 시 빈 상태 유지. |
+| setlist.fm 수집 | `status=공연완료` 대상. 공연 완료 후 1일 이내 실행.<br>`GET https://api.setlist.fm/rest/1.0/search/setlists?artistMbid={mbid}&countryCode=KR&p={n}`<br>Header: `x-api-key`, `Accept: application/json`<br>데이터 미존재 시 빈 상태 유지. |
+
+### ④ is_coming 동기화
+
+`artist.is_coming` 필드는 오늘 이후 `confidence=HIGH` 공연 보유 여부로 자동 갱신된다.
+
+- 갱신 시점: KOPIS 수집·매칭 완료 후, 공연 상태 갱신 완료 후
+- 실제로 변경된 행만 UPDATE (불필요한 쓰기 I/O 최소화)
+
+### ⑤ 관리자 단건 수집 (API 트리거)
+
+관리자 UI 또는 백엔드에서 직접 트리거하는 단건 수집 함수.
+
+| 함수 | 설명 |
+|------|------|
+| `collect_and_save_concert(kopis_id)` | 단건 KOPIS 공연 수집 → alias 매칭 → DB 저장. 내한 공연 아니거나 매칭 없으면 건너뜀. |
+| `collect_and_save_release_group(release_group_mbid, artist_mbid)` | 단건 릴리즈 그룹 수집 (트랙·레이블 포함) → DB 저장. |
+| `collect_and_save_cover_art(release_group_mbid)` | 단건 릴리즈 그룹 커버아트 수집 → DB 갱신. |
+| `collect_and_save_setlist(concert_id)` | 단건 공연 셋리스트 수집 → DB 저장. |
