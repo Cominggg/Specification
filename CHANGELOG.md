@@ -4,6 +4,18 @@
 
 ---
 
+## 2026-05-09
+
+- `pipeline.md` — 레포 이름 `jpop-concert-collector` → `coming-data`, `requirements.txt` → `pyproject.toml`, `tests/` 추가
+- `pipeline.md` — `collectors/wikipedia.py` 추가 — Korean Wikipedia redirect 기반 한국어 alias 수집 단계 신설
+- `pipeline.md` — 아티스트 수집 조건에 `type:Group OR type:Person` 필터 추가
+- `pipeline.md` — 매칭 로직 전면 수정: ② prfcast 퍼지(token_set_ratio), ③ prfnm 구문 일치(HIGH 폴백) — 기존 ② prfnm partial_ratio에서 변경
+- `pipeline.md` — KOPIS 수집 저장 필드에 `poster_url`·`venue_address`·`price` 추가
+- `pipeline.md` — 커버아트 갱신 잡 추가 (수요일 05시, 미수집 건만 보완)
+- `pipeline.md` — `artist.is_coming` 동기화 섹션 추가
+- `pipeline.md` — 관리자 단건 수집 함수(`collect_and_save_*`) 섹션 추가
+- `pipeline.md` — 스케줄 실행 시간 명시 (KOPIS 월 03시, 상태갱신 매일 04시, 릴리즈 화 05시 등)
+
 ## 2026-04-30
 
 - `pipeline.md` — MusicBrainz 아티스트 상세 수집에서 멤버 구성(artist-rels) 관련 내용 제거
