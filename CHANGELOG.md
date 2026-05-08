@@ -15,6 +15,12 @@
 - `pipeline.md` — `artist.is_coming` 동기화 섹션 추가
 - `pipeline.md` — 관리자 단건 수집 함수(`collect_and_save_*`) 섹션 추가
 - `pipeline.md` — 스케줄 실행 시간 명시 (KOPIS 월 03시, 상태갱신 매일 04시, 릴리즈 화 05시 등)
+- `features.md` — ART-06: `artist.is_coming` 배지 노출 조건을 HIGH confidence 공연 기준으로 명시, 동기화 주기(월/매일) 추가
+- `features.md` — CON-06: 갱신 실행 시간(매일 04시), `is_coming` 연동, 3단계 매칭 기준 명시
+- `features.md` — ADM-02: "실패 목록" 문구 제거 → LOW confidence 매칭 공연만 검토 대상
+- `features.md` — ADM-03: "수동 등록·수정" → "수동 등록" (수정 엔드포인트 미정의)
+- `admin.md` — ADM-02: "자동 매칭 실패 공연 목록" 문구 제거, ADM-03 동일 정정
+- `api.md` — `GET /api/admin/review-queue` 비고: "LOW 매칭 + 실패 목록" → "LOW confidence 매칭 목록"
 
 ## 2026-04-30
 
