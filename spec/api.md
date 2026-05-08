@@ -65,7 +65,7 @@
 
 | 메서드 | 엔드포인트 | 설명 | 비고 |
 |--------|------------|------|------|
-| GET | `/api/admin/review-queue` | 매칭 검토 큐 목록 조회 | LOW 매칭 + 실패 목록 |
+| GET | `/api/admin/review-queue` | 매칭 검토 큐 목록 조회 | LOW confidence 매칭 목록 |
 | POST | `/api/admin/review-queue/{id}/approve` | 매칭 승인 | alias 학습 포함 |
 | POST | `/api/admin/review-queue/{id}/reject` | 매칭 거부 | |
 | POST | `/api/admin/artists` | 아티스트 수동 등록 | |
