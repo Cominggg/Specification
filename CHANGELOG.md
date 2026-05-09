@@ -6,6 +6,8 @@
 
 ## 2026-05-09
 
+- `erd.md` — DB ERD 문서 신규 추가 (DDL 전문, 테이블 관계 요약, 변경 이력)
+
 - `pipeline.md` — 레포 이름 `jpop-concert-collector` → `coming-data`, `requirements.txt` → `pyproject.toml`, `tests/` 추가
 - `pipeline.md` — `collectors/wikipedia.py` 추가 — Korean Wikipedia redirect 기반 한국어 alias 수집 단계 신설
 - `pipeline.md` — 아티스트 수집 조건에 `type:Group OR type:Person` 필터 추가
