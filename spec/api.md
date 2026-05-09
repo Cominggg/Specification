@@ -71,6 +71,8 @@
 | POST | `/api/admin/artists` | 아티스트 수동 등록 | |
 | PUT | `/api/admin/artists/{id}` | 아티스트 정보 수정 | |
 | POST | `/api/admin/concerts` | 공연 수동 등록 | |
+| PUT | `/api/admin/concerts/{id}` | 공연 정보 수정 | title·cast·날짜·장소·poster_url·price·예매처 링크. 상태 변경 불포함 |
+| DELETE | `/api/admin/concerts/{id}` | 공연 삭제 | 연관 데이터 cascade 삭제. 복구 불가 |
 | PUT | `/api/admin/concerts/{id}/state` | 공연 상태 강제 변경 | 변경 이력 로그 |
 | GET | `/api/admin/inquiries` | 문의 목록 조회 | type, status, page, size 필터 |
 | GET | `/api/admin/inquiries/{id}` | 문의 상세 조회 | 유저 정보·대상 데이터 링크 포함 |
