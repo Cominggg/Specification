@@ -19,7 +19,7 @@
 | 메서드 | 엔드포인트 | 설명 | 인증 | 비고 |
 |--------|------------|------|------|------|
 | GET | `/api/artists` | 아티스트 목록 조회 (검색) | 불필요 | name, page, size(기본 25) |
-| GET | `/api/artists/{id}` | 아티스트 상세 정보 조회 | 불필요 | |
+| GET | `/api/artists/{id}` | 아티스트 상세 정보 조회 | 불필요 | 응답에 `followerCount`(int) 포함 — `user_follow_artist` 집계값. ERD 컬럼 추가 없이 COUNT 쿼리로 산출 |
 | GET | `/api/artists/{id}/concerts` | 아티스트 내한 공연 목록 | 불필요 | tab: all\|upcoming\|past, page, size(기본 10) |
 | GET | `/api/artists/{id}/releases` | 아티스트 디스코그래피 (앨범·싱글·EP + 수록곡) | 불필요 | type: ALBUM\|SINGLE\|EP (복수 허용), page, size(기본 10) |
 | GET | `/api/releases/{id}` | 릴리즈 상세 조회 (앨범·싱글·EP 공통) | 불필요 | 트랙리스트·커버 포함. REL-02 |
@@ -32,7 +32,7 @@
 | 메서드 | 엔드포인트 | 설명 | 인증 | 비고 |
 |--------|------------|------|------|------|
 | GET | `/api/concerts` | 내한 공연 목록 조회 (필터) | 불필요 | dateFrom(YYYY-MM-DD), dateTo(YYYY-MM-DD), artistId, region, page, size(기본 20). 기존 date 파라미터 하위 호환 유지 |
-| GET | `/api/concerts/stats` | 이달 공연 건수 조회 | 불필요 | year(int), month(int) → `{ "concertCount": N }`. 홈 통계 배너용 |
+| GET | `/api/concerts/stats` | 이달 공연 건수 조회 | 불필요 | year(int), month(int) → `{ "concertCount": N }`. 홈 통계 배너 미사용으로 엔드포인트 유지만 |
 | GET | `/api/concerts/{id}` | 공연 상세 정보 조회 | 불필요 | 조회수 +1 처리 |
 | GET | `/api/concerts/{id}/setlist` | 셋리스트 조회 | 불필요 | 공연 완료 후 제공 |
 | GET | `/api/concerts/popular` | 인기 공연 목록 (조회수 기반) | 불필요 | |
