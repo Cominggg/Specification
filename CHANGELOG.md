@@ -21,6 +21,9 @@
 - `features.md` — ADM-03: "수동 등록·수정" → "수동 등록" (수정 엔드포인트 미정의)
 - `admin.md` — ADM-02: "자동 매칭 실패 공연 목록" 문구 제거, ADM-03 동일 정정
 - `api.md` — `GET /api/admin/review-queue` 비고: "LOW 매칭 + 실패 목록" → "LOW confidence 매칭 목록"
+- `features.md` — ADM-07 공연 정보 수정, ADM-08 공연 삭제 기능 신규 추가
+- `admin.md` — ADM-07·ADM-08 상세 명세 추가 (수정 가능 필드, cascade 삭제 대상 명시); ADM-04 concert_status_log 명시
+- `api.md` — `PUT /api/admin/concerts/{id}` (공연 수정), `DELETE /api/admin/concerts/{id}` (공연 삭제) 추가
 
 ## 2026-04-30
 
