@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-05-18
+
+- `spec/api/admin.md` — review-queue 3개 섹션 제거 (`GET /api/admin/review-queue`, `approve`, `reject`) — `matching_review_queue` 테이블 제거(2026-05-07) 및 `concert_artist.approved` 컬럼 제거(2026-05-08)에 따른 반영
+- `spec/api/_index.md` — 관리자 엔드포인트 목록에서 review-queue 3개 행 제거
+- `spec/features.md` — ADM-02(매칭 검토 큐 관리) 전체 제거; CON-06 "관리자 승인 없이" 문구 삭제
+- `spec/pipeline.md` — 매칭 테이블 ② 노출 기준을 "미노출 (confidence=HIGH만 노출)"로 수정; 매칭 테이블 ①③ "관리자 승인 없이" 문구 삭제; `concert_artist.approved` 컬럼 설명 제거
+
 명세서 변경 이력입니다. 날짜 기준으로 관리합니다.
 
 ---
