@@ -54,9 +54,9 @@ coming-data/
 
 | 단계 | 대상 | 기준 | 신뢰도 | 노출 |
 |------|------|------|--------|------|
-| 매칭 ① | `prfcast` 각 이름 | Artist alias **완전 일치** | HIGH | 관리자 승인 없이 즉시 노출 |
-| 매칭 ② | `prfcast` 각 이름 | `rapidfuzz.fuzz.token_set_ratio` ≥ 85 | LOW | 관리자 승인 후 노출 |
-| 매칭 ③ | `prfnm` (제목) | 구문 일치(`_phrase_match_title`): 단어 경계 exact 또는 다중 단어 구문 포함 | HIGH | 관리자 승인 없이 즉시 노출 |
+| 매칭 ① | `prfcast` 각 이름 | Artist alias **완전 일치** | HIGH | 즉시 노출 |
+| 매칭 ② | `prfcast` 각 이름 | `rapidfuzz.fuzz.token_set_ratio` ≥ 85 | LOW | 미노출 (confidence=HIGH만 사용자에게 노출) |
+| 매칭 ③ | `prfnm` (제목) | 구문 일치(`_phrase_match_title`): 단어 경계 exact 또는 다중 단어 구문 포함 | HIGH | 즉시 노출 |
 
 - 매칭 ③은 `prfcast` 기반 매칭 ①②가 모두 실패한 경우에만 폴백으로 실행된다.
 - `has_match()` 통과 공연은 반드시 매칭 ①~③ 중 하나가 성공하므로 별도 검토 큐 없음.
@@ -73,7 +73,6 @@ coming-data/
 | `artist_id` | 아티스트 FK |
 | `confidence` | `HIGH` (prfcast 완전 일치 또는 prfnm 구문 일치) / `LOW` (prfcast 퍼지 매칭) |
 | `matched_by` | `prfcast` / `prfnm` / `manual` |
-| `approved` | LOW 매칭의 관리자 승인 여부. HIGH는 항상 `true`. |
 
 > 단독 공연은 `concert_artist` 행이 1개, 합동 공연은 참여 아티스트 수만큼 행이 생성됨.
 
