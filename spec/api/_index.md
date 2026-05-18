@@ -151,9 +151,6 @@ ADMIN 전용 엔드포인트는 일반 사용자 접근 시 `403` 반환합니�
 ### 관리자 (ROLE_ADMIN)
 | 메서드 | 엔드포인트 | 인증 |
 |--------|------------|------|
-| GET | `/api/admin/review-queue` | ADMIN |
-| POST | `/api/admin/review-queue/{id}/approve` | ADMIN |
-| POST | `/api/admin/review-queue/{id}/reject` | ADMIN |
 | POST | `/api/admin/artists` | ADMIN |
 | PUT | `/api/admin/artists/{id}` | ADMIN |
 | POST | `/api/admin/concerts` | ADMIN |
