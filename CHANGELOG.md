@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-05-19
+
+- `spec/api/artists.md` — `POST /api/artists/{id}/follow` 에러 테이블에 `ALREADY_FOLLOWING` (409) 추가
+- `spec/api/artists.md` — `DELETE /api/artists/{id}/follow` 에러 테이블에 `NOT_FOLLOWING` (400) 추가
+
 ## 2026-05-18
 
 - `spec/api/admin.md` — review-queue 3개 섹션 제거 (`GET /api/admin/review-queue`, `approve`, `reject`) — `matching_review_queue` 테이블 제거(2026-05-07) 및 `concert_artist.approved` 컬럼 제거(2026-05-08)에 따른 반영
