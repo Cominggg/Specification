@@ -6,6 +6,7 @@
 - `spec/api/concerts.md` — `GET /api/concerts` 기본 정렬 `startDate` 오름차순 → 내림차순으로 변경
 - `spec/api/concerts.md` — `status` 요청·응답 값 한국어 → enum 문자열 (`UPCOMING` \| `ONGOING` \| `ENDED` \| `CANCELLED`) 로 수정
 - `spec/api/concerts.md` — `GET /api/concerts/{id}` `ticketLinks[].id` 타입 `String` → `Long` 수정
+- `spec/api/concerts.md` — `GET /api/concerts/following` `status` 쿼리 파라미터 추가, "예정 공연"에서 전체 공연 조회로 변경 (`status` 미전달 시 전체 반환)
 
 ## 2026-05-19
 
