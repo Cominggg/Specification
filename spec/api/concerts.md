@@ -12,13 +12,10 @@
 
 | 이름 | 타입 | 필수 | 기본값 | 설명 |
 |------|------|------|--------|------|
-| `dateFrom` | String | N | — | 시작일 이후 (`YYYY-MM-DD`) |
-| `dateTo` | String | N | — | 시작일 이전 (`YYYY-MM-DD`) |
-| `artistId` | Long | N | — | 특정 아티스트 공연만 |
-| `region` | String | N | — | 지역 필터 |
-| `status` | String | N | — | `공연예정` \| `공연중` \| `공연완료` \| `공연취소` |
+| `status` | String | N | — | `UPCOMING` \| `ONGOING` \| `ENDED` \| `CANCELLED` |
 | `page` | int | N | `0` | 페이지 번호 |
 | `size` | int | N | `20` | 페이지 크기 |
+| `sort` | String | N | `startDate,desc` | 정렬 기준 (`필드명,방향`) |
 
 ### 응답
 
@@ -28,12 +25,12 @@
 |------|------|------|
 | `id` | Long | 공연 ID |
 | `posterUrl` | String? | 포스터 이미지 URL |
-| `artistName` | String | 아티스트명 |
+| `artistName` | String? | 아티스트명 (`confidence=HIGH` 기준, 없으면 `null`) |
 | `title` | String | 공연명 |
-| `startDate` | String | 시작일 |
-| `endDate` | String? | 종료일 |
+| `startDate` | String | 시작일 (`YYYY-MM-DD`) |
+| `endDate` | String? | 종료일 (`YYYY-MM-DD`) |
 | `venue` | String | 공연장명 |
-| `status` | String | `공연예정` \| `공연중` \| `공연완료` \| `공연취소` |
+| `status` | String | `UPCOMING` \| `ONGOING` \| `ENDED` \| `CANCELLED` |
 
 ```json
 {
@@ -46,7 +43,7 @@
       "startDate": "2025-08-15",
       "endDate": "2025-08-16",
       "venue": "KSPO DOME, 서울",
-      "status": "공연예정"
+      "status": "UPCOMING"
     }
   ],
   "page": 0,
@@ -58,9 +55,8 @@
 
 ### 비고
 
-- 기본 정렬: `startDate` 오름차순
-- 기존 `date` 파라미터 하위 호환 유지
-- 홈 "다가오는 공연" 섹션: `dateFrom={오늘}&size=6` 조합으로 재사용
+- 기본 정렬: `startDate` 내림차순 (최신 공연 우선)
+- `status` 미전달 시 전체 공연 반환
 
 ---
 
@@ -150,18 +146,18 @@
 | `id` | Long | 공연 ID |
 | `thumbnailUrl` | String? | 대표 이미지 URL (`concert.poster_url`) |
 | `posterUrls` | String[] | 공연 정보 이미지 목록 |
-| `artistName` | String | 아티스트명 |
-| `artistId` | Long | 아티스트 ID |
+| `artistName` | String? | 아티스트명 (`confidence=HIGH` 기준, 없으면 `null`) |
+| `artistId` | Long? | 아티스트 ID (없으면 `null`) |
 | `title` | String | 공연명 |
-| `startDate` | String | 시작일 |
-| `endDate` | String? | 종료일 |
+| `startDate` | String | 시작일 (`YYYY-MM-DD`) |
+| `endDate` | String? | 종료일 (`YYYY-MM-DD`) |
 | `venue` | String | 공연장명 |
-| `status` | String | `공연예정` \| `공연중` \| `공연완료` \| `공연취소` |
+| `status` | String | `UPCOMING` \| `ONGOING` \| `ENDED` \| `CANCELLED` |
 | `price` | String? | 가격 정보 |
 | `isInCalendar` | Boolean | 내 캘린더 추가 여부 |
 | `ticketLinks` | Object[] | 예매처 목록 |
-| `ticketLinks[].id` | String | 예매처 식별자 |
-| `ticketLinks[].label` | String | 예매처 표시명 |
+| `ticketLinks[].id` | Long | 예매처 ID (`concert_booking_link.id`) |
+| `ticketLinks[].label` | String | 예매처 표시명 (`concert_booking_link.name`) |
 | `ticketLinks[].url` | String | 예매처 URL |
 
 ```json
@@ -175,11 +171,11 @@
   "startDate": "2025-08-15",
   "endDate": "2025-08-16",
   "venue": "KSPO DOME, 서울",
-  "status": "공연예정",
+  "status": "UPCOMING",
   "price": "전석 165,000원",
   "isInCalendar": false,
   "ticketLinks": [
-    { "id": "interpark", "label": "인터파크", "url": "https://..." }
+    { "id": 1, "label": "인터파크", "url": "https://..." }
   ]
 }
 ```
@@ -194,7 +190,6 @@
 
 - 비인증 요청에서도 호출 가능하나 `isInCalendar`는 항상 `false`
 - `posterUrls`: DB `poster_url` 단일값을 1-element 배열로 래핑. `null`이면 `[]`
-- `ticketLinks[].id`와 `label`은 `concert_booking_link.name`을 공통으로 사용
 
 ---
 
