@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-05-21
+
+- `spec/api/concerts.md` — `GET /api/concerts` 쿼리 파라미터 정리 (`dateFrom`, `dateTo`, `artistId`, `region` 제거, `status` 유지)
+- `spec/api/concerts.md` — `GET /api/concerts` 기본 정렬 `startDate` 오름차순 → 내림차순으로 변경
+- `spec/api/concerts.md` — `status` 요청·응답 값 한국어 → enum 문자열 (`UPCOMING` \| `ONGOING` \| `ENDED` \| `CANCELLED`) 로 수정
+- `spec/api/concerts.md` — `GET /api/concerts/{id}` `ticketLinks[].id` 타입 `String` → `Long` 수정
+
 ## 2026-05-19
 
 - `spec/api/artists.md` — `POST /api/artists/{id}/follow` 에러 테이블에 `ALREADY_FOLLOWING` (409) 추가
