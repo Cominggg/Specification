@@ -29,6 +29,7 @@
 | `status` | String | `공연예정` \| `공연중` \| `공연완료` \| `공연취소` |
 | `posterUrl` | String? | 포스터 이미지 URL |
 | `venue` | String | 공연장명 |
+| `isInCalendar` | boolean | 내 캘린더 추가 여부 (비인증 시 `false`) |
 
 ```json
 [
@@ -40,7 +41,8 @@
     "endDate": "2025-08-16",
     "status": "공연예정",
     "posterUrl": null,
-    "venue": "KSPO DOME, 서울"
+    "venue": "KSPO DOME, 서울",
+    "isInCalendar": false
   }
 ]
 ```
@@ -48,6 +50,7 @@
 ### 비고
 
 - 멀티데이 공연: `startDate`~`endDate` 범위의 모든 날짜에 캘린더 도트 표시 (FE 처리)
+- 인증 사용자: 실제 추가 여부 반환. 비인증 사용자: 항상 `false`
 
 ---
 
@@ -71,6 +74,7 @@
 ### 비고
 
 - 마이페이지 "예정 공연" 탭(MY-03): 이 API 재사용. FE에서 `startDate >= 오늘`인 항목만 표시
+- `isInCalendar`는 항상 `true` (저장된 공연만 반환)
 
 ---
 
@@ -95,6 +99,7 @@
 | 코드 | 상태 코드 | 설명 |
 |------|-----------|------|
 | `CONCERT_NOT_FOUND` | 404 | 존재하지 않는 공연 |
+| `ALREADY_IN_CALENDAR` | 409 | 이미 캘린더에 추가된 공연 |
 
 ---
 
@@ -118,4 +123,4 @@
 
 | 코드 | 상태 코드 | 설명 |
 |------|-----------|------|
-| `CONCERT_NOT_FOUND` | 404 | 존재하지 않는 공연 |
+| `NOT_IN_CALENDAR` | 400 | 캘린더에 없는 공연 |
