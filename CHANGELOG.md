@@ -1,4 +1,6 @@
-$'# Changelog\n\n'## 2026-05-21 (2)
+# Changelog
+
+## 2026-05-21 (2)
 
 - `spec/admin.md` — ADM-01 비고에 현재 BE 구현 필드 범위 명시 (`mbid`·`name`·`sortName`·`debutDate` 지원, alias·소속사·이미지 미구현)
 
