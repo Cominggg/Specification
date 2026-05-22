@@ -188,7 +188,7 @@
 | `tracks` | Object[] | 수록곡 목록 |
 | `tracks[].position` | int | 트랙 순서 |
 | `tracks[].title` | String | 트랙 제목 |
-| `tracks[].length_ms` | int? | 재생 시간 (ms) |
+| `tracks[].lengthMs` | int? | 재생 시간 (ms) |
 
 ### 에러
 
