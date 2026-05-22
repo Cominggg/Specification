@@ -84,7 +84,7 @@
 | `tracks` | Object[] | 수록곡 목록 |
 | `tracks[].position` | int | 트랙 순서 |
 | `tracks[].title` | String | 트랙 제목 |
-| `tracks[].length_ms` | int? | 재생 시간 (ms) |
+| `tracks[].lengthMs` | int? | 재생 시간 (ms) |
 
 ```json
 {
@@ -97,8 +97,8 @@
   "artistId": 2,
   "artistName": "Kenshi Yonezu",
   "tracks": [
-    { "position": 1, "title": "LOST CORNER", "length_ms": 262000 },
-    { "position": 2, "title": "LADY", "length_ms": 238000 }
+    { "position": 1, "title": "LOST CORNER", "lengthMs": 262000 },
+    { "position": 2, "title": "LADY", "lengthMs": 238000 }
   ]
 }
 ```
