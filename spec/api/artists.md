@@ -149,8 +149,8 @@
 
 ### 비고
 
-- `upcoming`: status가 `공연예정` 또는 `공연중`인 항목
-- `past`: status가 `공연완료` 또는 `공연취소`인 항목
+- `upcoming`: status가 `UPCOMING` 또는 `ONGOING`인 항목
+- `past`: status가 `ENDED` 또는 `CANCELLED`인 항목
 
 ---
 
