@@ -75,7 +75,7 @@
 | `venueAddress` | String | N | 공연장 주소 |
 | `posterUrl` | String | N | 포스터 이미지 URL |
 | `price` | String | N | 가격 정보 |
-| `status` | String | Y | `공연예정` \| `공연중` \| `공연완료` \| `공연취소` |
+| `status` | String | Y | `UPCOMING` \| `ONGOING` \| `ENDED` \| `CANCELLED` |
 | `artistIds` | Long[] | N | 매핑할 아티스트 ID 목록 |
 
 ### 응답
@@ -173,7 +173,7 @@
 
 | 필드 | 타입 | 필수 | 설명 |
 |------|------|------|------|
-| `status` | String | Y | `공연예정` \| `공연중` \| `공연완료` \| `공연취소` |
+| `status` | String | Y | `UPCOMING` \| `ONGOING` \| `ENDED` \| `CANCELLED` |
 | `reason` | String | N | 변경 사유 |
 
 ### 응답
