@@ -12,7 +12,7 @@
 
 | 이름 | 타입 | 필수 | 기본값 | 설명 |
 |------|------|------|--------|------|
-| `name` | String | N | — | 이름 검색어 (부분 일치) |
+| `name` | String | N | — | 이름 검색어 (부분 일치, 아티스트명 및 alias 포함) |
 | `page` | int | N | `0` | 페이지 번호 (0-based) |
 | `size` | int | N | `25` | 페이지 크기 |
 
@@ -49,6 +49,7 @@
 ### 비고
 
 - 검색어 변경 시 FE에서 `page=0`으로 초기화
+- `name` 검색은 `artist.name` 및 `artist_alias.name` 모두 포함 (대소문자 무시)
 
 ---
 
@@ -139,7 +140,7 @@
 | `startDate` | String | 시작일 |
 | `endDate` | String? | 종료일 |
 | `venue` | String | 공연장명 |
-| `status` | String | `공연예정` \| `공연중` \| `공연완료` \| `공연취소` |
+| `status` | String | `UPCOMING` \| `ONGOING` \| `ENDED` \| `CANCELLED` |
 
 ### 에러
 
