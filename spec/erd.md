@@ -133,8 +133,7 @@ CREATE TABLE inquiry (
     id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     user_id bigint NOT NULL REFERENCES "user"(id),
     type varchar(20) NOT NULL,
-    concert_id bigint REFERENCES concert(id),
-    artist_id bigint REFERENCES artist(id),
+    target_id bigint NOT NULL,
     title varchar(255) NOT NULL,
     content text NOT NULL,
     status varchar(20) NOT NULL,
@@ -182,4 +181,4 @@ CREATE TABLE inquiry (
 | 2026-05-07 | matching_review_queue 테이블 제거 — has_match 필터로 매칭 실패 경로 소멸 |
 | 2026-05-08 | concert_artist.approved 컬럼 제거 — confidence='HIGH'가 단일 노출 기준으로 통합 |
 | 2026-05-09 | concert_status_log 테이블 제거 — 파이프라인 미사용, 상태 변경이 KOPIS 자동 수집으로만 발생 |
-
+| 2026-05-22 | inquiry.concert_id·artist_id → target_id(bigint NOT NULL) 단일 컬럼으로 통합 — type 컬럼으로 참조 대상 구분 (CONCERT·SETLIST=concert.id, ARTIST=artist.id) |
