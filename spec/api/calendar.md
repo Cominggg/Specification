@@ -26,7 +26,7 @@
 | `title` | String | 공연명 |
 | `startDate` | String | 시작일 |
 | `endDate` | String? | 종료일 |
-| `status` | String | `공연예정` \| `공연중` \| `공연완료` \| `공연취소` |
+| `status` | String | `UPCOMING` \| `ONGOING` \| `ENDED` \| `CANCELLED` |
 | `posterUrl` | String? | 포스터 이미지 URL |
 | `venue` | String | 공연장명 |
 | `isInCalendar` | boolean | 내 캘린더 추가 여부 (비인증 시 `false`) |
@@ -39,7 +39,7 @@
     "title": "YOASOBI ARENA TOUR 2025",
     "startDate": "2025-08-15",
     "endDate": "2025-08-16",
-    "status": "공연예정",
+    "status": "UPCOMING",
     "posterUrl": null,
     "venue": "KSPO DOME, 서울",
     "isInCalendar": false
