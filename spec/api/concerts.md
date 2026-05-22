@@ -31,6 +31,7 @@
 | `endDate` | String? | 종료일 (`YYYY-MM-DD`) |
 | `venue` | String | 공연장명 |
 | `status` | String | `UPCOMING` \| `ONGOING` \| `ENDED` \| `CANCELLED` |
+| `isInCalendar` | Boolean | 내 캘린더 추가 여부 (비인증 시 `false`) |
 
 ```json
 {
@@ -43,7 +44,8 @@
       "startDate": "2025-08-15",
       "endDate": "2025-08-16",
       "venue": "KSPO DOME, 서울",
-      "status": "UPCOMING"
+      "status": "UPCOMING",
+      "isInCalendar": false
     }
   ],
   "page": 0,
@@ -57,6 +59,7 @@
 
 - 기본 정렬: `startDate` 내림차순 (최신 공연 우선)
 - `status` 미전달 시 전체 공연 반환
+- 비인증 요청 허용 — `isInCalendar`는 비인증 시 항상 `false`, 인증 시 실제 값 반환
 
 ---
 
@@ -99,6 +102,7 @@
 ### 비고
 
 - `status` 미전달 시 전체 공연 반환
+- 인증 필수이므로 `isInCalendar`는 항상 실제 값 반환
 - 홈 "관심 아티스트 공연" 탭 및 공연 목록 "관심 아티스트만" 필터에서 재사용
 
 ---
