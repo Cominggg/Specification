@@ -108,9 +108,9 @@
 | `venueAddress` | String | N | 공연장 주소 |
 | `posterUrl` | String | N | 포스터 이미지 URL |
 | `price` | String | N | 가격 정보 |
-| `bookingLinks` | Object[] | N | 예매처 링크 목록 |
-| `bookingLinks[].name` | String | — | 예매처 이름 |
-| `bookingLinks[].url` | String | — | 예매처 URL |
+| `bookingLinks` | Object[] | N | 예매처 링크 목록. `null`이면 기존 링크 유지, `[]`이면 전체 삭제 |
+| `bookingLinks[].name` | String | Y | 예매처 이름 |
+| `bookingLinks[].url` | String | Y | 예매처 URL |
 
 ### 응답
 
