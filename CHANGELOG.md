@@ -1,5 +1,9 @@
 ## 2026-05-23
 
+- `spec/api/concerts.md` — `GET /api/concerts/popular` BE 반환 건수 10건 명시; `GET /api/concerts/stats` month 범위 초과 시 400 반환 정책 추가
+
+## 2026-05-23
+
 - `spec/admin.md` — ADM-03·04·07·08 BE 구현 완료 표시 추가
 - `spec/api/admin.md` — `bookingLinks[].name`·`bookingLinks[].url` 필수 여부 Y로 수정; `bookingLinks` null/빈 배열 정책 명시
 
