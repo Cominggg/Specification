@@ -77,7 +77,7 @@
 
 ### 비고
 
-- 고정 건수 반환 (size 파라미터 없음)
+- BE 반환 건수: 상위 10건 (`view_count` 내림차순)
 - 홈 캐러셀: 상위 5건 FE 슬라이싱
 - 홈 "인기 공연" 섹션: desktop 3건 / mobile 6건 FE 슬라이싱
 
@@ -133,6 +133,7 @@
 ### 비고
 
 - 홈 통계 배너 미사용으로 엔드포인트 유지만
+- `month`가 1–12 범위를 벗어나면 `400 Bad Request` 반환
 
 ---
 
@@ -198,7 +199,7 @@
 ### 비고
 
 - 비인증 요청에서도 호출 가능하나 `isInCalendar`는 항상 `false`
-- `posterUrls`: DB `poster_url` 단일값을 1-element 배열로 래핑. `null`이면 `[]`
+- `posterUrls`: DB `poster_url` 단일값을  1-element 배열로 래핑. `null`이면 `[]`
 
 ---
 
