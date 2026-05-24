@@ -1,3 +1,7 @@
+## 2026-05-24
+
+- `spec/api/my.md` — `GET /api/my/history` `artistName` 타입 `String` → `String?` 수정 및 `confidence=HIGH` 기준 비고 추가
+
 ## 2026-05-23
 
 - `spec/api/my.md` — `GET /api/my/history` BE 구현 완료 (MY-01 다녀온 공연, `my` 패키지 신규)
