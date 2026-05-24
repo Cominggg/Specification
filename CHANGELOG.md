@@ -1,5 +1,9 @@
 ## 2026-05-23
 
+- `spec/api/my.md` — `GET /api/my/history` BE 구현 완료 (MY-01 다녀온 공연, `my` 패키지 신규)
+
+## 2026-05-23
+
 - `spec/api/concerts.md` — `GET /api/concerts/popular` BE 반환 건수 10건 명시; `GET /api/concerts/stats` month 범위 초과 시 400 반환 정책 추가
 
 ## 2026-05-23
