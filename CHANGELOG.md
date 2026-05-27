@@ -1,3 +1,9 @@
+## 2026-05-27
+
+- `spec/pipeline.md` — `artist.debut_date` 컬럼 제거 반영 (MusicBrainz `life-span.begin` 신뢰도 문제)
+- `spec/pipeline.md` — Last.fm 월간 리스너 기준 아티스트 필터 정책 추가 (`LASTFM_MIN_LISTENERS`, 기본 5,000)
+- `spec/pipeline.md` — 릴리즈 저장 순서 Album → EP → Single 명시
+
 ## 2026-05-24
 
 - `spec/api/my.md` — `GET /api/my/history` `artistName` 타입 `String` → `String?` 수정 및 `confidence=HIGH` 기준 비고 추가
