@@ -18,7 +18,6 @@ CREATE TABLE artist (
     mbid varchar(36) NOT NULL UNIQUE,
     name varchar(255) NOT NULL,
     sort_name varchar(255),
-    debut_date date,
     is_coming boolean NOT NULL DEFAULT false,
     created_at timestamp,
     updated_at timestamp
@@ -29,7 +28,6 @@ CREATE TABLE artist_alias (
     artist_id bigint NOT NULL REFERENCES artist(id),
     name varchar(255) NOT NULL,
     locale varchar(10),
-    is_learned boolean NOT NULL DEFAULT false,
     created_at timestamp,
     UNIQUE (artist_id, name)
 );
@@ -115,9 +113,7 @@ CREATE TABLE release_group (
     type varchar(20),
     first_release_date date,
     cover_url text,
-    label varchar(255),
-    created_at timestamp,
-    updated_at timestamp
+    label varchar(255)
 );
 
 CREATE TABLE track (
@@ -182,3 +178,4 @@ CREATE TABLE inquiry (
 | 2026-05-08 | concert_artist.approved 컬럼 제거 — confidence='HIGH'가 단일 노출 기준으로 통합 |
 | 2026-05-09 | concert_status_log 테이블 제거 — 파이프라인 미사용, 상태 변경이 KOPIS 자동 수집으로만 발생 |
 | 2026-05-22 | inquiry.concert_id·artist_id → target_id(bigint NOT NULL) 단일 컬럼으로 통합 — type 컬럼으로 참조 대상 구분 (CONCERT·SETLIST=concert.id, ARTIST=artist.id) |
+| 2026-05-27 | artist.debut_date, artist_alias.is_learned, release_group.created_at/updated_at 컬럼 제거 — 수집 불일치 및 미사용 컬럼 정리 |
