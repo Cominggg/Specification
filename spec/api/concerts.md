@@ -154,8 +154,8 @@
 | 필드 | 타입 | 설명 |
 |------|------|------|
 | `id` | Long | 공연 ID |
-| `thumbnailUrl` | String? | 대표 이미지 URL (`concert.poster_url`) |
-| `posterUrls` | String[] | 공연 정보 이미지 목록 |
+| `posterUrl` | String? | 포스터 이미지 URL (`concert.poster_url`) |
+| `imageUrls` | String[] | 스틸컷 이미지 목록 (`concert_image` 테이블) |
 | `artistName` | String? | 아티스트명 (`confidence=HIGH` 기준, 없으면 `null`) |
 | `artistId` | Long? | 아티스트 ID (없으면 `null`) |
 | `title` | String | 공연명 |
@@ -173,8 +173,8 @@
 ```json
 {
   "id": 1,
-  "thumbnailUrl": "https://...",
-  "posterUrls": ["https://..."],
+  "posterUrl": "https://...",
+  "imageUrls": ["https://..."],
   "artistName": "YOASOBI",
   "artistId": 1,
   "title": "YOASOBI ARENA TOUR 2025",
@@ -199,7 +199,7 @@
 ### 비고
 
 - 비인증 요청에서도 호출 가능하나 `isInCalendar`는 항상 `false`
-- `posterUrls`: DB `poster_url` 단일값을  1-element 배열로 래핑. `null`이면 `[]`
+- `imageUrls`: `concert_image` 테이블에서 `position` 오름차순으로 반환. 없으면 `[]`
 
 ---
 
