@@ -19,6 +19,7 @@ CREATE TABLE artist (
     name varchar(255) NOT NULL,
     sort_name varchar(255),
     is_coming boolean NOT NULL DEFAULT false,
+    image_url text,
     created_at timestamp,
     updated_at timestamp
 );
@@ -71,6 +72,14 @@ CREATE TABLE concert_booking_link (
     name varchar(100) NOT NULL,
     url text NOT NULL,
     UNIQUE (concert_id, url)
+);
+
+
+CREATE TABLE concert_image (
+    id         bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    concert_id bigint NOT NULL REFERENCES concert(id),
+    url        text   NOT NULL,
+    position   int    NOT NULL DEFAULT 0
 );
 
 CREATE TABLE concert_artist (
@@ -150,6 +159,7 @@ CREATE TABLE inquiry (
 | `user_follow_artist` | 유저 아티스트 팔로우 |
 | `concert` | KOPIS 수집 공연 (공연장 정보 텍스트 포함) |
 | `concert_booking_link` | 예매처 링크 |
+| `concert_image` | 공연 스틸컷 이미지 URL 목록 (position 오름차순) |
 | `concert_artist` | 공연-아티스트 매칭 결과 (confidence=HIGH가 UI 노출 기준) |
 | `user_concert_calendar` | 유저 공연 일정 저장 |
 | `setlist` | setlist.fm 수집 셋리스트 |
@@ -179,3 +189,5 @@ CREATE TABLE inquiry (
 | 2026-05-09 | concert_status_log 테이블 제거 — 파이프라인 미사용, 상태 변경이 KOPIS 자동 수집으로만 발생 |
 | 2026-05-22 | inquiry.concert_id·artist_id → target_id(bigint NOT NULL) 단일 컬럼으로 통합 — type 컬럼으로 참조 대상 구분 (CONCERT·SETLIST=concert.id, ARTIST=artist.id) |
 | 2026-05-27 | artist.debut_date, artist_alias.is_learned, release_group.created_at/updated_at 컬럼 제거 — 수집 불일치 및 미사용 컬럼 정리 |
+| 2026-05-28 | artist.image_url(text) 컬럼 추가 — 아티스트 프로필 이미지 URL 저장 |
+| 2026-05-28 | concert_image 테이블 추가 — 공연 스틸컷 이미지 URL 관리 (position 정렬) |
