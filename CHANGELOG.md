@@ -1,3 +1,7 @@
+## 2026-05-28
+
+- `spec/api/concerts.md` — `GET /api/concerts/{id}` 응답 필드 갱신: `thumbnailUrl` 제거, `posterUrls: String[]` → `posterUrl: String?`, `imageUrls: String[]` 추가 (`concert_image` 테이블)
+
 ## 2026-05-27
 
 - `spec/pipeline.md` — `artist.debut_date` 컬럼 제거 반영 (MusicBrainz `life-span.begin` 신뢰도 문제)
