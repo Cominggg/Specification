@@ -62,6 +62,7 @@ CREATE TABLE concert (
     status varchar(20) NOT NULL,
     view_count bigint NOT NULL DEFAULT 0,
     kopis_update_date date NOT NULL,
+    fetch_attempted_at timestamptz,
     created_at timestamp,
     updated_at timestamp
 );
@@ -103,8 +104,7 @@ CREATE TABLE setlist (
     id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     concert_id bigint NOT NULL REFERENCES concert(id),
     setlist_fm_id varchar(50) NOT NULL UNIQUE,
-    collected_at timestamp NOT NULL,
-    fetch_attempted_at timestamptz
+    collected_at timestamp NOT NULL
 );
 
 CREATE TABLE setlist_track (
@@ -192,4 +192,4 @@ CREATE TABLE inquiry (
 | 2026-05-27 | artist.debut_date, artist_alias.is_learned, release_group.created_at/updated_at 컬럼 제거 — 수집 불일치 및 미사용 컬럼 정리 |
 | 2026-05-28 | artist.image_url(text) 컬럼 추가 — 아티스트 프로필 이미지 URL 저장 |
 | 2026-05-28 | concert_image 테이블 추가 — 공연 스틸컷 이미지 URL 관리 (position 정렬) |
-| 2026-05-30 | setlist.fetch_attempted_at(timestamptz) 컬럼 추가 — 파이프라인 중복 API 호출 방지 |
+| 2026-05-30 | concert.fetch_attempted_at(timestamptz) 컬럼 추가 — 파이프라인 중복 API 호출 방지 |
