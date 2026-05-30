@@ -1,3 +1,7 @@
+## 2026-05-30
+
+- `spec/erd.md` — setlist.fetch_attempted_at(timestamptz) 컬럼 추가 및 변경 이력 반영
+
 ## 2026-05-28
 
 - `spec/api/concerts.md` — `GET /api/concerts/{id}` 응답 필드 갱신: `thumbnailUrl` 제거, `posterUrls: String[]` → `posterUrl: String?`, `imageUrls: String[]` 추가 (`concert_image` 테이블)
