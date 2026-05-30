@@ -1,6 +1,6 @@
 ## 2026-05-30
 
-- `spec/erd.md` — setlist.fetch_attempted_at(timestamptz) 컬럼 추가 및 변경 이력 반영
+- `spec/erd.md` — fetch_attempted_at 컬럼 setlist → concert로 이동, 변경 이력 수정
 
 ## 2026-05-28
 
