@@ -24,7 +24,7 @@
 |------|------|------|
 | `id` | Long | 아티스트 ID |
 | `name` | String | 아티스트명 |
-| `imageUrl` | String? | 프로필 이미지 URL (항상 `null`) |
+| `imageUrl` | String? | 프로필 이미지 URL |
 | `hasUpcomingConcert` | Boolean | 예정 내한 공연 여부 (`artist.is_coming`) |
 | `isFollowing` | Boolean | 팔로우 여부 (비인증 시 `false`) |
 
@@ -71,11 +71,10 @@
 |------|------|------|
 | `id` | Long | 아티스트 ID |
 | `name` | String | 아티스트명 |
-| `imageUrl` | String? | 프로필 이미지 URL (항상 `null`) |
+| `imageUrl` | String? | 프로필 이미지 URL |
 | `hasUpcomingConcert` | Boolean | 예정 내한 공연 여부 |
 | `isFollowing` | Boolean | 팔로우 여부 (비인증 시 `false`) |
 | `followersCount` | int | 팔로워 수 (`user_follow_artist` COUNT) |
-| `debutDate` | String? | 데뷔일 (`YYYY-MM-DD`) |
 | `links` | Object[] | 외부 링크 목록 |
 | `links[].id` | String | 링크 타입 식별자 (`artist_url.type`) |
 | `links[].label` | String | 표시 이름 (예: `"Spotify"`) |
@@ -89,7 +88,6 @@
   "hasUpcomingConcert": true,
   "isFollowing": false,
   "followersCount": 24800,
-  "debutDate": "2019-09-12",
   "links": [
     { "id": "spotify", "label": "Spotify", "url": "https://..." },
     { "id": "youtube", "label": "YouTube", "url": "https://..." }
@@ -265,7 +263,7 @@
 |------|------|------|
 | `id` | Long | 아티스트 ID |
 | `name` | String | 아티스트명 |
-| `imageUrl` | String? | 프로필 이미지 URL (항상 `null`) |
+| `imageUrl` | String? | 프로필 이미지 URL |
 | `hasUpcomingConcert` | Boolean | 예정 내한 공연 여부 |
 
 ### 비고
