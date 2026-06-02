@@ -1,3 +1,8 @@
+## 2026-06-02
+
+- `spec/api/artists.md` — `GET /api/artists/{id}` 응답에서 `debutDate` 필드 제거 (V6 DB 컬럼 DROP 반영)
+- `spec/api/artists.md` — 아티스트 3개 API의 `imageUrl` 설명에서 "항상 null" 문구 제거 (`image_url` 컬럼 추가 반영)
+
 ## 2026-05-30
 
 - `spec/erd.md` — fetch_attempted_at 컬럼 setlist → concert로 이동, 변경 이력 수정
