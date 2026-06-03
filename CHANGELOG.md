@@ -1,3 +1,8 @@
+## 2026-06-03
+
+- `spec/api/releases.md` — type 표기 UPPER_CASE → Pascal Case(`Album`/`Single`) 통일; `GET /api/releases/{id}` 응답에 `totalTracks` 추가; `tracks[]`에 `discNumber`·`explicit` 추가
+- `spec/api/artists.md` — `GET /api/artists/{id}/releases` type 표기 Pascal Case 통일; `tracks[]`에 `discNumber`·`explicit` 추가
+
 ## 2026-06-02
 
 - `spec/api/artists.md` — `GET /api/artists/{id}` 응답에서 `debutDate` 필드 제거 (V6 DB 컬럼 DROP 반영)
