@@ -155,7 +155,7 @@
 
 ## GET /api/artists/{id}/releases
 
-**용도**: 아티스트의 디스코그래피(앨범·싱글·EP)를 수록곡 포함해 조회합니다.
+**용도**: 아티스트의 디스코그래피(앨범·싱글)를 수록곡 포함해 조회합니다.
 
 ### 요청
 
@@ -169,7 +169,7 @@
 
 | 이름 | 타입 | 필수 | 기본값 | 설명 |
 |------|------|------|--------|------|
-| `type` | String | N | — | `ALBUM` \| `SINGLE` \| `EP` (복수 허용) |
+| `type` | String | N | — | `Album` \| `Single` (복수 허용) |
 | `page` | int | N | `0` | 페이지 번호 |
 | `size` | int | N | `10` | 페이지 크기 |
 
@@ -180,14 +180,16 @@
 | 필드 | 타입 | 설명 |
 |------|------|------|
 | `id` | Long | 릴리즈 ID |
-| `title` | String | 앨범·싱글·EP 타이틀 |
-| `type` | String | `ALBUM` \| `SINGLE` \| `EP` |
+| `title` | String | 앨범·싱글 타이틀 |
+| `type` | String | `Album` \| `Single` |
 | `releaseDate` | String? | 발매일 |
 | `coverUrl` | String? | 커버 이미지 URL |
 | `tracks` | Object[] | 수록곡 목록 |
 | `tracks[].position` | int | 트랙 순서 |
 | `tracks[].title` | String | 트랙 제목 |
 | `tracks[].lengthMs` | int? | 재생 시간 (ms) |
+| `tracks[].discNumber` | int? | 디스크 번호 (멀티 디스크 앨범) |
+| `tracks[].explicit` | Boolean? | 명시적 콘텐츠 여부 |
 
 ### 에러
 
