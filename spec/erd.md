@@ -75,7 +75,6 @@ CREATE TABLE concert_booking_link (
     UNIQUE (concert_id, url)
 );
 
-
 CREATE TABLE concert_image (
     id         bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     concert_id bigint NOT NULL REFERENCES concert(id),
@@ -116,23 +115,28 @@ CREATE TABLE setlist_track (
 );
 
 CREATE TABLE release_group (
-    id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    mbid varchar(36) NOT NULL UNIQUE,
-    artist_id bigint NOT NULL REFERENCES artist(id),
-    title varchar(500) NOT NULL,
-    type varchar(20),
+    id                 bigint       GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    mbid               varchar(36)  UNIQUE,
+    spotify_id         varchar(22)  UNIQUE,
+    artist_id          bigint       NOT NULL,
+    title              varchar(500) NOT NULL,
+    type               varchar(20),
     first_release_date date,
-    cover_url text,
-    label varchar(255)
+    cover_url          text,
+    label              varchar(255),
+    total_tracks       int
 );
 
 CREATE TABLE track (
-    id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    release_group_id bigint NOT NULL REFERENCES release_group(id),
-    mbid varchar(36) NOT NULL UNIQUE,
-    title varchar(500) NOT NULL,
-    position int NOT NULL,
-    length_ms int
+    id               bigint       GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    release_group_id bigint       NOT NULL,
+    mbid             varchar(36)  UNIQUE,
+    spotify_id       varchar(22)  UNIQUE,
+    title            varchar(500) NOT NULL,
+    position         int          NOT NULL,
+    length_ms        int,
+    disc_number      int,
+    explicit         boolean
 );
 
 CREATE TABLE inquiry (
@@ -165,8 +169,8 @@ CREATE TABLE inquiry (
 | `user_concert_calendar` | 유저 공연 일정 저장 |
 | `setlist` | setlist.fm 수집 셋리스트 |
 | `setlist_track` | 셋리스트 트랙 목록 |
-| `release_group` | 앨범·싱글·EP |
-| `track` | 릴리즈 트랙 |
+| `release_group` | 앨범·싱글·EP (MusicBrainz 또는 Spotify 기반) |
+| `track` | 릴리즈 트랙 (MusicBrainz 또는 Spotify 기반) |
 | `inquiry` | 유저 문의 |
 
 ## 변경 이력
@@ -193,3 +197,4 @@ CREATE TABLE inquiry (
 | 2026-05-28 | artist.image_url(text) 컬럼 추가 — 아티스트 프로필 이미지 URL 저장 |
 | 2026-05-28 | concert_image 테이블 추가 — 공연 스틸컷 이미지 URL 관리 (position 정렬) |
 | 2026-05-30 | concert.fetch_attempted_at(timestamptz) 컬럼 추가 — 파이프라인 중복 API 호출 방지 |
+| 2026-06-04 | release_group·track 테이블 재구성 — spotify_id(varchar 22) 추가, mbid NOT NULL 제약 제거(MusicBrainz 없이 Spotify 단독 수집 허용), release_group.total_tracks·track.disc_number·track.explicit 컬럼 추가 |
