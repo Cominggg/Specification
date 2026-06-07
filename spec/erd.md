@@ -86,9 +86,16 @@ CREATE TABLE concert_artist (
     id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     concert_id bigint NOT NULL REFERENCES concert(id),
     artist_id bigint NOT NULL REFERENCES artist(id),
-    confidence varchar(10) NOT NULL,
-    matched_by varchar(20) NOT NULL,
     created_at timestamp,
+    UNIQUE (concert_id, artist_id)
+);
+
+CREATE TABLE concert_artist_candidate (
+    id         bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    concert_id bigint NOT NULL REFERENCES concert(id),
+    artist_id  bigint NOT NULL REFERENCES artist(id),
+    matched_by text   NOT NULL,
+    created_at timestamp NOT NULL DEFAULT now(),
     UNIQUE (concert_id, artist_id)
 );
 
@@ -162,10 +169,11 @@ CREATE TABLE inquiry (
 | `artist_alias` | 아티스트 별칭 (한/영/일) |
 | `artist_url` | 아티스트 외부 링크 (SNS 등) |
 | `user_follow_artist` | 유저 아티스트 팔로우 |
-| `concert` | KOPIS 수집 공연 (공연장 정보 텍스트 포함) |
+| `concert` | KOPIS 수집 공연 (공연장 정보 텍스트 포함). `status=PENDING`은 관리자 검토 대기 상태 |
 | `concert_booking_link` | 예매처 링크 |
 | `concert_image` | 공연 스틸컷 이미지 URL 목록 (position 오름차순) |
-| `concert_artist` | 공연-아티스트 매칭 결과 (confidence=HIGH가 UI 노출 기준) |
+| `concert_artist` | 공연-아티스트 매핑 (어드민 승인 후 확정된 관계) |
+| `concert_artist_candidate` | 파이프라인 매칭 후 관리자 검토 대기 후보 (승인 시 concert_artist로 이동) |
 | `user_concert_calendar` | 유저 공연 일정 저장 |
 | `setlist` | setlist.fm 수집 셋리스트 |
 | `setlist_track` | 셋리스트 트랙 목록 |
@@ -198,3 +206,5 @@ CREATE TABLE inquiry (
 | 2026-05-28 | concert_image 테이블 추가 — 공연 스틸컷 이미지 URL 관리 (position 정렬) |
 | 2026-05-30 | concert.fetch_attempted_at(timestamptz) 컬럼 추가 — 파이프라인 중복 API 호출 방지 |
 | 2026-06-04 | release_group·track 테이블 재구성 — spotify_id(varchar 22) 추가, mbid NOT NULL 제약 제거(MusicBrainz 없이 Spotify 단독 수집 허용), release_group.total_tracks·track.disc_number·track.explicit 컬럼 추가 |
+| 2026-06-07 | concert_artist.confidence·matched_by 컬럼 제거 — 파이프라인 매칭 신뢰도 기준 폐기, 전체 공연 어드민 검토 큐로 통합 |
+| 2026-06-07 | concert_artist_candidate 테이블 추가 — 파이프라인 매칭 결과를 어드민 검토 전 임시 저장 (승인 시 concert_artist로 이동, 거절 시 concert=EXCLUDED) |
