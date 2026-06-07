@@ -56,6 +56,38 @@
 
 ---
 
+## GET /api/admin/concerts/pending
+
+**용도**: 관리자 검토 대기 중인 PENDING 상태 공연 목록을 조회합니다.
+
+### 요청
+
+**Query Parameters**
+
+| 이름 | 타입 | 필수 | 기본값 | 설명 |
+|------|------|------|--------|------|
+| `page` | int | N | `0` | 페이지 번호 |
+| `size` | int | N | `20` | 페이지 크기 |
+
+### 응답
+
+[페이지네이션 응답](_index.md#페이지네이션-응답) 형태. `content` 항목:
+
+| 필드 | 타입 | 설명 |
+|------|------|------|
+| `id` | Long | 공연 ID |
+| `title` | String | 공연명 |
+| `startDate` | String | 시작일 (`YYYY-MM-DD`) |
+| `endDate` | String | 종료일 (`YYYY-MM-DD`) |
+| `venueName` | String | 공연장명 |
+| `posterUrl` | String? | 포스터 URL |
+| `candidates` | Object[] | 후보 아티스트 목록 |
+| `candidates[].artistId` | Long | 아티스트 ID |
+| `candidates[].name` | String | 아티스트명 |
+| `candidates[].matchedBy` | String | 매칭 방법 (`prfcast` / `prfnm` / `manual`) |
+
+---
+
 ## POST /api/admin/concerts
 
 **용도**: 공연을 수동 등록합니다.
@@ -192,6 +224,93 @@
 
 ---
 
+## PUT /api/admin/concerts/{id}/approve
+
+**용도**: PENDING 상태의 공연을 승인합니다. `concert_artist_candidate`를 `concert_artist`로 이동하고, 날짜 기반으로 status를 자동 계산합니다.
+
+### 요청
+
+**Path Parameters**
+
+| 이름 | 타입 | 필수 | 설명 |
+|------|------|------|------|
+| `id` | Long | Y | 공연 ID |
+
+### 응답
+
+`200 OK` (바디 없음)
+
+### 에러
+
+| 코드 | 상태 코드 | 설명 |
+|------|-----------|------|
+| `CONCERT_NOT_FOUND` | 404 | 존재하지 않는 공연 |
+| `CONCERT_NOT_PENDING` | 400 | PENDING 상태가 아닌 공연 |
+
+### 비고
+
+- 승인 시 날짜 기반 status 자동 계산: `today < startDate` → `UPCOMING`, `today ≤ endDate` → `ONGOING`, 그 외 → `ENDED`
+- 관련 아티스트의 `is_coming` 자동 동기화
+
+---
+
+## PUT /api/admin/concerts/{id}/reject
+
+**용도**: PENDING 상태의 공연을 거절합니다. 공연 status를 `EXCLUDED`로 변경하고 후보 아티스트를 삭제합니다.
+
+### 요청
+
+**Path Parameters**
+
+| 이름 | 타입 | 필수 | 설명 |
+|------|------|------|------|
+| `id` | Long | Y | 공연 ID |
+
+### 응답
+
+`200 OK` (바디 없음)
+
+### 에러
+
+| 코드 | 상태 코드 | 설명 |
+|------|-----------|------|
+| `CONCERT_NOT_FOUND` | 404 | 존재하지 않는 공연 |
+| `CONCERT_NOT_PENDING` | 400 | PENDING 상태가 아닌 공연 |
+
+---
+
+## POST /api/admin/concerts/{id}/artists
+
+**용도**: PENDING 공연에 아티스트를 직접 지정합니다. `concert_artist_candidate`에 후보를 추가합니다.
+
+### 요청
+
+**Path Parameters**
+
+| 이름 | 타입 | 필수 | 설명 |
+|------|------|------|------|
+| `id` | Long | Y | 공연 ID |
+
+**Request Body** (`application/json`)
+
+| 필드 | 타입 | 필수 | 설명 |
+|------|------|------|------|
+| `artistId` | Long | Y | 지정할 아티스트 ID |
+
+### 응답
+
+`201 Created` (바디 없음)
+
+### 에러
+
+| 코드 | 상태 코드 | 설명 |
+|------|-----------|------|
+| `CONCERT_NOT_FOUND` | 404 | 존재하지 않는 공연 |
+| `ARTIST_NOT_FOUND` | 404 | 존재하지 않는 아티스트 |
+| `CONCERT_ARTIST_ALREADY_EXISTS` | 409 | 이미 매핑된 아티스트 |
+
+---
+
 ## GET /api/admin/inquiries
 
 **용도**: 전체 문의 목록을 조회합니다.
@@ -277,3 +396,65 @@
 | 코드 | 상태 코드 | 설명 |
 |------|-----------|------|
 | `INQUIRY_NOT_FOUND` | 404 | 존재하지 않는 문의 |
+
+---
+
+## POST /api/admin/data/collect/concert
+
+**용도**: Data 파이프라인에 KOPIS 공연 수집을 트리거합니다.
+
+### 응답
+
+`200 OK` (바디 없음)
+
+### 비고
+
+- 파이프라인 측에서 비동기 처리. 응답은 트리거 성공 여부만 나타냄.
+
+---
+
+## POST /api/admin/data/collect/artists/{id}/releases
+
+**용도**: Data 파이프라인에 특정 아티스트의 MusicBrainz 릴리즈 수집을 트리거합니다.
+
+### 요청
+
+**Path Parameters**
+
+| 이름 | 타입 | 필수 | 설명 |
+|------|------|------|------|
+| `id` | Long | Y | 아티스트 ID |
+
+### 응답
+
+`200 OK` (바디 없음)
+
+### 에러
+
+| 코드 | 상태 코드 | 설명 |
+|------|-----------|------|
+| `ARTIST_NOT_FOUND` | 404 | Data 파이프라인 측에서 해당 아티스트를 찾을 수 없음 |
+
+---
+
+## POST /api/admin/data/collect/concerts/{id}/setlist
+
+**용도**: Data 파이프라인에 특정 공연의 셋리스트 수집을 트리거합니다.
+
+### 요청
+
+**Path Parameters**
+
+| 이름 | 타입 | 필수 | 설명 |
+|------|------|------|------|
+| `id` | Long | Y | 공연 ID |
+
+### 응답
+
+`200 OK` (바디 없음)
+
+### 에러
+
+| 코드 | 상태 코드 | 설명 |
+|------|-----------|------|
+| `CONCERT_NOT_FOUND` | 404 | Data 파이프라인 측에서 해당 공연을 찾을 수 없음 |
