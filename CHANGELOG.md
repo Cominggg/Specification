@@ -1,3 +1,11 @@
+## 2026-06-07
+
+- `spec/erd.md` — `concert_artist.confidence·matched_by` 컬럼 제거; `concert_artist_candidate` 테이블 추가 (파이프라인 매칭 후 어드민 검토 큐)
+- `spec/api/admin.md` — `GET /api/admin/concerts/pending`, `PUT .../approve`, `PUT .../reject`, `POST .../artists` 4개 PENDING 검토 엔드포인트 추가; Data 파이프라인 트리거 3종(`POST /api/admin/data/collect/*`) 추가
+- `spec/admin.md` — ADM-02 PENDING 검토 큐 BE 구현 반영; ADM-09 Data 파이프라인 수집 트리거 기능 추가
+- `spec/pipeline.md` — 매칭 흐름 PENDING 큐 방식으로 갱신 (`concert_artist_candidate` 임시 저장 → 어드민 승인 후 `concert_artist` 확정); `confidence` 기반 노출 기준 제거; `is_coming` 동기화 조건 갱신
+
+
 ## 2026-06-04
 
 - `spec/erd.md` — release_group·track 테이블 V12 재구성 반영: spotify_id 추가, mbid NOT NULL 제약 제거, release_group.total_tracks·track.disc_number·track.explicit 컬럼 추가
