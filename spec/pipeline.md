@@ -43,7 +43,7 @@ coming-data/
 
 | 작업 | 스케줄 | 상세 |
 |------|--------|------|
-| KOPIS 수집·매칭 | 월요일 03시 | 내한 공연 후보 조회. `visit=Y, genrenm=GGGA(대중음악)` 조건. `prfnm`·`prfcast`·날짜·장소·`poster_url`·`venue_address`·`price`·`updatedate` 저장.<br>`GET /openApi/restful/pblprfr?service={key}&stdate=20200101&eddate={today}&shcate=GGGA&visit=Y&rows=100&cpage={n}`<br>상세: `GET /openApi/restful/pblprfr/{mt20id}?service={key}`<br>상세 API 응답의 `relates` 필드(예매처 링크 목록) 저장. 값이 없는 경우 빈 배열로 처리.<br>저장 전 `has_match()`로 alias 매칭 공연만 필터링 — 비매칭 공연은 DB에 저장하지 않음.<br>저장 후 미매칭 공연 대상으로 `match_concert()` 실행 → `concert_artist` INSERT.<br>매칭 후 `artist.is_coming` 동기화.<br>※ 주 1회 이상 권장 |
+| KOPIS 수집·매칭 | 월요일 03시 | 내한 공연 후보 조회. `visit=Y, genrenm=GGGA(대중음악)` 조건. `prfnm`·`prfcast`·날짜·장소·`poster_url`·`venue_address`·`price`·`updatedate` 저장.<br>`GET /openApi/restful/pblprfr?service={key}&stdate=20200101&eddate={today}&shcate=GGGA&visit=Y&rows=100&cpage={n}`<br>상세: `GET /openApi/restful/pblprfr/{mt20id}?service={key}`<br>상세 API 응답의 `relates` 필드(예매처 링크 목록) 저장. 값이 없는 경우 빈 배열로 처리.<br>저장 전 `has_match()`로 alias 매칭 공연만 필터링 — 비매칭 공연은 DB에 저장하지 않음.<br>매칭 공연은 `status=PENDING`으로 저장하고, 매칭 결과를 `concert_artist_candidate`에 INSERT (어드민 검토 후 `concert_artist`로 확정).<br>※ 주 1회 이상 권장 |
 | 공연 상태 갱신 | 매일 04시 | KOPIS 재조회 후 `updatedate` 변화 감지 시 `status`·`kopis_update_date` 갱신. `artist.is_coming` 동기화. |
 | 릴리즈 갱신 | 화요일 05시 | 등록된 전체 아티스트의 신보 감지. `first-release-date` 기준 DB에 없는 항목만 INSERT. 신규 릴리즈 감지 시 트랙·레이블도 연속 수집. |
 | 커버아트 수집 | 수요일 05시 | `cover_url`이 없는 release_group만 대상으로 Cover Art Archive 호출. 404 시 null 유지. |
@@ -52,29 +52,39 @@ coming-data/
 
 #### 매칭 상세
 
-| 단계 | 대상 | 기준 | 신뢰도 | 노출 |
-|------|------|------|--------|------|
-| 매칭 ① | `prfcast` 각 이름 | Artist alias **완전 일치** | HIGH | 즉시 노출 |
-| 매칭 ② | `prfcast` 각 이름 | `rapidfuzz.fuzz.token_set_ratio` ≥ 85 | LOW | 미노출 (confidence=HIGH만 사용자에게 노출) |
-| 매칭 ③ | `prfnm` (제목) | 구문 일치(`_phrase_match_title`): 단어 경계 exact 또는 다중 단어 구문 포함 | HIGH | 즉시 노출 |
+| 단계 | 대상 | 기준 | 결과 |
+|------|------|------|------|
+| 매칭 ① | `prfcast` 각 이름 | Artist alias **완전 일치** | `concert_artist_candidate` INSERT, concert = PENDING |
+| 매칭 ② | `prfcast` 각 이름 | `rapidfuzz.fuzz.token_set_ratio` ≥ 85 | `concert_artist_candidate` INSERT, concert = PENDING |
+| 매칭 ③ | `prfnm` (제목) | 구문 일치(`_phrase_match_title`): 단어 경계 exact 또는 다중 단어 구문 포함 | `concert_artist_candidate` INSERT, concert = PENDING (매칭 ①② 실패 시 폴백) |
 
 - 매칭 ③은 `prfcast` 기반 매칭 ①②가 모두 실패한 경우에만 폴백으로 실행된다.
-- `has_match()` 통과 공연은 반드시 매칭 ①~③ 중 하나가 성공하므로 별도 검토 큐 없음.
+- 매칭된 모든 공연은 `PENDING` 상태로 저장되어 어드민 검토 큐에 진입한다.
 - `prfcast` 구분자: `,` `·` `&` `×` `・` `/` — feat/featuring/ft 표기 자동 제거.
-- `prfcast`에 여러 아티스트 포함 시 각각 개별 매칭 후 모두 `concert_artist`에 INSERT.
+- `prfcast`에 여러 아티스트 포함 시 각각 개별 매칭 후 모두 `concert_artist_candidate`에 INSERT.
 
 ### 공연-아티스트 관계 구조
 
 공연과 아티스트는 **다대다(M:N)** 관계. 합동 공연(페스티벌·조인트 콘서트) 지원을 위해 `concert_artist` 중간 테이블로 관리.
 
+파이프라인 매칭 결과는 먼저 `concert_artist_candidate`에 임시 저장되고, 어드민 승인 후 `concert_artist`로 이동한다.
+
+**concert_artist** (어드민 승인 후 확정된 관계):
+
 | 컬럼 | 설명 |
 |------|------|
 | `concert_id` | 공연 FK |
 | `artist_id` | 아티스트 FK |
-| `confidence` | `HIGH` (prfcast 완전 일치 또는 prfnm 구문 일치) / `LOW` (prfcast 퍼지 매칭) |
+
+**concert_artist_candidate** (파이프라인 매칭 후 어드민 검토 대기):
+
+| 컬럼 | 설명 |
+|------|------|
+| `concert_id` | 공연 FK |
+| `artist_id` | 아티스트 FK |
 | `matched_by` | `prfcast` / `prfnm` / `manual` |
 
-> 단독 공연은 `concert_artist` 행이 1개, 합동 공연은 참여 아티스트 수만큼 행이 생성됨.
+> 단독 공연은 `concert_artist_candidate` 행이 1개, 합동 공연은 참여 아티스트 수만큼 행이 생성됨.
 
 ### ③ 셋리스트 수집 (스케줄 · 매일 06시)
 
@@ -84,9 +94,9 @@ coming-data/
 
 ### ④ is_coming 동기화
 
-`artist.is_coming` 필드는 오늘 이후 `confidence=HIGH` 공연 보유 여부로 자동 갱신된다.
+`artist.is_coming` 필드는 오늘 이후 `UPCOMING` 또는 `ONGOING` 상태 공연이 `concert_artist`에 존재하는지 여부로 자동 갱신된다.
 
-- 갱신 시점: KOPIS 수집·매칭 완료 후, 공연 상태 갱신 완료 후
+- 갱신 시점: 공연 상태 갱신 완료 후, 어드민이 PENDING 공연을 승인할 때 (BE)
 - 실제로 변경된 행만 UPDATE (불필요한 쓰기 I/O 최소화)
 
 ### ⑤ 관리자 단건 수집 (API 트리거)
@@ -99,3 +109,5 @@ coming-data/
 | `collect_and_save_release_group(release_group_mbid, artist_mbid)` | 단건 릴리즈 그룹 수집 (트랙·레이블 포함) → DB 저장. |
 | `collect_and_save_cover_art(release_group_mbid)` | 단건 릴리즈 그룹 커버아트 수집 → DB 갱신. |
 | `collect_and_save_setlist(concert_id)` | 단건 공연 셋리스트 수집 → DB 저장. |
+
+BE에서는 `POST /api/admin/data/collect/*` 엔드포인트를 통해 Data 파이프라인에 HTTP 트리거를 보낸다. (`X-Internal-Secret` 헤더로 인증)
