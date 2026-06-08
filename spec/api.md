@@ -10,3 +10,4 @@
 - [음악 발매](api/releases.md)
 - [마이페이지·문의](api/my.md)
 - [관리자](api/admin.md)
+- [Data 파이프라인 연동](api/pipeline.md)
