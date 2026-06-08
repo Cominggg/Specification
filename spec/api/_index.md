@@ -89,6 +89,7 @@ ADMIN 전용 엔드포인트는 일반 사용자 접근 시 `403` 반환합니�
 | 음악 발매 | [releases.md](releases.md) |
 | 마이페이지·문의 | [my.md](my.md) |
 | 관리자 | [admin.md](admin.md) |
+| Data 파이프라인 연동 | [pipeline.md](pipeline.md) |
 
 ---
 
@@ -151,12 +152,23 @@ ADMIN 전용 엔드포인트는 일반 사용자 접근 시 `403` 반환합니�
 ### 관리자 (ROLE_ADMIN)
 | 메서드 | 엔드포인트 | 인증 |
 |--------|------------|------|
-| POST | `/api/admin/artists` | ADMIN |
 | PUT | `/api/admin/artists/{id}` | ADMIN |
-| POST | `/api/admin/concerts` | ADMIN |
+| GET | `/api/admin/concerts/pending` | ADMIN |
 | PUT | `/api/admin/concerts/{id}` | ADMIN |
-| DELETE | `/api/admin/concerts/{id}` | ADMIN |
 | PUT | `/api/admin/concerts/{id}/state` | ADMIN |
+| PUT | `/api/admin/concerts/{id}/approve` | ADMIN |
+| PUT | `/api/admin/concerts/{id}/reject` | ADMIN |
+| POST | `/api/admin/concerts/{id}/artists` | ADMIN |
 | GET | `/api/admin/inquiries` | ADMIN |
 | GET | `/api/admin/inquiries/{id}` | ADMIN |
 | PATCH | `/api/admin/inquiries/{id}/status` | ADMIN |
+
+### Data 파이프라인 연동 (ROLE_ADMIN)
+| 메서드 | 엔드포인트 | 인증 |
+|--------|------------|------|
+| GET | `/api/admin/data/search/artists` | ADMIN |
+| GET | `/api/admin/data/search/concerts` | ADMIN |
+| POST | `/api/admin/data/collect/artists` | ADMIN |
+| POST | `/api/admin/data/collect/concerts` | ADMIN |
+| POST | `/api/admin/data/collect/artists/{id}/releases` | ADMIN |
+| POST | `/api/admin/data/collect/concerts/{id}/setlist` | ADMIN |
