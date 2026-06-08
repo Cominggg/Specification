@@ -1,3 +1,12 @@
+## 2026-06-08
+
+- `spec/api/admin.md` — `POST /api/admin/artists`(수동 등록), `POST /api/admin/concerts`(수동 등록), `DELETE /api/admin/concerts/{id}`(삭제) 제거; `POST /api/admin/concerts/{id}/artists` 설명 수정 (`concert_artist_candidate` → `concert_artist` 직접 저장); Data 파이프라인 엔드포인트 전체 `spec/api/pipeline.md`로 분리
+- `spec/api/pipeline.md` — **신규** BE↔Data 파이프라인 연동 API 명세 파일. 검색 2종(`GET /api/admin/data/search/artists`, `GET /api/admin/data/search/concerts`), 수집 트리거 4종(`POST /api/admin/data/collect/artists`, `POST /api/admin/data/collect/concerts`, `.../artists/{id}/releases`, `.../concerts/{id}/setlist`) 포함
+- `spec/api/_index.md` — 관리자 엔드포인트 목록 정리(수동 등록·삭제 제거, pending/approve/reject/artists 추가); Data 파이프라인 연동 섹션 신규 추가; 도메인별 문서 표에 pipeline.md 추가
+- `spec/api.md` — Data 파이프라인 연동 파일 링크 추가
+- `spec/admin.md` — ADM-01 비고: 수동 등록 제거, 수집 트리거 방식으로 대체 반영; ADM-03 비고: BE 구현 제거; ADM-08 비고: BE 구현 제거; ADM-09 기능명·설명 확장 (검색 2종 + 수집 4종)
+- `spec/pipeline.md` — 섹션 ⑤ 갱신: `search_artists`, `search_concerts`, `collect_artist_initial` 함수 추가; BE 엔드포인트 참조 링크 추가
+
 ## 2026-06-07
 
 - `spec/erd.md` — `concert_artist.confidence·matched_by` 컬럼 제거; `concert_artist_candidate` 테이블 추가 (파이프라인 매칭 후 어드민 검토 큐)
