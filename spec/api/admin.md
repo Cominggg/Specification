@@ -3,26 +3,6 @@
 모든 엔드포인트는 `ROLE_ADMIN` 권한이 필요합니다. 일반 사용자 접근 시 `403` 반환.
 
 ---
-## POST /api/admin/artists
-
-**용도**: 아티스트를 수동 등록합니다.
-
-### 요청
-
-**Request Body** (`application/json`)
-
-| 필드 | 타입 | 필수 | 설명 |
-|------|------|------|------|
-| `mbid` | String | Y | MusicBrainz MBID (UUID) |
-| `name` | String | Y | 아티스트명 |
-| `sortName` | String | N | 정렬용 이름 |
-| `debutDate` | String | N | 데뷔일 (`YYYY-MM-DD`) |
-
-### 응답
-
-`201 Created` (바디 없음)
-
----
 
 ## PUT /api/admin/artists/{id}
 
@@ -88,34 +68,6 @@
 
 ---
 
-## POST /api/admin/concerts
-
-**용도**: 공연을 수동 등록합니다.
-
-### 요청
-
-**Request Body** (`application/json`)
-
-| 필드 | 타입 | 필수 | 설명 |
-|------|------|------|------|
-| `kopisId` | String | Y | KOPIS 공연 ID |
-| `title` | String | Y | 공연명 |
-| `cast` | String | N | 출연진 |
-| `startDate` | String | Y | 시작일 (`YYYY-MM-DD`) |
-| `endDate` | String | Y | 종료일 (`YYYY-MM-DD`) |
-| `venueName` | String | Y | 공연장명 |
-| `venueAddress` | String | N | 공연장 주소 |
-| `posterUrl` | String | N | 포스터 이미지 URL |
-| `price` | String | N | 가격 정보 |
-| `status` | String | Y | `UPCOMING` \| `ONGOING` \| `ENDED` \| `CANCELLED` |
-| `artistIds` | Long[] | N | 매핑할 아티스트 ID 목록 |
-
-### 응답
-
-`201 Created` (바디 없음)
-
----
-
 ## PUT /api/admin/concerts/{id}
 
 **용도**: 공연 정보를 수정합니다. (상태 변경 불포함)
@@ -157,35 +109,6 @@
 ### 비고
 
 - 상태 변경은 `PUT /api/admin/concerts/{id}/state`로만 처리
-
----
-
-## DELETE /api/admin/concerts/{id}
-
-**용도**: 공연을 삭제합니다.
-
-### 요청
-
-**Path Parameters**
-
-| 이름 | 타입 | 필수 | 설명 |
-|------|------|------|------|
-| `id` | Long | Y | 공연 ID |
-
-### 응답
-
-`200 OK` (바디 없음)
-
-### 에러
-
-| 코드 | 상태 코드 | 설명 |
-|------|-----------|------|
-| `CONCERT_NOT_FOUND` | 404 | 존재하지 않는 공연 |
-
-### 비고
-
-- 연관 데이터(예매처 링크·아티스트 매핑·유저 캘린더·셋리스트) 함께 삭제 (cascade)
-- 복구 불가
 
 ---
 
@@ -281,7 +204,7 @@
 
 ## POST /api/admin/concerts/{id}/artists
 
-**용도**: PENDING 공연에 아티스트를 직접 지정합니다. `concert_artist_candidate`에 후보를 추가합니다.
+**용도**: 공연에 아티스트를 직접 지정합니다. `concert_artist_candidate` 없이 `concert_artist`에 바로 저장합니다.
 
 ### 요청
 
@@ -396,65 +319,3 @@
 | 코드 | 상태 코드 | 설명 |
 |------|-----------|------|
 | `INQUIRY_NOT_FOUND` | 404 | 존재하지 않는 문의 |
-
----
-
-## POST /api/admin/data/collect/concert
-
-**용도**: Data 파이프라인에 KOPIS 공연 수집을 트리거합니다.
-
-### 응답
-
-`200 OK` (바디 없음)
-
-### 비고
-
-- 파이프라인 측에서 비동기 처리. 응답은 트리거 성공 여부만 나타냄.
-
----
-
-## POST /api/admin/data/collect/artists/{id}/releases
-
-**용도**: Data 파이프라인에 특정 아티스트의 MusicBrainz 릴리즈 수집을 트리거합니다.
-
-### 요청
-
-**Path Parameters**
-
-| 이름 | 타입 | 필수 | 설명 |
-|------|------|------|------|
-| `id` | Long | Y | 아티스트 ID |
-
-### 응답
-
-`200 OK` (바디 없음)
-
-### 에러
-
-| 코드 | 상태 코드 | 설명 |
-|------|-----------|------|
-| `ARTIST_NOT_FOUND` | 404 | Data 파이프라인 측에서 해당 아티스트를 찾을 수 없음 |
-
----
-
-## POST /api/admin/data/collect/concerts/{id}/setlist
-
-**용도**: Data 파이프라인에 특정 공연의 셋리스트 수집을 트리거합니다.
-
-### 요청
-
-**Path Parameters**
-
-| 이름 | 타입 | 필수 | 설명 |
-|------|------|------|------|
-| `id` | Long | Y | 공연 ID |
-
-### 응답
-
-`200 OK` (바디 없음)
-
-### 에러
-
-| 코드 | 상태 코드 | 설명 |
-|------|-----------|------|
-| `CONCERT_NOT_FOUND` | 404 | Data 파이프라인 측에서 해당 공연을 찾을 수 없음 |
