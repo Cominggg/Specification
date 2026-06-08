@@ -99,15 +99,25 @@ coming-data/
 - 갱신 시점: 공연 상태 갱신 완료 후, 어드민이 PENDING 공연을 승인할 때 (BE)
 - 실제로 변경된 행만 UPDATE (불필요한 쓰기 I/O 최소화)
 
-### ⑤ 관리자 단건 수집 (API 트리거)
+### ⑤ 관리자 검색·단건 수집 (API 트리거)
 
-관리자 UI 또는 백엔드에서 직접 트리거하는 단건 수집 함수.
+관리자 UI 또는 백엔드에서 직접 호출하는 검색 및 단건 수집 함수.
+
+**검색 함수** (동기 응답):
 
 | 함수 | 설명 |
 |------|------|
+| `search_artists(name)` | MusicBrainz 아티스트명 검색. 최대 10건 반환. |
+| `search_concerts(title)` | KOPIS 공연명 검색. 오늘~2년 후 범위, 최대 20건 반환. |
+
+**수집 트리거 함수** (비동기 처리):
+
+| 함수 | 설명 |
+|------|------|
+| `collect_artist_initial(mbid)` | MBID 기반 아티스트 초기 수집 (정보·릴리즈·이미지). |
 | `collect_and_save_concert(kopis_id)` | 단건 KOPIS 공연 수집 → alias 매칭 → DB 저장. 내한 공연 아니거나 매칭 없으면 건너뜀. |
 | `collect_and_save_release_group(release_group_mbid, artist_mbid)` | 단건 릴리즈 그룹 수집 (트랙·레이블 포함) → DB 저장. |
 | `collect_and_save_cover_art(release_group_mbid)` | 단건 릴리즈 그룹 커버아트 수집 → DB 갱신. |
 | `collect_and_save_setlist(concert_id)` | 단건 공연 셋리스트 수집 → DB 저장. |
 
-BE에서는 `POST /api/admin/data/collect/*` 엔드포인트를 통해 Data 파이프라인에 HTTP 트리거를 보낸다. (`X-Internal-Secret` 헤더로 인증)
+BE에서는 `/api/admin/data/*` 엔드포인트를 통해 Data 파이프라인에 HTTP 요청을 보낸다. (`X-Internal-Secret` 헤더로 인증) → 상세 명세: [spec/api/pipeline.md](../api/pipeline.md)
