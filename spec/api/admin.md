@@ -343,6 +343,7 @@
 | `name` | String | 아티스트명 |
 | `country` | String? | 국가 코드 |
 | `type` | String? | 아티스트 유형 (`Person` / `Group` 등) |
+| `url` | String? | MusicBrainz 아티스트 페이지 URL |
 
 ---
 
@@ -369,6 +370,7 @@
 | `startDate` | String | 시작일 (`YYYY-MM-DD`) |
 | `endDate` | String | 종료일 (`YYYY-MM-DD`) |
 | `venue` | String? | 공연장명 |
+| `url` | String? | KOPIS 공연 상세 URL |
 
 ---
 
