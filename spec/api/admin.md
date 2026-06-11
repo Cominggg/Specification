@@ -89,7 +89,6 @@
 | `startDate` | String | N | 시작일 (`YYYY-MM-DD`) |
 | `endDate` | String | N | 종료일 (`YYYY-MM-DD`) |
 | `venueName` | String | N | 공연장명 |
-| `venueAddress` | String | N | 공연장 주소 |
 | `posterUrl` | String | N | 포스터 이미지 URL |
 | `price` | String | N | 가격 정보 |
 | `bookingLinks` | Object[] | N | 예매처 링크 목록. `null`이면 기존 링크 유지, `[]`이면 전체 삭제 |
@@ -179,7 +178,7 @@
 
 ## PUT /api/admin/concerts/{id}/reject
 
-**용도**: PENDING 상태의 공연을 거절합니다. 공연 status를 `EXCLUDED`로 변경하고 후보 아티스트를 삭제합니다.
+**용도**: PENDING 상태의 공연을 거절합니다. 공연 status를 `EXCLUDED`로 변경하고 후보 아티스트(`concert_artist_candidate`) 및 확정 매핑(`concert_artist`) 레코드를 삭제합니다.
 
 ### 요청
 
