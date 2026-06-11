@@ -318,3 +318,138 @@
 | 코드 | 상태 코드 | 설명 |
 |------|-----------|------|
 | `INQUIRY_NOT_FOUND` | 404 | 존재하지 않는 문의 |
+
+---
+
+## GET /api/admin/data/search/artists
+
+**용도**: Data 파이프라인에서 아티스트를 이름으로 검색합니다. MBID 기반 수집 트리거 전 대상을 확인하는 용도입니다.
+
+### 요청
+
+**Query Parameters**
+
+| 이름 | 타입 | 필수 | 설명 |
+|------|------|------|------|
+| `name` | String | Y | 검색할 아티스트명 |
+
+### 응답
+
+`200 OK` — 배열
+
+| 필드 | 타입 | 설명 |
+|------|------|------|
+| `mbid` | String | MusicBrainz ID |
+| `name` | String | 아티스트명 |
+| `country` | String? | 국가 코드 |
+| `type` | String? | 아티스트 유형 (`Person` / `Group` 등) |
+
+---
+
+## GET /api/admin/data/search/concerts
+
+**용도**: Data 파이프라인에서 공연을 제목으로 검색합니다. KOPIS ID 기반 수집 트리거 전 대상을 확인하는 용도입니다.
+
+### 요청
+
+**Query Parameters**
+
+| 이름 | 타입 | 필수 | 설명 |
+|------|------|------|------|
+| `title` | String | Y | 검색할 공연명 |
+
+### 응답
+
+`200 OK` — 배열
+
+| 필드 | 타입 | 설명 |
+|------|------|------|
+| `kopisId` | String | KOPIS 공연 ID |
+| `title` | String | 공연명 |
+| `startDate` | String | 시작일 (`YYYY-MM-DD`) |
+| `endDate` | String | 종료일 (`YYYY-MM-DD`) |
+| `venue` | String? | 공연장명 |
+
+---
+
+## POST /api/admin/data/collect/artists
+
+**용도**: MBID를 지정해 Data 파이프라인의 아티스트 수집을 트리거합니다.
+
+### 요청
+
+**Request Body** (`application/json`)
+
+| 필드 | 타입 | 필수 | 설명 |
+|------|------|------|------|
+| `mbid` | String | Y | MusicBrainz ID |
+
+### 응답
+
+`200 OK` (바디 없음)
+
+---
+
+## POST /api/admin/data/collect/concerts
+
+**용도**: KOPIS ID를 지정해 Data 파이프라인의 공연 수집을 트리거합니다.
+
+### 요청
+
+**Request Body** (`application/json`)
+
+| 필드 | 타입 | 필수 | 설명 |
+|------|------|------|------|
+| `kopisId` | String | Y | KOPIS 공연 ID |
+
+### 응답
+
+`200 OK` (바디 없음)
+
+---
+
+## POST /api/admin/data/collect/artists/{id}/releases
+
+**용도**: 특정 아티스트의 릴리즈 수집을 Data 파이프라인에 트리거합니다.
+
+### 요청
+
+**Path Parameters**
+
+| 이름 | 타입 | 필수 | 설명 |
+|------|------|------|------|
+| `id` | Long | Y | 아티스트 ID |
+
+### 응답
+
+`200 OK` (바디 없음)
+
+### 에러
+
+| 코드 | 상태 코드 | 설명 |
+|------|-----------|------|
+| `ARTIST_NOT_FOUND` | 404 | Data 파이프라인 측에서 아티스트를 찾지 못한 경우 |
+
+---
+
+## POST /api/admin/data/collect/concerts/{id}/setlist
+
+**용도**: 특정 공연의 셋리스트 수집을 Data 파이프라인에 트리거합니다.
+
+### 요청
+
+**Path Parameters**
+
+| 이름 | 타입 | 필수 | 설명 |
+|------|------|------|------|
+| `id` | Long | Y | 공연 ID |
+
+### 응답
+
+`200 OK` (바디 없음)
+
+### 에러
+
+| 코드 | 상태 코드 | 설명 |
+|------|-----------|------|
+| `CONCERT_NOT_FOUND` | 404 | Data 파이프라인 측에서 공연을 찾지 못한 경우 |
