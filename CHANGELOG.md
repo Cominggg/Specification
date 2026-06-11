@@ -1,3 +1,8 @@
+## 2026-06-11
+
+- `spec/api/admin.md` — `GET /api/admin/data/search/artists` · `GET /api/admin/data/search/concerts` 응답에 `url` 필드 추가
+- `spec/api/pipeline.md` — `GET /api/admin/data/search/artists` · `GET /api/admin/data/search/concerts` 응답에 `url` 필드 추가
+
 ## 2026-06-08
 
 - `spec/api/admin.md` — `POST /api/admin/artists`(수동 등록), `POST /api/admin/concerts`(수동 등록), `DELETE /api/admin/concerts/{id}`(삭제) 제거; `POST /api/admin/concerts/{id}/artists` 설명 수정 (`concert_artist_candidate` → `concert_artist` 직접 저장); Data 파이프라인 엔드포인트 전체 `spec/api/pipeline.md`로 분리
