@@ -28,6 +28,7 @@ BE는 `DataPipelineClient`(WebClient)를 통해 Data 파이프라인 내부 API�
 | `name` | String | 아티스트명 |
 | `country` | String? | 국가 코드 |
 | `type` | String? | `Person` \| `Group` 등 |
+| `url` | String? | MusicBrainz 아티스트 페이지 URL |
 
 ### 비고
 
@@ -59,6 +60,7 @@ BE는 `DataPipelineClient`(WebClient)를 통해 Data 파이프라인 내부 API�
 | `startDate` | String | 시작일 (`YYYY-MM-DD`) |
 | `endDate` | String | 종료일 (`YYYY-MM-DD`) |
 | `venue` | String? | 공연장명 |
+| `url` | String? | KOPIS 공연 상세 URL |
 
 ### 비고
 
