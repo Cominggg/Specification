@@ -1,3 +1,8 @@
+## 2026-06-12
+
+- `spec/api/admin.md` — `GET /api/admin/concerts/excluded` · `GET /api/admin/artists` 엔드포인트 신규 추가; `PUT /api/admin/concerts/{id}/state` status 허용값에 `EXCLUDED` 추가 및 비고 갱신; `POST /api/admin/concerts/{id}/artists` 비고에 EXCLUDED 공연 적용 가능 명시
+- `spec/admin.md` — ADM-01 비고: DB 아티스트 검색 API 추가 반영; ADM-04 비고: 복원 시 `is_coming` 자동 갱신 명시; ADM-10 EXCLUDED 공연 관리 기능 신규 추가
+
 ## 2026-06-11
 
 - `spec/api/admin.md` — `GET /api/admin/data/search/artists` · `GET /api/admin/data/search/concerts` 응답에 `url` 필드 추가
