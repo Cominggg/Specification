@@ -4,6 +4,35 @@
 
 ---
 
+## GET /api/admin/artists
+
+**용도**: DB에 등록된 아티스트를 이름(별칭 포함)으로 검색합니다. EXCLUDED 공연에 아티스트를 수동 연결할 때 `artistId` 확인 용도입니다.
+
+### 요청
+
+**Query Parameters**
+
+| 이름 | 타입 | 필수 | 기본값 | 설명 |
+|------|------|------|--------|------|
+| `name` | String | Y | — | 검색할 아티스트명 (대소문자 무시, 별칭 포함 부분 일치) |
+| `page` | int | N | `0` | 페이지 번호 |
+| `size` | int | N | `20` | 페이지 크기 |
+
+### 응답
+
+[페이지네이션 응답](_index.md#페이지네이션-응답) 형태. `content` 항목:
+
+| 필드 | 타입 | 설명 |
+|------|------|------|
+| `id` | Long | 아티스트 ID |
+| `name` | String | 아티스트명 |
+
+### 비고
+
+- `GET /api/admin/data/search/artists`(MusicBrainz 외부 검색)와 다름 — DB 등록 아티스트 전용
+
+---
+
 ## PUT /api/admin/artists/{id}
 
 **용도**: 아티스트 정보를 수정합니다.
@@ -33,6 +62,41 @@
 | 코드 | 상태 코드 | 설명 |
 |------|-----------|------|
 | `ARTIST_NOT_FOUND` | 404 | 존재하지 않는 아티스트 |
+
+---
+
+## GET /api/admin/concerts/excluded
+
+**용도**: EXCLUDED 상태의 공연 목록을 조회합니다.
+
+### 요청
+
+**Query Parameters**
+
+| 이름 | 타입 | 필수 | 기본값 | 설명 |
+|------|------|------|--------|------|
+| `page` | int | N | `0` | 페이지 번호 |
+| `size` | int | N | `20` | 페이지 크기 |
+
+### 응답
+
+[페이지네이션 응답](_index.md#페이지네이션-응답) 형태. `content` 항목:
+
+| 필드 | 타입 | 설명 |
+|------|------|------|
+| `id` | Long | 공연 ID |
+| `title` | String | 공연명 |
+| `startDate` | String | 시작일 (`YYYY-MM-DD`) |
+| `endDate` | String | 종료일 (`YYYY-MM-DD`) |
+| `venueName` | String | 공연장명 |
+| `posterUrl` | String? | 포스터 URL |
+| `artists` | Object[] | 연결된 아티스트 목록 |
+| `artists[].artistId` | Long | 아티스트 ID |
+| `artists[].name` | String | 아티스트명 |
+
+### 비고
+
+- `rejectConcert()`로 EXCLUDED된 공연은 `concert_artist`가 삭제되어 `artists` 빈 배열로 반환
 
 ---
 
@@ -127,7 +191,7 @@
 
 | 필드 | 타입 | 필수 | 설명 |
 |------|------|------|------|
-| `status` | String | Y | `UPCOMING` \| `ONGOING` \| `ENDED` \| `CANCELLED` |
+| `status` | String | Y | `UPCOMING` \| `ONGOING` \| `ENDED` \| `CANCELLED` \| `EXCLUDED` |
 | `reason` | String | N | 변경 사유 |
 
 ### 응답
@@ -142,7 +206,7 @@
 
 ### 비고
 
-- 변경 이력 로그 기록
+- `EXCLUDED` → `UPCOMING` / `ONGOING`으로 복원 시 연결된 아티스트의 `is_coming` 자동 갱신
 
 ---
 
@@ -203,7 +267,7 @@
 
 ## POST /api/admin/concerts/{id}/artists
 
-**용도**: 공연에 아티스트를 직접 지정합니다. `concert_artist_candidate` 없이 `concert_artist`에 바로 저장합니다.
+**용도**: 공연에 아티스트를 직접 지정합니다. `concert_artist_candidate` 없이 `concert_artist`에 바로 저장합니다. EXCLUDED 공연에도 사용 가능합니다.
 
 ### 요청
 
