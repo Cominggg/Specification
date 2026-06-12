@@ -132,6 +132,49 @@
 
 ---
 
+## GET /api/admin/concerts/{id}
+
+**용도**: 관리자 전용 공연 단건 조회. EXCLUDED·PENDING을 포함한 모든 status의 공연을 조회합니다. 공연 수정 폼 데이터 로드에 사용합니다.
+
+### 요청
+
+**Path Parameters**
+
+| 이름 | 타입 | 필수 | 설명 |
+|------|------|------|------|
+| `id` | Long | Y | 공연 ID |
+
+### 응답
+
+`200 OK`
+
+| 필드 | 타입 | 설명 |
+|------|------|------|
+| `id` | Long | 공연 ID |
+| `title` | String | 공연명 |
+| `cast` | String? | 출연진 |
+| `startDate` | String | 시작일 (`YYYY-MM-DD`) |
+| `endDate` | String | 종료일 (`YYYY-MM-DD`) |
+| `venueName` | String | 공연장명 |
+| `posterUrl` | String? | 포스터 URL |
+| `price` | String? | 가격 정보 |
+| `status` | String | `UPCOMING` \| `ONGOING` \| `ENDED` \| `CANCELLED` \| `EXCLUDED` \| `PENDING` |
+| `bookingLinks` | Object[] | 예매처 링크 목록 |
+| `bookingLinks[].name` | String | 예매처 이름 |
+| `bookingLinks[].url` | String | 예매처 URL |
+
+### 에러
+
+| 코드 | 상태 코드 | 설명 |
+|------|-----------|------|
+| `CONCERT_NOT_FOUND` | 404 | 존재하지 않는 공연 |
+
+### 비고
+
+- 공개 API `GET /api/concerts/{id}`와 달리 EXCLUDED·PENDING 상태도 정상 반환
+
+---
+
 ## PUT /api/admin/concerts/{id}
 
 **용도**: 공연 정보를 수정합니다. (상태 변경 불포함)
@@ -294,6 +337,37 @@
 | `CONCERT_NOT_FOUND` | 404 | 존재하지 않는 공연 |
 | `ARTIST_NOT_FOUND` | 404 | 존재하지 않는 아티스트 |
 | `CONCERT_ARTIST_ALREADY_EXISTS` | 409 | 이미 매핑된 아티스트 |
+
+---
+
+## DELETE /api/admin/concerts/{id}/artists/{artistId}
+
+**용도**: 공연에 매핑된 아티스트를 제거합니다.
+
+### 요청
+
+**Path Parameters**
+
+| 이름 | 타입 | 필수 | 설명 |
+|------|------|------|------|
+| `id` | Long | Y | 공연 ID |
+| `artistId` | Long | Y | 제거할 아티스트 ID |
+
+### 응답
+
+`204 No Content`
+
+### 에러
+
+| 코드 | 상태 코드 | 설명 |
+|------|-----------|------|
+| `CONCERT_NOT_FOUND` | 404 | 존재하지 않는 공연 |
+| `ARTIST_NOT_FOUND` | 404 | 존재하지 않는 아티스트 |
+| `CONCERT_ARTIST_NOT_FOUND` | 404 | 해당 공연에 매핑되지 않은 아티스트 |
+
+### 비고
+
+- 공연이 UPCOMING / ONGOING 상태일 경우 해당 아티스트의 다른 활성 공연 존재 여부로 `is_coming` 자동 재계산
 
 ---
 
