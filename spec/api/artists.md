@@ -73,6 +73,7 @@
 | `name` | String | 아티스트명 |
 | `imageUrl` | String? | 프로필 이미지 URL |
 | `hasUpcomingConcert` | Boolean | 예정 내한 공연 여부 |
+| `isFollowing` | Boolean | 팔로우 여부 (항상 `true`) |
 | `isFollowing` | Boolean | 팔로우 여부 (비인증 시 `false`) |
 | `followersCount` | int | 팔로워 수 (`user_follow_artist` COUNT) |
 | `links` | Object[] | 외부 링크 목록 |
@@ -267,7 +268,9 @@
 | `name` | String | 아티스트명 |
 | `imageUrl` | String? | 프로필 이미지 URL |
 | `hasUpcomingConcert` | Boolean | 예정 내한 공연 여부 |
+| `isFollowing` | Boolean | 팔로우 여부 (항상 `true`) |
 
 ### 비고
 
 - 마이페이지 "관심 아티스트" 탭(MY-02)에서 재사용
+- `isFollowing`은 이 엔드포인트가 팔로우한 아티스트만 반환하므로 항상 `true`
