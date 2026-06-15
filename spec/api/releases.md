@@ -54,7 +54,7 @@
 
 - 정렬: `releaseDate` DESC NULLS LAST 고정 (발매일 없는 항목은 항상 마지막)
 - `기타`: `Album`·`Single` 외 타입 (Live·Compilation·Remix·Soundtrack·Other 등) 전체
-- `following=true`이면 `artistId`, `type` 필터 무시 (독립 동작)
+- `following=true`이면 `artistId` 필터 무시; `type` 필터는 동시 적용 가능
 - 홈 "새 앨범·싱글" 섹션: `size=8`로 재사용
 
 ---
