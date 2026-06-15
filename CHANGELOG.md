@@ -1,4 +1,6 @@
 ## 2026-06-15
+- `spec/api/releases.md` — `GET /api/releases/search` 엔드포인트 신규 등록 (릴리즈명·트랙명·아티스트명·alias 검색, `q` 필수)
+- `spec/features.md` — REL-04 음악 검색 기능 신규 추가 (P1)
 
 - `spec/api/concerts.md` — `GET /api/concerts`에 `inCalendar` 파라미터 추가 및 `status` 우선순위 비고 반영; `GET /api/concerts/search` 엔드포인트 신규 등록 (공연명·아티스트명·alias LIKE 검색, `q` 필수)
 - `spec/api/releases.md` — `GET /api/releases`에 `following` 파라미터 추가 (팔로우 아티스트 필터); 정렬 설명 `releaseDate DESC NULLS LAST` 갱신
