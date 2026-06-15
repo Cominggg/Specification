@@ -13,6 +13,7 @@
 | 이름 | 타입 | 필수 | 기본값 | 설명 |
 |------|------|------|--------|------|
 | `status` | String | N | — | `UPCOMING` \| `ONGOING` \| `ENDED` \| `CANCELLED` |
+| `inCalendar` | Boolean | N | — | `true`이면 내 캘린더에 추가한 공연만 반환 (인증 필요) |
 | `page` | int | N | `0` | 페이지 번호 |
 | `size` | int | N | `20` | 페이지 크기 |
 | `sort` | String | N | `startDate,desc` | 정렬 기준 (`필드명,방향`) |
@@ -60,6 +61,39 @@
 - 기본 정렬: `startDate` 내림차순 (최신 공연 우선)
 - `status` 미전달 시 전체 공연 반환
 - 비인증 요청 허용 — `isInCalendar`는 비인증 시 항상 `false`, 인증 시 실제 값 반환
+- `inCalendar=true`와 `status` 동시 전달 시 `inCalendar`가 우선 적용되어 `status`는 무시됨
+
+---
+
+## GET /api/concerts/search
+
+**용도**: 공연명·아티스트명·아티스트 alias 키워드로 공연을 검색합니다.
+
+### 요청
+
+**Query Parameters**
+
+| 이름 | 타입 | 필수 | 기본값 | 설명 |
+|------|------|------|--------|------|
+| `q` | String | Y | — | 검색어 (빈 문자열·공백 불가) |
+| `page` | int | N | `0` | 페이지 번호 |
+| `size` | int | N | `20` | 페이지 크기 |
+| `sort` | String | N | `startDate,desc` | 정렬 기준 |
+
+### 응답
+
+[페이지네이션 응답](_index.md#페이지네이션-응답) 형태. `content` 항목은 `GET /api/concerts`와 동일 구조.
+
+### 에러
+
+| 코드 | 상태 코드 | 설명 |
+|------|-----------|------|
+| `VALIDATION_ERROR` | 400 | `q`가 전달되지 않았거나 빈 문자열·공백인 경우 |
+
+### 비고
+
+- 공연명(`title`)·아티스트명(`artist.name`)·아티스트 alias(`artist_alias.name`) 대소문자 무관 LIKE 검색
+- `isInCalendar`는 인증 시 실제 값 반환, 비인증 시 `false`
 
 ---
 
