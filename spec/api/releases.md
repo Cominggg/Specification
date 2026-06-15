@@ -59,6 +59,46 @@
 
 ---
 
+## GET /api/releases/search
+
+**용도**: 릴리즈명·트랙명·아티스트명(alias 포함)으로 음악을 검색합니다. (REL-04)
+
+### 요청
+
+**Query Parameters**
+
+| 이름 | 타입 | 필수 | 기본값 | 설명 |
+|------|------|------|--------|------|
+| `q` | String | Y | — | 검색어 (릴리즈명·트랙명·아티스트명·alias 부분 일치, 대소문자 무시) |
+| `page` | int | N | `0` | 페이지 번호 |
+| `size` | int | N | `20` | 페이지 크기 |
+
+### 응답
+
+[페이지네이션 응답](_index.md#페이지네이션-응답) 형태. `content` 항목은 `GET /api/releases`와 동일:
+
+| 필드 | 타입 | 설명 |
+|------|------|------|
+| `id` | Long | 릴리즈 ID |
+| `coverUrl` | String? | 커버 이미지 URL |
+| `artistName` | String | 아티스트명 |
+| `title` | String | 타이틀 |
+| `type` | String | `Album` \| `Single` 또는 기타 |
+| `releaseDate` | String? | 발매일 |
+
+### 에러
+
+| 코드 | 상태 코드 | 설명 |
+|------|-----------|------|
+| `INVALID_INPUT` | 400 | `q` 파라미터 누락 |
+
+### 비고
+
+- 검색 대상: 릴리즈명, 수록 트랙명, 아티스트명, 아티스트 alias (대소문자 무시 부분 일치)
+- 정렬: `releaseDate` DESC NULLS LAST 고정
+
+---
+
 ## GET /api/releases/{id}
 
 **용도**: 릴리즈 상세 정보를 트랙리스트·커버 포함해 조회합니다. (REL-02)
