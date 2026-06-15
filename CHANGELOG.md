@@ -1,3 +1,9 @@
+## 2026-06-15
+
+- `spec/api/concerts.md` — `GET /api/concerts`에 `inCalendar` 파라미터 추가 및 `status` 우선순위 비고 반영; `GET /api/concerts/search` 엔드포인트 신규 등록 (공연명·아티스트명·alias LIKE 검색, `q` 필수)
+- `spec/api/releases.md` — `GET /api/releases`에 `following` 파라미터 추가 (팔로우 아티스트 필터); 정렬 설명 `releaseDate DESC NULLS LAST` 갱신
+- `spec/features.md` — CON-01 내 캘린더 필터(`inCalendar=true`) 추가; CON-08 공연 검색 기능 신규 추가 (P1); REL-03 `following=true` 필터 및 NULLS LAST 정렬 명세 반영
+
 ## 2026-06-12
 
 - `spec/api/admin.md` — `GET /api/admin/concerts/{id}` (EXCLUDED 포함 단건 조회), `DELETE /api/admin/concerts/{id}/artists/{artistId}` (아티스트 매핑 제거) 엔드포인트 신규 추가
