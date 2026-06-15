@@ -14,6 +14,7 @@
 |------|------|------|--------|------|
 | `artistId` | Long | N | — | 특정 아티스트 필터 |
 | `type` | String | N | — | `Album` \| `Single` \| `기타` |
+| `following` | Boolean | N | — | `true`이면 팔로우 아티스트 릴리즈만 반환. 미인증이면 빈 페이지 반환 |
 | `page` | int | N | `0` | 페이지 번호 |
 | `size` | int | N | `20` | 페이지 크기 |
 
@@ -51,8 +52,9 @@
 
 ### 비고
 
-- 정렬: `releaseDate` 내림차순 고정
+- 정렬: `releaseDate` DESC NULLS LAST 고정 (발매일 없는 항목은 항상 마지막)
 - `기타`: `Album`·`Single` 외 타입 (Live·Compilation·Remix·Soundtrack·Other 등) 전체
+- `following=true`이면 `artistId`, `type` 필터 무시 (독립 동작)
 - 홈 "새 앨범·싱글" 섹션: `size=8`로 재사용
 
 ---
