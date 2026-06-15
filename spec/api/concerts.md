@@ -76,6 +76,7 @@
 | 이름 | 타입 | 필수 | 기본값 | 설명 |
 |------|------|------|--------|------|
 | `q` | String | Y | — | 검색어 (빈 문자열·공백 불가) |
+| `status` | String | N | — | `UPCOMING` \| `ONGOING` \| `ENDED` \| `CANCELLED` |
 | `page` | int | N | `0` | 페이지 번호 |
 | `size` | int | N | `20` | 페이지 크기 |
 | `sort` | String | N | `startDate,desc` | 정렬 기준 |
