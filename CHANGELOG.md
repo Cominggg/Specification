@@ -1,3 +1,9 @@
+## 2026-06-16
+
+- `spec/api/releases.md` — `GET /api/releases/search` `q` 선택 파라미터로 변경; `type`(`Album`·`Single` 허용, 그 외 400), `following`(팔로우 아티스트 필터) 파라미터 추가; `following=true` 시 Bearer 토큰 필요 비고 추가
+- `spec/api/_index.md` — 전체 엔드포인트 목록에 `GET /api/concerts/search`, `GET /api/releases/search` 추가
+- `spec/features.md` — REL-04 `q` 선택 파라미터로 변경, `type`·`following` 조합 지원 명세 반영
+
 ## 2026-06-15
 - `spec/api/releases.md` — `GET /api/releases/search` 엔드포인트 신규 등록 (릴리즈명·트랙명·아티스트명·alias 검색, `q` 필수)
 - `spec/features.md` — REL-04 음악 검색 기능 신규 추가 (P1)
