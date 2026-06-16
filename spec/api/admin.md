@@ -159,6 +159,7 @@
 | `posterUrl` | String? | 포스터 URL |
 | `price` | String? | 가격 정보 |
 | `status` | String | `UPCOMING` \| `ONGOING` \| `ENDED` \| `CANCELLED` \| `EXCLUDED` \| `PENDING` |
+| `ticketOpenAt` | String? | 티켓 오픈 일시 (ISO 8601 datetime, 미입력 시 `null`) |
 | `bookingLinks` | Object[] | 예매처 링크 목록 |
 | `bookingLinks[].name` | String | 예매처 이름 |
 | `bookingLinks[].url` | String | 예매처 URL |
@@ -198,6 +199,7 @@
 | `venueName` | String | N | 공연장명 |
 | `posterUrl` | String | N | 포스터 이미지 URL |
 | `price` | String | N | 가격 정보 |
+| `ticketOpenAt` | String | N | 티켓 오픈 일시 (ISO 8601 datetime, 예: `2026-06-20T10:00:00`) |
 | `bookingLinks` | Object[] | N | 예매처 링크 목록. `null`이면 기존 링크 유지, `[]`이면 전체 삭제 |
 | `bookingLinks[].name` | String | Y | 예매처 이름 |
 | `bookingLinks[].url` | String | Y | 예매처 URL |
