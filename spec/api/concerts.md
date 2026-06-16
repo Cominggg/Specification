@@ -33,6 +33,7 @@
 | `venue` | String | 공연장명 |
 | `status` | String | `UPCOMING` \| `ONGOING` \| `ENDED` \| `CANCELLED` |
 | `isInCalendar` | Boolean | 내 캘린더 추가 여부 (비인증 시 `false`) |
+| `ticketOpenAt` | String? | 티켓 오픈 일시 (ISO 8601 datetime, 관리자 입력값, 미입력 시 `null`) |
 
 ```json
 {
@@ -46,7 +47,8 @@
       "endDate": "2025-08-16",
       "venue": "KSPO DOME, 서울",
       "status": "UPCOMING",
-      "isInCalendar": false
+      "isInCalendar": false,
+      "ticketOpenAt": "2025-07-01T10:00:00"
     }
   ],
   "page": 0,
@@ -142,6 +144,36 @@
 
 ---
 
+## GET /api/concerts/ticketing
+
+**용도**: 티켓 오픈 예정 공연 목록을 조회합니다. (`ticket_open_at > 현재 시각` 기준, 최대 20건)
+
+### 요청
+
+**Query Parameters**
+
+| 이름 | 타입 | 필수 | 기본값 | 설명 |
+|------|------|------|--------|------|
+| `following` | Boolean | N | `false` | `true`이면 팔로우한 아티스트의 공연만 반환 (인증 필요) |
+
+### 응답
+
+배열 형태 (최대 20건). `GET /api/concerts` `content` 항목과 동일 구조.
+
+### 에러
+
+| 코드 | 상태 코드 | 설명 |
+|------|-----------|------|
+| `UNAUTHORIZED` | 401 | `following=true`이고 비인증 요청인 경우 |
+
+### 비고
+
+- `ticket_open_at` 오름차순 정렬 (오픈 임박 순)
+- `following=false` 또는 파라미터 미전달: 비인증 요청 허용
+- `following=true`: 인증 필수. 팔로우 아티스트가 없으면 빈 배열 반환
+
+---
+
 ## GET /api/concerts/stats
 
 **용도**: 특정 월의 공연 건수를 조회합니다.
@@ -200,6 +232,7 @@
 | `status` | String | `UPCOMING` \| `ONGOING` \| `ENDED` \| `CANCELLED` |
 | `price` | String? | 가격 정보 |
 | `isInCalendar` | Boolean | 내 캘린더 추가 여부 |
+| `ticketOpenAt` | String? | 티켓 오픈 일시 (ISO 8601 datetime, 미입력 시 `null`) |
 | `ticketLinks` | Object[] | 예매처 목록 |
 | `ticketLinks[].id` | Long | 예매처 ID (`concert_booking_link.id`) |
 | `ticketLinks[].label` | String | 예매처 표시명 (`concert_booking_link.name`) |
@@ -219,6 +252,7 @@
   "status": "UPCOMING",
   "price": "전석 165,000원",
   "isInCalendar": false,
+  "ticketOpenAt": "2025-07-01T10:00:00",
   "ticketLinks": [
     { "id": 1, "label": "인터파크", "url": "https://..." }
   ]
