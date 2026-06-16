@@ -68,7 +68,7 @@
 | REL-01 | 새 앨범·싱글·EP 조회 | 아티스트의 최근 앨범·싱글·EP 발매 목록.<br>▸ **홈 화면**: 팔로우 아티스트 우선, 수평 스크롤 표시. 아티스트명·타이틀·발매일·타입 배지 노출.<br>▸ **아티스트 상세 페이지**: ART-02 디스코그래피 섹션과 데이터 공유. 전체 발매 목록(타입 필터 가능) + 수록곡 표시.<br>▸ 발매일 내림차순(최신순) 정렬. | P1 | MusicBrainz 데이터 |
 | REL-02 | 앨범·싱글·EP 상세 조회 | 릴리즈 상세 페이지(`/releases/:id`). ALBUM / SINGLE / EP 타입 공통 구조.<br>▸ **기본 정보**: 앨범 커버(MusicBrainz Cover Art Archive), 타이틀, 아티스트명, 발매일, 레이블, 타입 배지.<br>▸ **트랙리스트**: 트랙 번호·제목·재생 시간 표시. 스트리밍 기능 없음.<br>▸ ART-02 디스코그래피 및 REL-01 목록에서 진입. | P2 | MusicBrainz API |
 | REL-03 | 음악 전체 목록 조회 | 릴리즈(앨범·싱글·EP) 전체 목록 페이지(`/releases`). ALBUM / SINGLE / EP 타입 배지.<br>▸ **필터**: 아티스트(`artistId`), 타입(ALBUM/SINGLE/EP/기타), 관심 아티스트(`following=true`). 기타는 ALBUM·SINGLE·EP 외 타입(Live·Compilation·Remix·Soundtrack·Other·미분류 등) 전체를 포함. `following=true`이면 `artistId` 필터 무시; `type` 필터는 동시 적용 가능. 미인증 시 빈 페이지 반환.<br>▸ **정렬**: 발매일 내림차순 NULLS LAST 고정 (발매일 없는 항목 항상 마지막).<br>▸ **페이지네이션**: 20건/페이지. 필터 변경 시 1페이지로 초기화.<br>▸ **진입점**: ① 홈 "새 앨범·싱글" 섹션 헤더 "전체 보기" 링크 ② 상단 네비게이션 "음악" 탭(캘린더 우측).<br>▸ 카드 클릭 시 `/releases/:id` 상세 페이지(REL-02) 진입.<br>▸ API: `GET /api/releases?artistId=&type=&following=&page=&size=20`<br>▸ 결과 0건 시 "아직 수집된 음반 정보가 없습니다" 빈 상태 표시. | P2 | REL-01·REL-02 의존<br>BE 경로 충돌 정리 선행 필요 |
-| REL-04 | 음악 검색 | 릴리즈명·트랙명·아티스트명(alias 포함)으로 음악을 검색한다. `q` 파라미터 필수, 대소문자 무시 부분 일치. 정렬은 발매일 DESC NULLS LAST 고정.<br>▸ API: `GET /api/releases/search?q=` | P1 | |
+| REL-04 | 음악 검색 | 릴리즈명·트랙명·아티스트명(alias 포함)으로 음악을 검색한다. `q` 선택 파라미터(부분 일치, 대소문자 무시), `type`(`Album`·`Single`), `following`(팔로우 아티스트 필터) 조합 지원. `q` 생략 시 다른 필터만 적용. 정렬은 발매일 DESC NULLS LAST 고정.<br>▸ API: `GET /api/releases/search?q=&type=&following=` | P1 | |
 
 ## 데이터 문의
 
