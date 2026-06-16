@@ -1,3 +1,10 @@
+## 2026-06-17
+
+- `spec/api/concerts.md` — `ticketOpenAt` 필드 전체 응답에 추가; `GET /api/concerts/ticketing` 엔드포인트 신규 추가 (티켓 오픈 예정 공연 조회, `following` 파라미터 지원)
+- `spec/api/calendar.md` — `CalendarEntry`에 `type`(`CONCERT`|`TICKETING`) 및 `ticketOpenAt` 필드 추가; 캘린더 응답에 티켓팅 일정 통합 설명 반영
+- `spec/api/admin.md` — `GET /api/admin/concerts/{id}` 응답 및 `PUT /api/admin/concerts/{id}` 요청 바디에 `ticketOpenAt` 필드 추가
+- `spec/features.md` — CON-09 티켓 오픈 예정 공연 조회 신규 추가; CAL-01 티켓팅 일정 통합 반영; ADM-07 `ticketOpenAt` 수정 지원 반영
+
 ## 2026-06-16
 
 - `spec/api/releases.md` — `GET /api/releases/search` `q` 선택 파라미터로 변경; `type`(`Album`·`Single` 허용, 그 외 400), `following`(팔로우 아티스트 필터) 파라미터 추가; `following=true` 시 Bearer 토큰 필요 비고 추가
