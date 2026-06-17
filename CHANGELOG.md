@@ -1,5 +1,10 @@
 ## 2026-06-17
 
+- `spec/api/admin.md` — `PUT /api/admin/concerts/{id}` `ticketOpenAt` null 전달 시 기존 값 초기화(null-reset) 동작 명세 추가
+- `spec/admin.md` — ADM-07 수정 가능 필드에 `ticketOpenAt` 추가 및 null-reset 동작 명시
+
+## 2026-06-17
+
 - `spec/api/concerts.md` — `ticketOpenAt` 필드 전체 응답에 추가; `GET /api/concerts/ticketing` 엔드포인트 신규 추가 (티켓 오픈 예정 공연 조회, `following` 파라미터 지원)
 - `spec/api/calendar.md` — `CalendarEntry`에 `type`(`CONCERT`|`TICKETING`) 및 `ticketOpenAt` 필드 추가; 캘린더 응답에 티켓팅 일정 통합 설명 반영
 - `spec/api/admin.md` — `GET /api/admin/concerts/{id}` 응답 및 `PUT /api/admin/concerts/{id}` 요청 바디에 `ticketOpenAt` 필드 추가
