@@ -199,7 +199,7 @@
 | `venueName` | String | N | 공연장명 |
 | `posterUrl` | String | N | 포스터 이미지 URL |
 | `price` | String | N | 가격 정보 |
-| `ticketOpenAt` | String | N | 티켓 오픈 일시 (ISO 8601 datetime, 예: `2026-06-20T10:00:00`) |
+| `ticketOpenAt` | String? | N | 티켓 오픈 일시 (ISO 8601 datetime, 예: `2026-06-20T10:00:00`). `null` 또는 필드 생략 시 기존 값이 `null`로 초기화됨 (다른 필드와 달리 null-reset 지원) |
 | `bookingLinks` | Object[] | N | 예매처 링크 목록. `null`이면 기존 링크 유지, `[]`이면 전체 삭제 |
 | `bookingLinks[].name` | String | Y | 예매처 이름 |
 | `bookingLinks[].url` | String | Y | 예매처 URL |
