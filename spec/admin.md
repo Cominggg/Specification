@@ -5,7 +5,7 @@
 | ID | 기능명 | 설명 | 우선순위 | 비고 |
 |----|--------|------|----------|------|
 | ADM-01 | 아티스트 수동 등록·수정 | MusicBrainz 미등록 아티스트를 직접 입력. 이름(한/영/일), alias, 소속사, 데뷔일, 이미지 업로드. | P0 | 초기 데이터 구축 필수. **현재 BE 구현**: 수정(`PUT /api/admin/artists/{id}`)과 DB 아티스트 검색(`GET /api/admin/artists`)만 지원. 신규 아티스트 등록은 ADM-09 MBID 기반 수집 트리거(`POST /api/admin/data/collect/artists`)로 대체. alias·소속사·이미지 미구현. |
-| ADM-02 | PENDING 공연 검토 큐 관리 | 파이프라인이 수집·매칭한 PENDING 상태 공연 목록 조회. 후보 아티스트(`concert_artist_candidate`) 확인 후 승인 / 거절 처리. 승인 시 `concert_artist`로 이동하고 날짜 기반으로 status 자동 계산. 거절 시 `EXCLUDED` 처리. 아티스트 직접 지정(`POST /api/admin/concerts/{id}/artists`)으로 후보 보완 가능. | P0 | **BE 구현 완료** |
+| ADM-02 | PENDING 공연 검토 큐 관리 | 파이프라인이 수집·매칭한 PENDING 상태 공연 목록 조회. 후보 아티스트(`concert_artist_candidate`) 확인 후 승인 / 거절 처리. 승인 시 `concert_artist`로 이동하고 날짜 기반으로 status 자동 계산. 거절 시 `EXCLUDED` 처리. 아티스트 직접 지정(`POST /api/admin/concerts/{id}/artists`)으로 후보 보완 가능. **목록 응답에 `ticketOpenAt`·`bookingLinks` 포함.** 승인 시 optional request body로 `ticketOpenAt`·`bookingLinks` 동시 설정 가능. | P0 | **BE 구현 완료** |
 | ADM-03 | 공연 수동 등록 | KOPIS 미등록 소규모 공연 직접 입력. 날짜·장소·아티스트 매핑·예매처 URL. | P1 | **BE 구현 제거.** KOPIS ID 기반 공연 수집 트리거(ADM-09 `POST /api/admin/data/collect/concerts`)로 대체. |
 | ADM-04 | 공연 강제 상태 변경 | prfstate를 관리자가 직접 변경 가능 (긴급 정정용). | P1 | **BE 구현 완료.** `EXCLUDED` → `UPCOMING` / `ONGOING` 복원 시 연결된 아티스트의 `is_coming` 자동 갱신. |
 | ADM-07 | 공연 정보 수정 | 기존 공연의 내용 필드 수정. 수정 가능 필드: 공연명(`title`)·출연진(`cast`)·시작일·종료일·공연장명·포스터 URL·가격(`price`)·티켓 오픈 일시(`ticketOpenAt`). `ticketOpenAt`는 `null` 전달 시 기존 값 초기화 (null-reset 지원, 다른 필드는 null 전달 시 기존 값 유지). 예매처 링크(`concert_booking_link`) 추가·수정·삭제 포함. 상태 변경은 ADM-04에서만 처리. | P1 | **BE 구현 완료** |
