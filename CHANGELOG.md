@@ -1,3 +1,9 @@
+## 2026-06-18
+
+- `spec/api/admin.md` — `GET /admin/concerts/pending` 응답에 `ticketOpenAt`·`bookingLinks` 필드 추가
+- `spec/api/admin.md` — `PUT /admin/concerts/{id}/approve` optional request body (`ticketOpenAt`, `bookingLinks`) 명세 추가
+- `spec/admin.md` — ADM-02 PENDING 목록 응답 필드 및 승인 동시 설정 동작 명시
+
 ## 2026-06-17
 
 - `spec/api/admin.md` — `PUT /api/admin/concerts/{id}` `ticketOpenAt` null 전달 시 기존 값 초기화(null-reset) 동작 명세 추가
