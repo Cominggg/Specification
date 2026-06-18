@@ -125,6 +125,10 @@
 | `endDate` | String | 종료일 (`YYYY-MM-DD`) |
 | `venueName` | String | 공연장명 |
 | `posterUrl` | String? | 포스터 URL |
+| `ticketOpenAt` | String? | 티켓 오픈 일시 (ISO 8601 datetime, 미입력 시 `null`) |
+| `bookingLinks` | Object[] | 예매 링크 목록 (없으면 `[]`) |
+| `bookingLinks[].name` | String | 예매처 이름 |
+| `bookingLinks[].url` | String | 예매처 URL |
 | `candidates` | Object[] | 후보 아티스트 목록 |
 | `candidates[].artistId` | Long | 아티스트 ID |
 | `candidates[].name` | String | 아티스트명 |
@@ -266,6 +270,15 @@
 | 이름 | 타입 | 필수 | 설명 |
 |------|------|------|------|
 | `id` | Long | Y | 공연 ID |
+
+**Request Body** (`application/json`, 선택 — 바디 전체 생략 가능)
+
+| 필드 | 타입 | 필수 | 설명 |
+|------|------|------|------|
+| `ticketOpenAt` | String? | N | 티켓 오픈 일시 (ISO 8601 datetime, 예: `2026-07-01T10:00:00`). `null` 또는 생략 시 미설정 |
+| `bookingLinks` | Object[] | N | 예매 링크 목록. `null` 또는 생략 시 링크 미생성, `[]` 이면 no-op |
+| `bookingLinks[].name` | String | Y | 예매처 이름 |
+| `bookingLinks[].url` | String | Y | 예매처 URL |
 
 ### 응답
 
