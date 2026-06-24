@@ -2,7 +2,32 @@
 
 ---
 
-## GET /api/my/history
+## GET /api/me/concerts/upcoming
+
+**용도**: 내 캘린더에 저장한 공연 중 아직 종료되지 않은 공연 목록을 조회합니다. **(인증 필요)**
+
+### 요청
+
+**Query Parameters**
+
+| 이름 | 타입 | 필수 | 기본값 | 설명 |
+|------|------|------|--------|------|
+| `page` | int | N | `0` | 페이지 번호 |
+| `size` | int | N | `10` | 페이지 크기 |
+
+### 응답
+
+[페이지네이션 응답](_index.md#페이지네이션-응답) 형태. `content` 항목은 `GET /api/calendar` 배열 항목과 동일 구조.
+
+### 비고
+
+- `endDate >= 오늘`인 항목만 반환 — UPCOMING·ONGOING 공연 모두 포함
+- `type`은 항상 `"CONCERT"` (저장된 공연 기준, 티켓팅 항목 없음)
+- `isInCalendar`는 항상 `true`
+
+---
+
+## GET /api/me/concerts/history
 
 **용도**: 내 캘린더에 저장한 공연 중 이미 종료된 공연 목록을 조회합니다. **(인증 필요)**
 
@@ -31,7 +56,7 @@
 
 ### 비고
 
-- `startDate < 오늘`인 항목만 반환 (BE 필터링)
+- `endDate < 오늘`인 항목만 반환 (BE 필터링)
 
 ---
 
@@ -78,7 +103,7 @@
 
 ---
 
-## GET /api/inquiries/my
+## GET /api/me/inquiries
 
 **용도**: 내가 등록한 문의 목록을 조회합니다. **(인증 필요)**
 
@@ -133,7 +158,7 @@
 
 ---
 
-## GET /api/inquiries/my/{id}
+## GET /api/me/inquiries/{id}
 
 **용도**: 내 문의 상세를 조회합니다. **(인증 필요)**
 
@@ -147,7 +172,7 @@
 
 ### 응답
 
-`GET /api/inquiries/my` `content` 항목과 동일 구조에 아래 필드 추가:
+`GET /api/me/inquiries` `content` 항목과 동일 구조에 아래 필드 추가:
 
 | 필드 | 타입 | 설명 |
 |------|------|------|
@@ -158,3 +183,4 @@
 | 코드 | 상태 코드 | 설명 |
 |------|-----------|------|
 | `INQUIRY_NOT_FOUND` | 404 | 존재하지 않는 문의 또는 접근 권한 없음 |
+
