@@ -4,7 +4,6 @@
 - `spec/api/my.md` — 마이페이지 API 전체 경로 `/me/*`로 변경: `GET /api/me/concerts/upcoming`(신규), `GET /api/me/concerts/history`, `GET /api/me/inquiries`, `GET /api/me/inquiries/{id}`
 - `spec/api/calendar.md` — `GET /api/calendar/my` 섹션 제거 (`/api/me/concerts/upcoming`으로 이관)
 - `spec/features.md` — MY-01 필터 기준 `endDate < 오늘`로 명시, MY-03 API 경로·ONGOING 포함 설명 갱신
-- `spec/api/artists.md` — `GET /api/artists`에 `isComing`·`following` 쿼리 파라미터 추가; 세 파라미터 조합 필터 지원 비고 반영
 
 ## 2026-06-18
 
@@ -37,7 +36,6 @@
 - `spec/api/concerts.md` — `GET /api/concerts`에 `inCalendar` 파라미터 추가 및 `status` 우선순위 비고 반영; `GET /api/concerts/search` 엔드포인트 신규 등록 (공연명·아티스트명·alias LIKE 검색, `q` 필수)
 - `spec/api/releases.md` — `GET /api/releases`에 `following` 파라미터 추가 (팔로우 아티스트 필터); 정렬 설명 `releaseDate DESC NULLS LAST` 갱신
 - `spec/features.md` — CON-01 내 캘린더 필터(`inCalendar=true`) 추가; CON-08 공연 검색 기능 신규 추가 (P1); REL-03 `following=true` 필터 및 NULLS LAST 정렬 명세 반영
-- `spec/api/artists.md` — `GET /api/artists/following` 응답에 `isFollowing` 필드 추가 (항상 `true`)
 - `spec/api/concerts.md` — `GET /api/concerts/search`에 `status` 파라미터 추가 (상태별 필터 지원)
 - `spec/api/releases.md` — `GET /api/releases` `following=true` 비고 수정: `type` 필터 동시 적용 가능
 - `spec/features.md` — REL-03 `following=true` 동작 명세 수정: `type` 필터 병행 적용 허용
@@ -79,12 +77,9 @@
 ## 2026-06-03
 
 - `spec/api/releases.md` — type 표기 UPPER_CASE → Pascal Case(`Album`/`Single`) 통일; `GET /api/releases/{id}` 응답에 `totalTracks` 추가; `tracks[]`에 `discNumber`·`explicit` 추가
-- `spec/api/artists.md` — `GET /api/artists/{id}/releases` type 표기 Pascal Case 통일; `tracks[]`에 `discNumber`·`explicit` 추가
 
 ## 2026-06-02
 
-- `spec/api/artists.md` — `GET /api/artists/{id}` 응답에서 `debutDate` 필드 제거 (V6 DB 컬럼 DROP 반영)
-- `spec/api/artists.md` — 아티스트 3개 API의 `imageUrl` 설명에서 "항상 null" 문구 제거 (`image_url` 컬럼 추가 반영)
 
 ## 2026-05-30
 
@@ -120,7 +115,5 @@
 
 ## 2026-05-22
 
-- `spec/api/artists.md` — `tracks[].length_ms` → `tracks[].lengthMs` (camelCase 통일)
 - `spec/api/releases.md` — `tracks[].length_ms` → `tracks[].lengthMs` (camelCase 통일)
-- `spec/api/artists.md` — `GET /api/artists` name 검색에 alias 포함 명시; `GET /api/artists/{id}/concerts` status 영어 통일 (`공연예정` → `UPCOMING` 등)
 - `spec/api/admin.md` — `POST /api/admin/concerts`, `PUT /api/admin/concerts/{id}/state` status 영어 통일
