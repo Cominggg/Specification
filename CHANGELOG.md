@@ -1,3 +1,7 @@
+## 2026-06-24
+
+- `spec/api/artists.md` — `GET /api/artists`에 `isComing`·`following` 쿼리 파라미터 추가; 세 파라미터 조합 필터 지원 비고 반영
+
 ## 2026-06-18
 
 - `spec/api/admin.md` — `GET /admin/concerts/pending` 응답에 `ticketOpenAt`·`bookingLinks` 필드 추가
