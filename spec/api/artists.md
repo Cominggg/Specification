@@ -4,7 +4,7 @@
 
 ## GET /api/artists
 
-**용도**: 아티스트 목록을 조회합니다. 이름 검색을 지원합니다.
+**용도**: 아티스트 목록을 조회합니다. 이름 검색, isComing 필터, 팔로잉 필터를 지원합니다.
 
 ### 요청
 
@@ -13,6 +13,8 @@
 | 이름 | 타입 | 필수 | 기본값 | 설명 |
 |------|------|------|--------|------|
 | `name` | String | N | — | 이름 검색어 (부분 일치, 아티스트명 및 alias 포함) |
+| `isComing` | Boolean | N | — | `true`/`false`이면 예정 내한 공연 여부(`is_coming`)로 필터. 미전달 시 전체 조회 |
+| `following` | Boolean | N | — | `true`이면 팔로잉 아티스트만 조회. 미인증 또는 팔로잉 없으면 빈 페이지 반환 |
 | `page` | int | N | `0` | 페이지 번호 (0-based) |
 | `size` | int | N | `25` | 페이지 크기 |
 
@@ -48,6 +50,8 @@
 
 ### 비고
 
+- `name`, `isComing`, `following` 세 파라미터는 모두 독립적으로 조합 가능
+- `following=true` 시 인증 없거나 팔로잉 아티스트가 없으면 빈 페이지 반환
 - 검색어 변경 시 FE에서 `page=0`으로 초기화
 - `name` 검색은 `artist.name` 및 `artist_alias.name` 모두 포함 (대소문자 무시)
 
@@ -73,7 +77,6 @@
 | `name` | String | 아티스트명 |
 | `imageUrl` | String? | 프로필 이미지 URL |
 | `hasUpcomingConcert` | Boolean | 예정 내한 공연 여부 |
-| `isFollowing` | Boolean | 팔로우 여부 (항상 `true`) |
 | `isFollowing` | Boolean | 팔로우 여부 (비인증 시 `false`) |
 | `followersCount` | int | 팔로워 수 (`user_follow_artist` COUNT) |
 | `links` | Object[] | 외부 링크 목록 |
