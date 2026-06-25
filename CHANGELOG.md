@@ -1,3 +1,8 @@
+## 2026-06-25
+
+- `spec/api/my.md` — history `artistName` 설명에서 `confidence=HIGH` 기준 제거 (V15 마이그레이션으로 `concert_artist.confidence` 컬럼 삭제됨)
+- `spec/features.md` — ART-06 배지 노출 조건, CON-06 매칭 기준에서 confidence 관련 설명 제거
+
 ## 2026-06-24
 
 - `spec/api/artists.md` — `GET /api/artists`에 `isComing`·`following` 쿼리 파라미터 추가; 세 파라미터 조합 필터 지원 비고 반영
