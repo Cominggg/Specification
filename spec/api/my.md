@@ -47,7 +47,7 @@
 | 필드 | 타입 | 설명 |
 |------|------|------|
 | `id` | Long | 공연 ID |
-| `artistName` | String? | 아티스트명 (`confidence=HIGH` 기준, 없으면 `null`) |
+| `artistName` | String? | 아티스트명 (없으면 `null`) |
 | `title` | String | 공연명 |
 | `startDate` | String | 시작일 |
 | `endDate` | String? | 종료일 |
