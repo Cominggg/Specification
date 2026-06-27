@@ -14,9 +14,10 @@
 
 | ID | 기능명 | 설명 | 우선순위 | 비고 |
 |----|--------|------|----------|------|
-| AUTH-01 | OAuth 2.0 소셜 로그인 | Google / Kakao OAuth 2.0 연동. 로그인 성공 시 온보딩 없이 홈으로 바로 이동.<br>▸ 비로그인 상태에서 인증 필요 기능 접근 시: 로그인 유도 모달 표시 후 현재 URL 유지 (redirect_uri 파라미터 전달)<br>▸ Access Token 만료(30분) 시 Refresh Token(7일)으로 자동 재발급. Refresh Token 만료 시 재로그인 요구. | P0 | Spring Security |
-| AUTH-02 | 회원 프로필 조회·수정 | 닉네임, 프로필 이미지 관리. 프로필 이미지는 파일 업로드(jpg·png·webp, 최대 5MB) 방식. 업로드 실패 시 현재 이미지 유지. | P1 | |
+| AUTH-01 | OAuth 2.0 소셜 로그인 | Google / Kakao OAuth 2.0 연동.<br>▸ **신규 가입**: 로그인 시 PENDING 역할 발급 → 회원가입 완료 페이지(AUTH-04)로 이동.<br>▸ **기존 사용자**: 로그인 성공 시 홈으로 바로 이동.<br>▸ **탈퇴 후 재가입**: 재로그인 시 계정 재활성화 및 PENDING 역할 발급 → AUTH-04 플로우 진행. 기존 닉네임·가입 정보 초기화.<br>▸ **정지(SUSPENDED) 계정**: OAuth2 인증 단계에서 로그인 차단.<br>▸ 비로그인 상태에서 인증 필요 기능 접근 시: 로그인 유도 모달 표시 후 현재 URL 유지 (redirect_uri 파라미터 전달)<br>▸ Access Token 만료(30분) 시 Refresh Token(7일)으로 자동 재발급. Refresh Token 만료 시 재로그인 요구. | P0 | Spring Security |
+| AUTH-02 | 회원 프로필 조회·수정 | 닉네임 조회·수정. `GET /api/auth/me` 응답에 닉네임·출생연도·역할 포함. `PUT /api/auth/me?nickname=`으로 닉네임 수정 (최대 20자). | P1 | |
 | AUTH-03 | 회원 탈퇴 | 계정 및 관련 데이터(캘린더, 팔로우 등) 삭제. 탈퇴 전 확인 다이얼로그 표시. 탈퇴 완료 후 홈으로 이동. | P1 | |
+| AUTH-04 | 회원가입 완료 (온보딩) | PENDING 사용자가 닉네임·출생연도·약관 동의를 입력해 가입을 완료한다.<br>▸ 필수 입력: 닉네임(최대 20자), 출생연도, 이용약관 동의, 개인정보처리방침 동의.<br>▸ 선택 입력: 마케팅 정보 수신 동의.<br>▸ 완료 시 USER 역할로 승격, Access Token 발급 (`POST /api/auth/register`).<br>▸ 닉네임 중복 검사: `GET /api/auth/check-nickname?nickname=` (인증 불필요). | P0 | |
 
 ## 아티스트
 
