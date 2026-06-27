@@ -1,3 +1,9 @@
+## 2026-06-27
+
+- `spec/api/auth.md` — 콜백 응답을 리다이렉트(`isNewUser` 쿼리 파라미터) 방식으로 갱신; `GET /api/auth/me` 응답 `avatarUrl` → `birthYear` 교체·`PENDING` 역할 추가; `PUT /api/auth/me` multipart → Query Parameter 방식으로 변경; `POST /api/auth/register`(회원가입 완료), `GET /api/auth/check-nickname`(닉네임 중복 검사) 엔드포인트 신규 추가
+- `spec/auth-policy.md` — PENDING 역할 정책 추가: 신규 가입·탈퇴 후 재가입·SUSPENDED 차단 처리 흐름 명세
+- `spec/features.md` — AUTH-01 PENDING 역할 분기·SUSPENDED 차단·재가입 플로우 반영; AUTH-02 프로필 이미지 업로드 제거; AUTH-04 회원가입 완료(온보딩) 신규 추가 (P0)
+
 ## 2026-06-25
 
 - `spec/api/my.md` — history `artistName` 설명에서 `confidence=HIGH` 기준 제거 (V15 마이그레이션으로 `concert_artist.confidence` 컬럼 삭제됨)
