@@ -11,25 +11,33 @@
 ## CI/CD 흐름
 
 ```
-coming-be (PR/push)                  coming-data (PR/push)
+coming-be (PR → main)                coming-data (PR → main)
   └── CI                               └── CI
-      ├── 단위 테스트                        ├── pytest
-      └── 이미지 빌드 검증                   └── ruff check
+      ├── 단위/통합 테스트                   ├── pytest
+      │   (PostgreSQL·Redis 서비스 컨테이너) └── ruff check
+      └── Docker 이미지 빌드 검증
 
 coming-be (main 머지)                coming-data (main 머지)
   └── CD                               └── CD
       ├── 이미지 빌드                        ├── 이미지 빌드
-      ├── ghcr.io/coming/be:latest push     ├── ghcr.io/coming/data:latest push
+      ├── ghcr.io/cominggg/coming-be:latest  ├── ghcr.io/cominggg/coming-data:latest
+      │   push                              │   push
       └── SSH → Instance 1                  └── SSH → Instance 1
-              └── docker compose pull be            └── docker compose pull data
-                  docker compose up -d be                docker compose up -d data
+              ├── SCP: scripts/deploy.sh            └── docker compose pull data
+              ├── .env 갱신 (GitHub Secrets)             docker compose up -d data
+              └── bash ~/scripts/deploy.sh
+                      ├── 비활성 슬롯 이미지 pull
+                      ├── 비활성 슬롯 기동
+                      ├── /actuator/health 대기 (최대 30s)
+                      ├── upstream.conf 교체 + nginx -s reload
+                      └── 구 슬롯 중지
 ```
 
 ## 레포별 역할 분담
 
 | 레포 | 보유 파일 | 없는 파일 |
 |------|----------|----------|
-| coming-be | `Dockerfile`, CI/CD 워크플로우 | `docker-compose.yml` |
+| coming-be | `Dockerfile`, `.dockerignore`, `.github/workflows/ci.yml`, `.github/workflows/cd.yml`, `scripts/deploy.sh` | `docker-compose.yml` |
 | coming-data | `Dockerfile`, CI/CD 워크플로우 | `docker-compose.yml` |
 
 ## 서버 파일 구조
@@ -39,19 +47,34 @@ coming-be (main 머지)                coming-data (main 머지)
 ```
 ~/compose/
 ├── docker-compose.yml   # 서버 직접 작성 (레포에 없음)
-└── .env                 # CD 실행 시 GitHub Secrets로 자동 갱신
+├── .env                 # CD 실행 시 GitHub Secrets로 자동 갱신
+└── active_slot          # 현재 활성 슬롯 (blue 또는 green)
+
+~/scripts/
+└── deploy.sh            # CD가 SCP로 동기화 후 실행
+
+/etc/nginx/conf.d/
+└── upstream.conf        # 활성 슬롯 포트 지정, 배포마다 교체
 ```
 
 `docker-compose.yml` 구성:
 
 ```yaml
 services:
-  be:
+  be-blue:
     image: ghcr.io/cominggg/coming-be:latest
     ports: ["8080:8080"]
     env_file: .env
     environment:
-      JAVA_OPTS: "-Xmx300m -Xms200m"
+      JAVA_OPTS: "-Xmx300m -Xms200m -XX:MaxMetaspaceSize=128m"
+    depends_on: [redis]
+
+  be-green:
+    image: ghcr.io/cominggg/coming-be:latest
+    ports: ["8081:8080"]
+    env_file: .env
+    environment:
+      JAVA_OPTS: "-Xmx300m -Xms200m -XX:MaxMetaspaceSize=128m"
     depends_on: [redis]
 
   data:
@@ -75,7 +98,7 @@ services:
 
 | 서비스 | 배포 방식 | 다운타임 |
 |--------|----------|----------|
-| spring-be | CD 자동 배포 | 없음 (블루그린 전환) |
+| spring-be | 블루-그린 (비활성 슬롯 기동 → health check → Nginx 전환 → 구 슬롯 중지) | 없음 |
 | python-data | CD 자동 배포 | 수 초 (스케줄러 재시작) |
 | 모니터링 | 수동 SSH | 해당 없음 |
 
@@ -85,10 +108,14 @@ services:
 |--------|------|
 | `SERVER_HOST` | 서버 IP |
 | `SERVER_USER` | SSH 사용자명 |
+| `SERVER_HOME` | 서버 홈 디렉토리 경로 (SCP target 경로 지정) |
 | `SSH_PRIVATE_KEY` | SSH 개인키 |
-| `DB_HOST` / `DB_PORT` / `DB_NAME` / `DB_USER` / `DB_PASSWORD` | DB 접속 정보 |
-| `KOPIS_API_KEY` | KOPIS API |
-| `MUSICBRAINZ_USER_AGENT` | MusicBrainz API |
-| `SETLISTFM_API_KEY` | setlist.fm API |
-| `SPOTIFY_CLIENT_ID` / `SPOTIFY_CLIENT_SECRET` | Spotify API |
-| `INTERNAL_SECRET` | 내부 서비스 인증 |
+| `DB_URL` | DB 접속 URL (`jdbc:postgresql://host:port/db`) |
+| `DB_USERNAME` / `DB_PASSWORD` | DB 인증 정보 |
+| `JWT_SECRET` | JWT 서명 키 |
+| `REDIS_PASSWORD` | Redis 인증 비밀번호 |
+| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Google OAuth |
+| `KAKAO_CLIENT_ID` / `KAKAO_CLIENT_SECRET` | Kakao OAuth |
+| `CORS_ALLOWED_ORIGINS` | 허용 오리진 |
+| `OAUTH2_REDIRECT_BASE_URI` | OAuth2 콜백 기본 URI |
+| `DATA_PIPELINE_SECRET` | 내부 서비스 인증 |
