@@ -4,10 +4,10 @@
 
 | 항목 | 내용 |
 |------|------|
-| 최신 명세 | 2026-04-06 |
+| 최신 명세 | 2026-06-28 |
 | 상태 | In Review |
 | 프론트엔드 | React 19 + Vite, JavaScript (JSX) |
-| 백엔드 | Java 17 (Spring Boot 3.x) |
+| 백엔드 | Java 21 (Spring Boot 4.x) |
 
 ---
 
@@ -18,7 +18,7 @@
 | 구분 | 상세 |
 |------|------|
 | 프론트엔드 | React 19 + Vite, JavaScript (JSX) — 라우터: React Router v6, 상태관리: Zustand (전역) + React Query (서버), HTTP: Axios |
-| 백엔드 | Java 17 + Spring Boot 3.x |
+| 백엔드 | Java 21 + Spring Boot 4.x |
 | 데이터 수집 | Python (별도 레포지토리) — APScheduler 기반 스케줄링 |
 | 인증 | OAuth 2.0 (Google / Kakao) + JWT (Access / Refresh Token) |
 | 외부 API | KOPIS OpenAPI, MusicBrainz API, setlist.fm API |
