@@ -22,7 +22,7 @@ OAuth 제공자 로그인 페이지로 302 리다이렉트.
 
 ## GET /api/auth/callback/{provider}
 
-**용도**: OAuth 콜백을 처리하고 JWT를 발급합니다.
+**용도**: OAuth 콜백을 처리하고 토큰을 발급합니다.
 
 ### 요청
 
@@ -34,14 +34,22 @@ OAuth 제공자 로그인 페이지로 302 리다이렉트.
 
 ### 응답
 
-| 필드 | 타입 | 설명 |
-|------|------|------|
-| `accessToken` | String | Access Token (30분 만료) |
+Refresh Token을 HttpOnly Cookie에 설정한 뒤 아래 URL로 302 리다이렉트.
+
+```
+{redirectBaseUri}?isNewUser=true|false
+```
+
+| 쿼리 파라미터 | 타입 | 설명 |
+|--------------|------|------|
+| `isNewUser` | Boolean | `true`: PENDING 역할 (신규 가입 또는 탈퇴 후 재가입) / `false`: 기존 사용자 |
 
 ### 비고
 
 - Refresh Token은 HttpOnly Cookie에 설정 (7일 만료)
-- 로그인 성공 후 FE는 `redirect_uri` 파라미터 경로로 이동
+- `isNewUser=true` → FE는 회원가입 완료 페이지로 이동, `POST /api/auth/register` 완료 후 Access Token 발급
+- `isNewUser=false` → FE는 `POST /api/auth/refresh` 호출 후 홈으로 이동
+- SUSPENDED 계정 로그인 시 OAuth2 인증 단계에서 차단, `USER_SUSPENDED` 에러로 실패 핸들러 호출
 
 ---
 
@@ -107,22 +115,22 @@ Cookie에서 Refresh Token 자동 추출 (별도 바디 없음).
 
 ## GET /api/auth/me
 
-**용도**: 로그인한 사용자의 프로필 정보를 조회합니다. **(인증 필요)**
+**용도**: 로그인한 사용자의 프로필 정보를 조회합니다. **(인증 필요 — USER·ADMIN·PENDING)**
 
 ### 응답
 
 | 필드 | 타입 | 설명 |
 |------|------|------|
 | `id` | Long | 사용자 ID |
-| `nickname` | String | 닉네임 |
-| `avatarUrl` | String? | 프로필 이미지 URL |
-| `role` | String | `USER` \| `ADMIN` |
+| `nickname` | String? | 닉네임 (PENDING 상태일 때 null 가능) |
+| `birthYear` | Integer? | 출생연도 (PENDING 상태일 때 null) |
+| `role` | String | `USER` \| `ADMIN` \| `PENDING` |
 
 ```json
 {
   "id": 1,
   "nickname": "라이브덕후",
-  "avatarUrl": null,
+  "birthYear": 1995,
   "role": "USER"
 }
 ```
@@ -131,16 +139,15 @@ Cookie에서 Refresh Token 자동 추출 (별도 바디 없음).
 
 ## PUT /api/auth/me
 
-**용도**: 닉네임·프로필 이미지를 수정합니다. **(인증 필요)**
+**용도**: 닉네임을 수정합니다. **(인증 필요)**
 
 ### 요청
 
-**Content-Type**: `multipart/form-data`
+**Query Parameters**
 
-| 필드 | 타입 | 필수 | 설명 |
+| 이름 | 타입 | 필수 | 설명 |
 |------|------|------|------|
 | `nickname` | String | N | 닉네임 (최대 20자) |
-| `profileImage` | File | N | 이미지 파일 (jpg·png·webp, 최대 5MB) |
 
 ### 응답
 
@@ -150,6 +157,58 @@ Cookie에서 Refresh Token 자동 추출 (별도 바디 없음).
 
 | 코드 | 상태 코드 | 설명 |
 |------|-----------|------|
-| `INVALID_FILE_TYPE` | 400 | 허용되지 않는 파일 형식 |
-| `FILE_TOO_LARGE` | 400 | 파일 크기 5MB 초과 |
 | `NICKNAME_TOO_LONG` | 400 | 닉네임 20자 초과 |
+
+---
+
+## POST /api/auth/register
+
+**용도**: 회원가입을 완료하고 USER 역할의 Access Token을 발급합니다. **(인증 필요 — PENDING)**
+
+### 요청
+
+**Content-Type**: `application/json`
+
+| 필드 | 타입 | 필수 | 설명 |
+|------|------|------|------|
+| `nickname` | String | Y | 닉네임 (최대 20자) |
+| `birthYear` | Integer | Y | 출생연도 |
+| `agreedTerms` | Boolean | Y | 이용약관 동의 (반드시 `true`) |
+| `agreedPrivacy` | Boolean | Y | 개인정보처리방침 동의 (반드시 `true`) |
+| `agreedMarketing` | Boolean | N | 마케팅 정보 수신 동의 (선택) |
+
+### 응답
+
+| 필드 | 타입 | 설명 |
+|------|------|------|
+| `accessToken` | String | USER 역할 Access Token (30분 만료) |
+
+### 에러
+
+| 코드 | 상태 코드 | 설명 |
+|------|-----------|------|
+| `TERMS_NOT_AGREED` | 400 | 필수 약관 미동의 |
+| `NICKNAME_REQUIRED` | 400 | 닉네임 미입력 |
+| `NICKNAME_TOO_LONG` | 400 | 닉네임 20자 초과 |
+| `BIRTH_YEAR_REQUIRED` | 400 | 출생연도 미입력 |
+| `NICKNAME_DUPLICATE` | 409 | 닉네임 중복 |
+
+---
+
+## GET /api/auth/check-nickname
+
+**용도**: 닉네임 중복 여부를 확인합니다.
+
+### 요청
+
+**Query Parameters**
+
+| 이름 | 타입 | 필수 | 설명 |
+|------|------|------|------|
+| `nickname` | String | Y | 확인할 닉네임 |
+
+### 응답
+
+| 필드 | 타입 | 설명 |
+|------|------|------|
+| `available` | Boolean | `true`: 사용 가능 / `false`: 중복 |
