@@ -16,8 +16,12 @@
               │       │               │
               │       ▼               │
               │  ┌─────────────┐      │
-              │  │  spring-be  │      │
+              │  │  be-blue    │      │ ← 활성 슬롯
               │  │   :8080     │      │
+              │  └─────────────┘      │
+              │  ┌─────────────┐      │
+              │  │  be-green   │      │ ← 대기 슬롯
+              │  │   :8081     │      │
               │  └─────────────┘      │
               │  ┌─────────────┐      │
               │  │ python-data │      │
@@ -61,15 +65,25 @@
 
 | 컨테이너 | 이미지 | 포트 | 비고 |
 |----------|--------|------|------|
-| spring-be | `ghcr.io/cominggg/coming-be:latest` | 8080 | JVM 힙 `-Xmx300m` |
+| be-blue | `ghcr.io/cominggg/coming-be:latest` | 8080 | JVM 힙 `-Xmx300m -Xms200m -XX:MaxMetaspaceSize=128m` |
+| be-green | `ghcr.io/cominggg/coming-be:latest` | 8081 | JVM 힙 동일, 블루-그린 대기 슬롯 |
 | python-data | `ghcr.io/cominggg/coming-data:latest` | - | APScheduler 상시 실행 |
 | redis | `redis:7-alpine` | 6379 | |
+
+> **RAM 예산**: 전환 순간 두 JVM 동시 기동 기준 약 1.5GB 사용 (여유 ~500MB).
+> `-XX:MaxMetaspaceSize=128m`으로 메타스페이스 상한을 명시해 OOM 위험 감소.
 
 ### Nginx 리버스 프록시
 
 ```
-/api/** → localhost:8080 (spring-be)
+/api/** → coming_backend (upstream.conf가 가리키는 슬롯)
 ```
+
+`/etc/nginx/conf.d/upstream.conf`로 활성 슬롯 포트를 관리하며, 배포 시 교체 후 `nginx -s reload`로 무중단 전환.
+
+### 활성 슬롯 추적
+
+`~/compose/active_slot` 파일에 현재 활성 슬롯(`blue` 또는 `green`)을 기록.
 
 ## Instance 2 — 모니터링
 
