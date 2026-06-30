@@ -30,6 +30,7 @@
 | `title` | String | 타이틀 |
 | `type` | String | `Album` \| `Single` 또는 기타 |
 | `releaseDate` | String? | 발매일 |
+| `spotifyId` | String? | Spotify 릴리즈 ID (`release_group.spotify_id`) |
 
 ```json
 {
@@ -40,7 +41,8 @@
       "artistName": "Kenshi Yonezu",
       "title": "LOST CORNER",
       "type": "Album",
-      "releaseDate": "2024-08-28"
+      "releaseDate": "2024-08-28",
+      "spotifyId": "4CPMuGYB4TP0BdHiWlVMOA"
     }
   ],
   "page": 0,
@@ -89,6 +91,7 @@
 | `title` | String | 타이틀 |
 | `type` | String | `Album` \| `Single` 또는 기타 |
 | `releaseDate` | String? | 발매일 |
+| `spotifyId` | String? | Spotify 릴리즈 ID (`release_group.spotify_id`) |
 
 ### 에러
 
@@ -129,12 +132,14 @@
 | `totalTracks` | int? | 전체 트랙 수 |
 | `artistId` | Long | 아티스트 ID |
 | `artistName` | String | 아티스트명 |
+| `spotifyId` | String? | Spotify 릴리즈 ID (`release_group.spotify_id`) |
 | `tracks` | Object[] | 수록곡 목록 |
 | `tracks[].position` | int | 트랙 순서 |
 | `tracks[].title` | String | 트랙 제목 |
 | `tracks[].lengthMs` | int? | 재생 시간 (ms) |
 | `tracks[].discNumber` | int? | 디스크 번호 (멀티 디스크 앨범) |
 | `tracks[].explicit` | Boolean? | 명시적 콘텐츠 여부 |
+| `tracks[].spotifyId` | String? | Spotify 트랙 ID (`track.spotify_id`) |
 
 ```json
 {
@@ -147,9 +152,10 @@
   "totalTracks": 13,
   "artistId": 2,
   "artistName": "Kenshi Yonezu",
+  "spotifyId": "4CPMuGYB4TP0BdHiWlVMOA",
   "tracks": [
-    { "position": 1, "title": "LOST CORNER", "lengthMs": 262000, "discNumber": 1, "explicit": false },
-    { "position": 2, "title": "LADY", "lengthMs": 238000, "discNumber": 1, "explicit": false }
+    { "position": 1, "title": "LOST CORNER", "lengthMs": 262000, "discNumber": 1, "explicit": false, "spotifyId": "1YHEuThB7dJjBBjDaJZJyO" },
+    { "position": 2, "title": "LADY", "lengthMs": 238000, "discNumber": 1, "explicit": false, "spotifyId": null }
   ]
 }
 ```
