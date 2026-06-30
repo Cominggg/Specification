@@ -291,13 +291,15 @@
 | `tracks` | Object[] | 트랙 목록 (없으면 `[]`) |
 | `tracks[].order` | int | 순서 (`setlist_track.position`) |
 | `tracks[].title` | String | 곡명 (`setlist_track.song_name`) |
+| `sourceUrl` | String? | setlist.fm 원본 URL (`setlist.attribution_url`). 셋리스트 데이터 미존재 시 `null` |
 
 ```json
 {
   "tracks": [
     { "order": 1, "title": "Pale Blue" },
     { "order": 2, "title": "KICK BACK" }
-  ]
+  ],
+  "sourceUrl": "https://www.setlist.fm/setlist/yoasobi/2025/kspo-dome-seoul-south-korea-1a2b3c4d.html"
 }
 ```
 
@@ -306,3 +308,7 @@
 | 코드 | 상태 코드 | 설명 |
 |------|-----------|------|
 | `CONCERT_NOT_FOUND` | 404 | 존재하지 않는 공연 |
+
+### 비고
+
+- `sourceUrl`이 `null`인 경우(셋리스트 데이터 없음) FE는 `https://www.setlist.fm/`으로 폴백
