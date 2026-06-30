@@ -183,4 +183,33 @@
 | 코드 | 상태 코드 | 설명 |
 |------|-----------|------|
 | `INQUIRY_NOT_FOUND` | 404 | 존재하지 않는 문의 또는 접근 권한 없음 |
+---
+
+## GET /api/me/inquiries/exists
+
+**용도**: 특정 대상에 대해 현재 사용자의 PENDING 상태 문의가 존재하는지 조회합니다. **(인증 필요)**
+
+### 요청
+
+**Query Parameters**
+
+| 이름 | 타입 | 필수 | 설명 |
+|------|------|------|------|
+| `type` | String | Y | `ARTIST` \| `CONCERT` \| `SETLIST` |
+| `targetId` | Long | Y | 문의 대상 ID |
+
+### 응답
+
+| 필드 | 타입 | 설명 |
+|------|------|------|
+| `exists` | Boolean | PENDING 문의 존재 여부 |
+
+```json
+{ "exists": true }
+```
+
+### 비고
+
+- `POST /api/inquiries` 호출 전 중복 등록 여부를 사전 확인하는 용도
+- `exists=true`이면 해당 사용자·유형·대상에 이미 PENDING 문의가 존재함
 
