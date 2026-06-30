@@ -102,7 +102,8 @@ CREATE TABLE setlist (
     id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     concert_id bigint NOT NULL REFERENCES concert(id),
     setlist_fm_id varchar(50) NOT NULL UNIQUE,
-    collected_at timestamp NOT NULL
+    collected_at timestamp NOT NULL,
+    attribution_url text
 );
 
 CREATE TABLE setlist_track (
@@ -202,3 +203,4 @@ CREATE TABLE inquiry (
 | 2026-06-07 | concert_artist_candidate 테이블 추가 — 파이프라인 매칭 결과를 어드민 검토 전 임시 저장 (승인 시 concert_artist로 이동, 거절 시 concert=EXCLUDED) |
 | 2026-06-11 | concert.venue_address 컬럼 제거 — 파이프라인 미수집, API 미노출 |
 | 2026-06-11 | artist, artist_alias, concert, concert_artist, concert_artist_candidate audit 컬럼(created_at/updated_at) 제거 — 파이프라인 수집 테이블은 감사 이력 미관리. user, user_follow_artist, user_concert_calendar, inquiry는 유지 |
+| 2026-06-30 | setlist.attribution_url(text) 컬럼 추가 — setlist.fm 저작자 표시 URL 저장 (V21 마이그레이션) |
