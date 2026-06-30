@@ -190,12 +190,14 @@
 | `type` | String | `Album` \| `Single` |
 | `releaseDate` | String? | 발매일 |
 | `coverUrl` | String? | 커버 이미지 URL |
+| `spotifyId` | String? | Spotify 릴리즈 ID (`release_group.spotify_id`) |
 | `tracks` | Object[] | 수록곡 목록 |
 | `tracks[].position` | int | 트랙 순서 |
 | `tracks[].title` | String | 트랙 제목 |
 | `tracks[].lengthMs` | int? | 재생 시간 (ms) |
 | `tracks[].discNumber` | int? | 디스크 번호 (멀티 디스크 앨범) |
 | `tracks[].explicit` | Boolean? | 명시적 콘텐츠 여부 |
+| `tracks[].spotifyId` | String? | Spotify 트랙 ID (`track.spotify_id`) |
 
 ### 에러
 
