@@ -1,3 +1,7 @@
+## 2026-06-30
+
+- `spec/api/my.md` — `GET /api/me/inquiries/exists` 엔드포인트 추가: 문의 제출 전 PENDING 중복 여부 사전 확인
+
 ## 2026-06-27
 
 - `spec/api/auth.md` — 콜백 응답을 리다이렉트(`isNewUser` 쿼리 파라미터) 방식으로 갱신; `GET /api/auth/me` 응답 `avatarUrl` → `birthYear` 교체·`PENDING` 역할 추가; `PUT /api/auth/me` multipart → Query Parameter 방식으로 변경; `POST /api/auth/register`(회원가입 완료), `GET /api/auth/check-nickname`(닉네임 중복 검사) 엔드포인트 신규 추가
