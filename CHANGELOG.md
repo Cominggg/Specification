@@ -1,6 +1,8 @@
 ## 2026-06-30
 
 - `spec/api/my.md` — `GET /api/me/inquiries/exists` 엔드포인트 추가: 문의 제출 전 PENDING 중복 여부 사전 확인
+- `spec/api/concerts.md` — `GET /api/concerts/{id}/setlist` 응답에 `sourceUrl: String?` 필드 추가 (setlist.fm attribution URL); 비고 섹션 추가 (null 시 `https://www.setlist.fm/` 폴백)
+- `spec/erd.md` — `setlist.attribution_url(text)` 컬럼 추가 (V21 마이그레이션)
 
 ## 2026-06-27
 
