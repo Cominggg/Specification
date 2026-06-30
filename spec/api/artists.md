@@ -29,6 +29,7 @@
 | `imageUrl` | String? | 프로필 이미지 URL |
 | `hasUpcomingConcert` | Boolean | 예정 내한 공연 여부 (`artist.is_coming`) |
 | `isFollowing` | Boolean | 팔로우 여부 (비인증 시 `false`) |
+| `spotifyUrl` | String? | Spotify 아티스트 URL (없으면 `null`) |
 
 ```json
 {
@@ -38,7 +39,8 @@
       "name": "YOASOBI",
       "imageUrl": null,
       "hasUpcomingConcert": true,
-      "isFollowing": false
+      "isFollowing": false,
+      "spotifyUrl": "https://open.spotify.com/artist/..."
     }
   ],
   "page": 0,
