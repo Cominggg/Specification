@@ -1,3 +1,8 @@
+## 2026-07-01
+
+- `spec/api/releases.md` — `GET /api/releases`, `GET /api/releases/search` content[] 응답에 `spotifyId: String?` 추가 (`release_group.spotify_id`); `GET /api/releases/{id}` 최상위 및 `tracks[]`에 각각 `spotifyId` 추가 (`track.spotify_id`)
+- `spec/api/artists.md` — `GET /api/artists/{id}/releases` content[] 릴리즈 레벨 및 `tracks[]`에 `spotifyId: String?` 추가
+
 ## 2026-06-30
 
 - `spec/api/artists.md` — `GET /api/artists` 목록 응답에 `spotifyUrl: String?` 필드 추가 (Spotify URL 없으면 `null`)
