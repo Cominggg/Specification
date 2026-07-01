@@ -125,13 +125,15 @@ Cookie에서 Refresh Token 자동 추출 (별도 바디 없음).
 | `nickname` | String? | 닉네임 (PENDING 상태일 때 null 가능) |
 | `birthYear` | Integer? | 출생연도 (PENDING 상태일 때 null) |
 | `role` | String | `USER` \| `ADMIN` \| `PENDING` |
+| `agreedMarketing` | Boolean | 마케팅 수신 동의 여부 (미동의 또는 PENDING 상태이면 `false`) |
 
 ```json
 {
   "id": 1,
   "nickname": "라이브덕후",
   "birthYear": 1995,
-  "role": "USER"
+  "role": "USER",
+  "agreedMarketing": true
 }
 ```
 
@@ -158,6 +160,24 @@ Cookie에서 Refresh Token 자동 추출 (별도 바디 없음).
 | 코드 | 상태 코드 | 설명 |
 |------|-----------|------|
 | `NICKNAME_TOO_LONG` | 400 | 닉네임 20자 초과 |
+
+---
+
+## PATCH /api/auth/me/marketing
+
+**용도**: 마케팅 수신 동의 여부를 변경합니다. **(인증 필요)**
+
+### 요청
+
+**Content-Type**: `application/json`
+
+| 필드 | 타입 | 필수 | 설명 |
+|------|------|------|------|
+| `agreedMarketing` | Boolean | Y | 마케팅 수신 동의 여부 |
+
+### 응답
+
+`200 OK` (바디 없음)
 
 ---
 
