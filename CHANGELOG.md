@@ -1,5 +1,11 @@
 ## 2026-07-01
 
+- `spec/api/auth.md` — `GET /api/auth/me` 응답에 `agreedMarketing: Boolean` 추가; `PATCH /api/auth/me/marketing` 엔드포인트 신규 추가
+- `spec/api/admin.md` — `GET /api/admin/artists/{id}` 신규 추가 (alias 포함 단건 조회); `PUT /api/admin/artists/{id}` 요청 바디에 `aliases` 필드 추가·`debutDate` 제거
+- `spec/admin.md` — ADM-01 비고 갱신: alias 편집(`GET/PUT /api/admin/artists/{id}`) 구현 완료 반영
+
+## 2026-07-01
+
 - `spec/api/releases.md` — `GET /api/releases`, `GET /api/releases/search` content[] 응답에 `spotifyId: String?` 추가 (`release_group.spotify_id`); `GET /api/releases/{id}` 최상위 및 `tracks[]`에 각각 `spotifyId` 추가 (`track.spotify_id`)
 - `spec/api/artists.md` — `GET /api/artists/{id}/releases` content[] 릴리즈 레벨 및 `tracks[]`에 `spotifyId: String?` 추가
 
