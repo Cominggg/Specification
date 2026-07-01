@@ -33,6 +33,38 @@
 
 ---
 
+## GET /api/admin/artists/{id}
+
+**용도**: 어드민 전용 아티스트 단건 조회. alias를 포함한 편집 폼 초기값 로드에 사용합니다.
+
+### 요청
+
+**Path Parameters**
+
+| 이름 | 타입 | 필수 | 설명 |
+|------|------|------|------|
+| `id` | Long | Y | 아티스트 ID |
+
+### 응답
+
+`200 OK`
+
+| 필드 | 타입 | 설명 |
+|------|------|------|
+| `id` | Long | 아티스트 ID |
+| `name` | String | 아티스트명 |
+| `aliases.ja` | String[] | 일본어 alias 목록 (없으면 `[]`) |
+| `aliases.en` | String[] | 영어 alias 목록 (없으면 `[]`) |
+| `aliases.ko` | String[] | 한국어 alias 목록 (없으면 `[]`) |
+
+### 에러
+
+| 코드 | 상태 코드 | 설명 |
+|------|-----------|------|
+| `ARTIST_NOT_FOUND` | 404 | 존재하지 않는 아티스트 |
+
+---
+
 ## PUT /api/admin/artists/{id}
 
 **용도**: 아티스트 정보를 수정합니다.
@@ -51,7 +83,10 @@
 |------|------|------|------|
 | `name` | String | N | 아티스트명 |
 | `sortName` | String | N | 정렬용 이름 |
-| `debutDate` | String | N | 데뷔일 (`YYYY-MM-DD`) |
+| `aliases` | Object | N | locale별 alias 목록. 미전달 시 변경 없음 |
+| `aliases.ja` | String[] | N | 일본어 alias 목록. 빈 배열 `[]` 전달 시 전체 삭제, 배열 전달 시 교체 |
+| `aliases.en` | String[] | N | 영어 alias 목록. 빈 배열 `[]` 전달 시 전체 삭제, 배열 전달 시 교체 |
+| `aliases.ko` | String[] | N | 한국어 alias 목록. 빈 배열 `[]` 전달 시 전체 삭제, 배열 전달 시 교체 |
 
 ### 응답
 
@@ -62,6 +97,12 @@
 | 코드 | 상태 코드 | 설명 |
 |------|-----------|------|
 | `ARTIST_NOT_FOUND` | 404 | 존재하지 않는 아티스트 |
+
+### 비고
+
+- `aliases` 필드 자체를 미전달하면 alias 변경 없음
+- `aliases.ja` 등 각 locale 필드는 항상 세 필드 모두 전송 권장
+- 공백 문자열은 저장되지 않음 (서버에서 필터링)
 
 ---
 
