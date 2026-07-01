@@ -16,12 +16,14 @@ Jpop 아티스트 내한 공연 정보 통합 웹 플랫폼 **Coming**의 기획
 |------|------|
 | spec/overview.md | 프로젝트 개요, 기술 스택, 우선순위 기준 |
 | spec/features.md | 기능 명세 (AUTH / ART / CON / CAL / MY / SRC / INQ) |
-| spec/api.md | API 엔드포인트 명세 |
-| spec/auth-policy.md | 인증 및 토큰 정책 |
-| spec/ux-policy.md | 에러 처리·UX 정책 |
-| spec/admin.md | 관리자 기능 명세 |
-| spec/pipeline.md | 데이터 수집 파이프라인 명세 |
-| spec/constraints.md | 제약 사항 및 리스크 |
+| spec/api/ | API 엔드포인트 명세 (도메인별 분리) |
+| spec/policy/auth-policy.md | 인증 및 토큰 정책 |
+| spec/policy/ux-policy.md | 에러 처리·UX 정책 |
+| spec/policy/constraints.md | 제약 사항 및 리스크 |
+| spec/data/erd.md | 데이터베이스 구조 (ERD) |
+| spec/data/pipeline.md | 데이터 수집 파이프라인 명세 |
+| spec/admin/features.md | 관리자 기능 명세 (ADM-xx) |
+| spec/legal/ | 법적 문서 (이용약관·개인정보처리방침·마케팅 수신 동의) |
 | CHANGELOG.md | 명세 변경 이력 |
 
 ## 명세 작성 규칙
