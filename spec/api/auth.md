@@ -177,7 +177,7 @@ Cookie에서 Refresh Token 자동 추출 (별도 바디 없음).
 
 ### 응답
 
-`200 OK` (바디 없음)
+`204 No Content` (바디 없음)
 
 ---
 
