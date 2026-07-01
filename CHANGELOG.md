@@ -1,5 +1,9 @@
 ## 2026-07-01
 
+- `spec/api/auth.md` — `PATCH /api/auth/me/marketing` 응답을 `200 OK`에서 `204 No Content`로 수정
+
+## 2026-07-01
+
 - `spec/api/auth.md` — `GET /api/auth/me` 응답에 `agreedMarketing: Boolean` 추가; `PATCH /api/auth/me/marketing` 엔드포인트 신규 추가
 - `spec/api/admin.md` — `GET /api/admin/artists/{id}` 신규 추가 (alias 포함 단건 조회); `PUT /api/admin/artists/{id}` 요청 바디에 `aliases` 필드 추가·`debutDate` 제거
 - `spec/admin.md` — ADM-01 비고 갱신: alias 편집(`GET/PUT /api/admin/artists/{id}`) 구현 완료 반영
