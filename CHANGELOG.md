@@ -1,3 +1,8 @@
+## 2026-07-03
+
+- `spec/api/pipeline.md` — `POST /api/admin/data/collect/artists`, `POST /api/admin/data/collect/concerts`, `POST /api/admin/data/collect/concerts/{id}/setlist` 동기 처리로 전환: 응답 바디 없음 → 수집 결과 DTO 반환; `PIPELINE_NOT_FOUND`(404)·`PIPELINE_CONFLICT`(409) 에러 추가
+- `spec/data/pipeline.md` — ⑤ 관리자 수집 함수 동기/비동기 분리: 아티스트·공연·셋리스트 수집은 동기(결과 반환), 릴리즈·커버아트는 비동기 유지
+
 ## 2026-07-01
 
 - `spec/api/auth.md` — `PATCH /api/auth/me/marketing` 응답을 `200 OK`에서 `204 No Content`로 수정
