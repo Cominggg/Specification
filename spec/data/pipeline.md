@@ -110,14 +110,19 @@ coming-data/
 | `search_artists(name)` | MusicBrainz 아티스트명 검색. 최대 10건 반환. |
 | `search_concerts(title)` | KOPIS 공연명 검색. 오늘~2년 후 범위, 최대 20건 반환. |
 
-**수집 트리거 함수** (비동기 처리):
+**수집 함수** (동기 처리 — 결과 반환):
+
+| 함수 | 반환 | 설명 |
+|------|------|------|
+| `collect_artist_initial(mbid)` | `CollectArtistResult` | MBID 기반 아티스트 수집 (정보·이미지). 릴리즈는 미포함. |
+| `collect_and_save_concert(kopis_id)` | `CollectConcertResult` | 단건 KOPIS 공연 수집 → alias 매칭 → DB 저장. 내한 공연 아니거나 매칭 없으면 `success: false`. |
+| `collect_and_save_setlist(concert_id)` | `CollectSetlistResult` | 단건 공연 셋리스트 수집 → DB 저장. 데이터 미존재 시 `success: false`. |
+
+**수집 트리거 함수** (비동기 처리 — 결과 미반환):
 
 | 함수 | 설명 |
 |------|------|
-| `collect_artist_initial(mbid)` | MBID 기반 아티스트 초기 수집 (정보·릴리즈·이미지). |
-| `collect_and_save_concert(kopis_id)` | 단건 KOPIS 공연 수집 → alias 매칭 → DB 저장. 내한 공연 아니거나 매칭 없으면 건너뜀. |
 | `collect_and_save_release_group(release_group_mbid, artist_mbid)` | 단건 릴리즈 그룹 수집 (트랙·레이블 포함) → DB 저장. |
 | `collect_and_save_cover_art(release_group_mbid)` | 단건 릴리즈 그룹 커버아트 수집 → DB 갱신. |
-| `collect_and_save_setlist(concert_id)` | 단건 공연 셋리스트 수집 → DB 저장. |
 
 BE에서는 `/api/admin/data/*` 엔드포인트를 통해 Data 파이프라인에 HTTP 요청을 보낸다. (`X-Internal-Secret` 헤더로 인증) → 상세 명세: [spec/api/pipeline.md](../api/pipeline.md)
