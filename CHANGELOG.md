@@ -1,5 +1,18 @@
 ## 2026-07-03
 
+- `spec/data/pipeline.md` — 함수별 로직·예외 처리·외부 API 상세를 하위 문서로 분리한 인덱스로 재구성; 릴리즈 수집을 MusicBrainz+Cover Art Archive에서 Spotify 단독 방식으로, Wikipedia alias 수집을 로마자→한글 변환(`ja_romanize`)으로 코드 실체에 맞게 갱신; `prfcast` 기반 매칭 단계 폐기(현재는 title 구문 매칭 단일 전략) 반영
+- `spec/data/scheduler.md` — 신규 추가: 잡별 cron 시각·진입점·의존관계, 체크포인트·복구 파일, CLI 커맨드, 내부 API(`api.py`) 동시 실행 가드 명세
+- `spec/data/matchers.md` — 신규 추가: `has_match`·`match_concert`·`_phrase_match_title` 함수별 로직 명세
+- `spec/data/error-handling.md` — 신규 추가: 재시도/백오프 정책, Spotify 429 밴 처리, 체크포인트 기반 재개, 로깅 규칙 명세
+- `spec/data/collectors/musicbrainz.md` — 신규 추가: MusicBrainz 아티스트 수집 함수·API 요청/응답 상세 (Last.fm 인기도 필터는 코드에서 제거되어 명세에 미포함)
+- `spec/data/collectors/release.md` — 신규 추가: Spotify 릴리즈 수집 함수·API 상세
+- `spec/data/collectors/kopis.md` — 신규 추가: KOPIS 공연 수집 함수·API 상세
+- `spec/data/collectors/setlist.md` — 신규 추가: setlist.fm 수집 함수·API 상세
+- `spec/data/collectors/ja_romanize.md` — 신규 추가: 로마자→한글 alias 변환 규칙·함수 로직 상세
+- `spec/data/collectors/artist_image.md` — 신규 추가: Spotify 이미지 수집·Client Credentials 인증 함수 상세
+
+## 2026-07-03
+
 - `spec/api/pipeline.md` — `POST /api/admin/data/collect/artists`, `POST /api/admin/data/collect/concerts`, `POST /api/admin/data/collect/concerts/{id}/setlist` 동기 처리로 전환: 응답 바디 없음 → 수집 결과 DTO 반환; `PIPELINE_NOT_FOUND`(404)·`PIPELINE_CONFLICT`(409) 에러 추가
 - `spec/data/pipeline.md` — ⑤ 관리자 수집 함수 동기/비동기 분리: 아티스트·공연·셋리스트 수집은 동기(결과 반환), 릴리즈·커버아트는 비동기 유지
 
