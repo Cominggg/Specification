@@ -1,3 +1,8 @@
+## 2026-07-04
+
+- `spec/api/admin.md` — `POST /api/admin/concerts/{id}/candidates`, `DELETE /api/admin/concerts/{id}/candidates/{artistId}` 신규 추가 (PENDING 공연 후보 아티스트 관리); `POST /api/admin/concerts/{id}/artists`, `DELETE /api/admin/concerts/{id}/artists/{artistId}`에 `CONCERT_IS_PENDING(400)` 에러 추가 및 PENDING 공연 사용 불가 비고 반영
+- `spec/admin/features.md` — ADM-02 비고 갱신: 후보 아티스트 보완 API를 `/candidates` 엔드포인트로 변경
+
 ## 2026-07-03
 
 - `spec/data/pipeline.md` — 함수별 로직·예외 처리·외부 API 상세를 하위 문서로 분리한 인덱스로 재구성; 릴리즈 수집을 MusicBrainz+Cover Art Archive에서 Spotify 단독 방식으로, Wikipedia alias 수집을 로마자→한글 변환(`ja_romanize`)으로 코드 실체에 맞게 갱신; `prfcast` 기반 매칭 단계 폐기(현재는 title 구문 매칭 단일 전략) 반영
