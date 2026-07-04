@@ -364,9 +364,78 @@
 
 ---
 
+## POST /api/admin/concerts/{id}/candidates
+
+**용도**: PENDING 공연의 후보 아티스트(`concert_artist_candidate`)를 추가합니다. PENDING 공연 검토 중 파이프라인 매칭 결과를 보완하는 용도입니다.
+
+### 요청
+
+**Path Parameters**
+
+| 이름 | 타입 | 필수 | 설명 |
+|------|------|------|------|
+| `id` | Long | Y | 공연 ID |
+
+**Request Body** (`application/json`)
+
+| 필드 | 타입 | 필수 | 설명 |
+|------|------|------|------|
+| `artistId` | Long | Y | 추가할 아티스트 ID |
+
+### 응답
+
+`201 Created` (바디 없음)
+
+### 에러
+
+| 코드 | 상태 코드 | 설명 |
+|------|-----------|------|
+| `CONCERT_NOT_FOUND` | 404 | 존재하지 않는 공연 |
+| `CONCERT_NOT_PENDING` | 400 | PENDING 상태가 아닌 공연 |
+| `ARTIST_NOT_FOUND` | 404 | 존재하지 않는 아티스트 |
+| `CONCERT_ARTIST_ALREADY_EXISTS` | 409 | 이미 후보로 등록된 아티스트 |
+
+### 비고
+
+- PENDING 전용. 확정 공연(UPCOMING·ONGOING·ENDED·EXCLUDED)에는 `POST /api/admin/concerts/{id}/artists` 사용
+
+---
+
+## DELETE /api/admin/concerts/{id}/candidates/{artistId}
+
+**용도**: PENDING 공연의 후보 아티스트(`concert_artist_candidate`)를 제거합니다.
+
+### 요청
+
+**Path Parameters**
+
+| 이름 | 타입 | 필수 | 설명 |
+|------|------|------|------|
+| `id` | Long | Y | 공연 ID |
+| `artistId` | Long | Y | 제거할 아티스트 ID |
+
+### 응답
+
+`204 No Content`
+
+### 에러
+
+| 코드 | 상태 코드 | 설명 |
+|------|-----------|------|
+| `CONCERT_NOT_FOUND` | 404 | 존재하지 않는 공연 |
+| `CONCERT_NOT_PENDING` | 400 | PENDING 상태가 아닌 공연 |
+| `ARTIST_NOT_FOUND` | 404 | 존재하지 않는 아티스트 |
+| `CONCERT_ARTIST_NOT_FOUND` | 404 | 해당 공연의 후보로 등록되지 않은 아티스트 |
+
+### 비고
+
+- PENDING 전용. 확정 공연에는 `DELETE /api/admin/concerts/{id}/artists/{artistId}` 사용
+
+---
+
 ## POST /api/admin/concerts/{id}/artists
 
-**용도**: 공연에 아티스트를 직접 지정합니다. `concert_artist_candidate` 없이 `concert_artist`에 바로 저장합니다. EXCLUDED 공연에도 사용 가능합니다.
+**용도**: 확정 공연(UPCOMING·ONGOING·ENDED·EXCLUDED)에 아티스트를 직접 매핑합니다. `concert_artist`에 바로 저장합니다.
 
 ### 요청
 
@@ -391,14 +460,19 @@
 | 코드 | 상태 코드 | 설명 |
 |------|-----------|------|
 | `CONCERT_NOT_FOUND` | 404 | 존재하지 않는 공연 |
+| `CONCERT_IS_PENDING` | 400 | PENDING 상태의 공연 — `/candidates` 엔드포인트를 사용해야 함 |
 | `ARTIST_NOT_FOUND` | 404 | 존재하지 않는 아티스트 |
 | `CONCERT_ARTIST_ALREADY_EXISTS` | 409 | 이미 매핑된 아티스트 |
+
+### 비고
+
+- PENDING 공연에는 `POST /api/admin/concerts/{id}/candidates` 사용
 
 ---
 
 ## DELETE /api/admin/concerts/{id}/artists/{artistId}
 
-**용도**: 공연에 매핑된 아티스트를 제거합니다.
+**용도**: 확정 공연(UPCOMING·ONGOING·ENDED·EXCLUDED)에서 아티스트 매핑을 제거합니다.
 
 ### 요청
 
@@ -418,12 +492,14 @@
 | 코드 | 상태 코드 | 설명 |
 |------|-----------|------|
 | `CONCERT_NOT_FOUND` | 404 | 존재하지 않는 공연 |
+| `CONCERT_IS_PENDING` | 400 | PENDING 상태의 공연 — `/candidates` 엔드포인트를 사용해야 함 |
 | `ARTIST_NOT_FOUND` | 404 | 존재하지 않는 아티스트 |
 | `CONCERT_ARTIST_NOT_FOUND` | 404 | 해당 공연에 매핑되지 않은 아티스트 |
 
 ### 비고
 
 - 공연이 UPCOMING / ONGOING 상태일 경우 해당 아티스트의 다른 활성 공연 존재 여부로 `is_coming` 자동 재계산
+- PENDING 공연에는 `DELETE /api/admin/concerts/{id}/candidates/{artistId}` 사용
 
 ---
 
