@@ -1,3 +1,9 @@
+## 2026-08-11
+
+- `spec/legal/terms-of-service.md` — 브랜드 표기 "Coming" → "커밍" 전환 (제1조·제2조, 프론트엔드 실제 약관 텍스트와 동기화)
+- `spec/legal/privacy-policy.md` — 브랜드 표기 "Coming" → "커밍" 전환 (도입부, 프론트엔드 실제 방침 텍스트와 동기화)
+- `spec/overview.md` — 프로젝트 소개 문구를 "**커밍**(Coming)"으로 갱신 (공식 표시 브랜드명 변경 반영, 기술 레포지토리명은 변경 없음)
+
 ## 2026-07-04
 
 - `spec/api/admin.md` — `POST /api/admin/concerts/{id}/candidates`, `DELETE /api/admin/concerts/{id}/candidates/{artistId}` 신규 추가 (PENDING 공연 후보 아티스트 관리); `POST /api/admin/concerts/{id}/artists`, `DELETE /api/admin/concerts/{id}/artists/{artistId}`에 `CONCERT_IS_PENDING(400)` 에러 추가 및 PENDING 공연 사용 불가 비고 반영
