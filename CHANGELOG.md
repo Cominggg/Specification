@@ -1,6 +1,7 @@
 ## 2026-09-06
 
 - `spec/api/concerts.md` — `GET /api/concerts`에 `q`·`followedOnly`·`ticketOpenPending` 파라미터 추가, `sort` 허용 필드(`startDate`·`ticketOpenAt`) 명시 및 위반 시 400 반영; `GET /api/concerts/search`·`GET /api/concerts/following`는 위 엔드포인트로 통합되어 제거; `inCalendar`·`status` 동시 사용 시 우선순위가 있다는 기존 오기재를 AND 조합으로 정정
+- `spec/api/concerts.md` — `GET /api/concerts`, `GET /api/concerts/{id}` 응답의 아티스트 필드를 `artistName`(단일 문자열, `confidence` 기준)에서 `artists`(배열, `{artistId, name, koreanName}[]`)로 정정 — `confidence` 컬럼은 이미 제거되어 다중 아티스트 배열 구조로 전환된 상태였음
 - `spec/api/releases.md` — `GET /api/releases`에 `q` 파라미터 추가 및 `type`을 `Album`·`Single`만 허용하도록 변경(그 외 값은 400); `GET /api/releases/search`는 위 엔드포인트로 통합되어 제거
 - `spec/api/artists.md` — `GET /api/artists`에 `sort` 파라미터 추가(`sortName`·`followerCount`, 동시 지정 시 400), 응답에 `followerCount` 필드 추가
 - `spec/features.md` — ART-01 정렬 옵션 추가; CON-01 통합 필터 및 기본 정렬 방향(내림차순) 오기재 정정; CON-08·REL-04 검색 API 경로를 통합 엔드포인트로 갱신; REL-03 `type` 필터를 `Album`·`Single`로 정정, 해소된 "BE 경로 충돌" 비고 제거
