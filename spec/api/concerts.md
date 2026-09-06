@@ -4,7 +4,7 @@
 
 ## GET /api/concerts
 
-**용도**: 내한 공연 목록을 필터·페이지네이션으로 조회합니다.
+**용도**: 내한 공연 목록을 검색어·필터·페이지네이션으로 조회합니다. 공연명·아티스트명 검색과 관심 아티스트 필터를 이 엔드포인트 하나로 통합 제공합니다.
 
 ### 요청
 
@@ -12,11 +12,14 @@
 
 | 이름 | 타입 | 필수 | 기본값 | 설명 |
 |------|------|------|--------|------|
+| `q` | String | N | — | 검색어 (공연명·아티스트명·아티스트 alias 대소문자 무관 부분 일치). 생략·공백이면 텍스트 조건 없이 나머지 필터만 적용 |
 | `status` | String | N | — | `UPCOMING` \| `ONGOING` \| `ENDED` \| `CANCELLED` |
-| `inCalendar` | Boolean | N | — | `true`이면 내 캘린더에 추가한 공연만 반환 (인증 필요) |
+| `inCalendar` | Boolean | N | — | `true`이면 내 캘린더에 추가한 공연만 반환 (인증 필요, 미인증 시 빈 페이지) |
+| `followedOnly` | Boolean | N | — | `true`이면 팔로우한 아티스트의 공연만 반환 (미인증·팔로잉 없으면 빈 페이지) |
+| `ticketOpenPending` | Boolean | N | `false` | `true`이면 티켓 오픈 예정(`ticketOpenAt > 현재 시각`) 공연만 반환 |
 | `page` | int | N | `0` | 페이지 번호 |
 | `size` | int | N | `20` | 페이지 크기 |
-| `sort` | String | N | `startDate,desc` | 정렬 기준 (`필드명,방향`) |
+| `sort` | String | N | `startDate,desc` | 정렬 기준 (`필드명,방향`). 허용 필드: `startDate`, `ticketOpenAt` |
 
 ### 응답
 
@@ -58,45 +61,19 @@
 }
 ```
 
-### 비고
-
-- 기본 정렬: `startDate` 내림차순 (최신 공연 우선)
-- `status` 미전달 시 전체 공연 반환
-- 비인증 요청 허용 — `isInCalendar`는 비인증 시 항상 `false`, 인증 시 실제 값 반환
-- `inCalendar=true`와 `status` 동시 전달 시 `inCalendar`가 우선 적용되어 `status`는 무시됨
-
----
-
-## GET /api/concerts/search
-
-**용도**: 공연명·아티스트명·아티스트 alias 키워드로 공연을 검색합니다.
-
-### 요청
-
-**Query Parameters**
-
-| 이름 | 타입 | 필수 | 기본값 | 설명 |
-|------|------|------|--------|------|
-| `q` | String | Y | — | 검색어 (빈 문자열·공백 불가) |
-| `status` | String | N | — | `UPCOMING` \| `ONGOING` \| `ENDED` \| `CANCELLED` |
-| `page` | int | N | `0` | 페이지 번호 |
-| `size` | int | N | `20` | 페이지 크기 |
-| `sort` | String | N | `startDate,desc` | 정렬 기준 |
-
-### 응답
-
-[페이지네이션 응답](_index.md#페이지네이션-응답) 형태. `content` 항목은 `GET /api/concerts`와 동일 구조.
-
 ### 에러
 
 | 코드 | 상태 코드 | 설명 |
 |------|-----------|------|
-| `VALIDATION_ERROR` | 400 | `q`가 전달되지 않았거나 빈 문자열·공백인 경우 |
+| `INVALID_INPUT` | 400 | `sort` 필드가 `startDate`·`ticketOpenAt` 외의 값인 경우 |
 
 ### 비고
 
-- 공연명(`title`)·아티스트명(`artist.name`)·아티스트 alias(`artist_alias.name`) 대소문자 무관 LIKE 검색
-- `isInCalendar`는 인증 시 실제 값 반환, 비인증 시 `false`
+- 기본 정렬: `startDate` 내림차순 (최신 공연 우선)
+- `status` 미전달 시 전체 공연 반환. `EXCLUDED`·`PENDING` 상태는 `status` 값과 무관하게 항상 숨겨짐
+- `q`·`status`·`inCalendar`·`followedOnly`·`ticketOpenPending`은 모두 AND로 조합됨
+- 비인증 요청 허용 — `isInCalendar`는 비인증 시 항상 `false`, 인증 시 실제 값 반환
+- 기존 `GET /api/concerts/search`(공연 검색), `GET /api/concerts/following`(관심 아티스트 공연)는 이 엔드포인트로 통합되어 제거됨 — 각각 `q`, `followedOnly=true` 파라미터로 대체
 
 ---
 
@@ -117,30 +94,6 @@
 - BE 반환 건수: 상위 10건 (`view_count` 내림차순)
 - 홈 캐러셀: 상위 5건 FE 슬라이싱
 - 홈 "인기 공연" 섹션: desktop 3건 / mobile 6건 FE 슬라이싱
-
----
-
-## GET /api/concerts/following
-
-**용도**: 내가 팔로우한 아티스트의 공연 목록을 status 조건으로 조회합니다. **(인증 필요)**
-
-### 요청
-
-**Query Parameters**
-
-| 이름 | 타입 | 필수 | 기본값 | 설명 |
-|------|------|------|--------|------|
-| `status` | String | N | — | `UPCOMING` \| `ONGOING` \| `ENDED` \| `CANCELLED` |
-
-### 응답
-
-배열 형태 (페이지네이션 없음). `GET /api/concerts` `content` 항목과 동일 구조.
-
-### 비고
-
-- `status` 미전달 시 전체 공연 반환
-- 인증 필수이므로 `isInCalendar`는 항상 실제 값 반환
-- 홈 "관심 아티스트 공연" 탭 및 공연 목록 "관심 아티스트만" 필터에서 재사용
 
 ---
 
