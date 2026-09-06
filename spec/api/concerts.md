@@ -29,7 +29,10 @@
 |------|------|------|
 | `id` | Long | 공연 ID |
 | `posterUrl` | String? | 포스터 이미지 URL |
-| `artistName` | String? | 아티스트명 (`confidence=HIGH` 기준, 없으면 `null`) |
+| `artists` | Object[] | 참여 아티스트 목록 (다중 아티스트 가능, 없으면 `[]`) |
+| `artists[].artistId` | Long | 아티스트 ID |
+| `artists[].name` | String | 아티스트명 |
+| `artists[].koreanName` | String? | 한글 표기명 (없으면 `null`) |
 | `title` | String | 공연명 |
 | `startDate` | String | 시작일 (`YYYY-MM-DD`) |
 | `endDate` | String? | 종료일 (`YYYY-MM-DD`) |
@@ -44,7 +47,9 @@
     {
       "id": 1,
       "posterUrl": null,
-      "artistName": "YOASOBI",
+      "artists": [
+        { "artistId": 1, "name": "YOASOBI", "koreanName": null }
+      ],
       "title": "YOASOBI ARENA TOUR 2025",
       "startDate": "2025-08-15",
       "endDate": "2025-08-16",
@@ -176,8 +181,10 @@
 | `id` | Long | 공연 ID |
 | `posterUrl` | String? | 포스터 이미지 URL (`concert.poster_url`) |
 | `imageUrls` | String[] | 스틸컷 이미지 목록 (`concert_image` 테이블) |
-| `artistName` | String? | 아티스트명 (`confidence=HIGH` 기준, 없으면 `null`) |
-| `artistId` | Long? | 아티스트 ID (없으면 `null`) |
+| `artists` | Object[] | 참여 아티스트 목록 (다중 아티스트 가능, 없으면 `[]`) |
+| `artists[].artistId` | Long | 아티스트 ID |
+| `artists[].name` | String | 아티스트명 |
+| `artists[].koreanName` | String? | 한글 표기명 (없으면 `null`) |
 | `title` | String | 공연명 |
 | `startDate` | String | 시작일 (`YYYY-MM-DD`) |
 | `endDate` | String? | 종료일 (`YYYY-MM-DD`) |
@@ -196,8 +203,9 @@
   "id": 1,
   "posterUrl": "https://...",
   "imageUrls": ["https://..."],
-  "artistName": "YOASOBI",
-  "artistId": 1,
+  "artists": [
+    { "artistId": 1, "name": "YOASOBI", "koreanName": null }
+  ],
   "title": "YOASOBI ARENA TOUR 2025",
   "startDate": "2025-08-15",
   "endDate": "2025-08-16",
