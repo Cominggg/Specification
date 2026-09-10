@@ -1,3 +1,9 @@
+## 2026-09-10
+
+- `spec/api/posts.md` — 신규 추가: 게시판(Post) API 9종 명세 (⚠️ 설계 확정, 구현 예정 — 이슈 #116, 브랜치 `feat/#116-post-board`). 멘션 자동완성(`GET /api/mentions/search`), 게시글 CRUD(`/api/posts`), 추천(`/api/posts/{id}/recommend`), 엔티티별 백링크(`GET /api/entities/{type}/{id}/posts`), 통합 검색(`GET /api/search`)
+- `spec/api/_index.md` — 도메인별 문서 표·전체 엔드포인트 목록에 "게시판" 섹션 추가 (posts.md 링크)
+- `spec/features.md` — POST-01~06 게시판 기능 명세 신규 추가 (P1~P2); ART-05(아티스트 게시판) 비고에 신규 게시판과의 관계 명시
+
 ## 2026-09-06
 
 - `spec/api/concerts.md` — `GET /api/concerts`에 `q`·`followedOnly`·`ticketOpenPending` 파라미터 추가, `sort` 허용 필드(`startDate`·`ticketOpenAt`) 명시 및 위반 시 400 반영; `GET /api/concerts/search`·`GET /api/concerts/following`는 위 엔드포인트로 통합되어 제거; `inCalendar`·`status` 동시 사용 시 우선순위가 있다는 기존 오기재를 AND 조합으로 정정
