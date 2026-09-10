@@ -120,6 +120,7 @@
 |------|------|------|
 | `id` | Long | 게시글 ID |
 | `authorNickname` | String? | 작성자 닉네임 (탈퇴 회원이면 `null`) |
+| `isAuthor` | Boolean | 현재 사용자가 작성자 본인인지 여부. 비인증 시 `false` |
 | `category` | String | `REVIEW` \| `INFO` \| `FREE` |
 | `title` | String | 제목 |
 | `content` | Object | Tiptap 에디터 JSON |
@@ -144,6 +145,7 @@
 {
   "id": 10,
   "authorNickname": "moonlit_haze",
+  "isAuthor": false,
   "category": "REVIEW",
   "title": "요네즈 켄시 내한 첫 공연, 앙코르만 3번",
   "content": { "type": "doc", "content": [] },
@@ -192,9 +194,8 @@
 | `title` | String | 제목 |
 | `entityTags` | Object[] | 멘션 엔티티 목록 (`EntityTag`, 위 상세 API 참고) |
 | `recommendCount` | Long | 추천 수 |
+| `viewCount` | Long | 조회 수 |
 | `createdAt` | String | 작성일시 |
-
-`viewCount`는 목록 응답에 포함되지 않습니다(상세 전용).
 
 ```json
 {
@@ -206,12 +207,15 @@
       "title": "요네즈 켄시 내한 첫 공연, 앙코르만 3번",
       "entityTags": [ { "entityType": "CONCERT", "entityId": 1, "title": "요네즈 켄시 KOREA LIVE 2026", "subtitle": null, "thumbnailUrl": null } ],
       "recommendCount": 128,
+      "viewCount": 3204,
       "createdAt": "2026-09-08T10:00:00"
     }
   ],
   "page": 0, "size": 20, "totalElements": 1, "totalPages": 1
 }
 ```
+
+`PostSummary`는 이 목록 API·백링크 API(`GET /api/entities/{type}/{id}/posts`)·통합 검색 API(`GET /api/search`)에서 공통으로 사용되며 `viewCount`를 동일하게 포함합니다.
 
 ---
 
@@ -227,9 +231,10 @@
 
 | 이름 | 타입 | 필수 | 설명 |
 |------|------|------|------|
+| `category` | String | N | `REVIEW` \| `INFO` \| `FREE`. 생략·`null`이면 기존 값 유지 |
 | `title` | String | N | 생략·`null`이면 기존 값 유지 |
 | `content` | Object | N | 생략·`null`이면 기존 값 유지 |
-| `entityTags` | Object[] | Y | 항상 전체 교체(기존 태그 전체 삭제 후 재삽입). `category`가 `REVIEW`\|`INFO`면 1개 이상 필수 |
+| `entityTags` | Object[] | Y | 항상 전체 교체(기존 태그 전체 삭제 후 재삽입). 수정 후 최종 `category`(요청값 또는 기존값)가 `REVIEW`\|`INFO`면 1개 이상 필수 |
 
 ### 응답
 
@@ -241,11 +246,12 @@
 |------|-----------|------|
 | `POST_NOT_FOUND` | 404 | 존재하지 않는 게시글 |
 | `FORBIDDEN` | 403 | 작성자 본인이 아님 |
-| `INVALID_INPUT` | 400 | `category`가 `REVIEW`\|`INFO`인데 `entityTags`가 비어 있음 |
+| `INVALID_INPUT` | 400 | 수정 후 최종 `category`가 `REVIEW`\|`INFO`인데 `entityTags`가 비어 있음 |
 
 ### 비고
 
 - `entityTags`는 부분 수정을 지원하지 않습니다. 수정 시 항상 전체 목록을 보내야 합니다.
+- `category`를 변경해도 `entityTags` 검증은 우회되지 않습니다 — 검증은 항상 변경 후 최종 `category` 기준으로 수행됩니다.
 
 ---
 
@@ -284,7 +290,11 @@
 
 ### 응답
 
-`200 OK`, body 없음
+`200 OK`
+
+```json
+{ "recommendCount": 129 }
+```
 
 ### 에러
 
@@ -310,7 +320,11 @@
 
 ### 응답
 
-`200 OK`, body 없음
+`200 OK`
+
+```json
+{ "recommendCount": 128 }
+```
 
 ### 에러
 
