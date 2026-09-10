@@ -3,6 +3,7 @@
 - `spec/api/posts.md` — 신규 추가: 게시판(Post) API 9종 명세 (⚠️ 설계 확정, 구현 예정 — 이슈 #116, 브랜치 `feat/#116-post-board`). 멘션 자동완성(`GET /api/mentions/search`), 게시글 CRUD(`/api/posts`), 추천(`/api/posts/{id}/recommend`), 엔티티별 백링크(`GET /api/entities/{type}/{id}/posts`), 통합 검색(`GET /api/search`)
 - `spec/api/_index.md` — 도메인별 문서 표·전체 엔드포인트 목록에 "게시판" 섹션 추가 (posts.md 링크)
 - `spec/features.md` — POST-01~06 게시판 기능 명세 신규 추가 (P1~P2); ART-05(아티스트 게시판) 비고에 신규 게시판과의 관계 명시
+- `spec/api/posts.md` — FE 리뷰 반영: `GET /api/posts` 목록 응답(`PostSummary`)에 `viewCount` 추가(백링크·통합검색에도 동일 적용); `GET /api/posts/{id}` 응답에 `isAuthor: Boolean` 추가(닉네임 문자열 비교 대신 본인 여부 판별용); `PATCH /api/posts/{id}`에 `category` 수정 지원 추가(선택 필드, 검증은 최종 category 기준); `POST`/`DELETE /api/posts/{id}/recommend` 응답에 `recommendCount` 포함
 
 ## 2026-09-06
 
