@@ -165,6 +165,11 @@ ADMIN 전용 엔드포인트는 일반 사용자 접근 시 `403` 반환합니�
 | DELETE | `/api/posts/{id}/recommend` | 필요 |
 | GET | `/api/entities/{type}/{id}/posts` | 불필요 |
 | GET | `/api/search` | 불필요 |
+| GET | `/api/posts/{id}/comments` | 불필요 |
+| POST | `/api/posts/{id}/comments` | 필요 |
+| DELETE | `/api/comments/{commentId}` | 필요 |
+| POST | `/api/comments/{commentId}/like` | 필요 |
+| DELETE | `/api/comments/{commentId}/like` | 필요 |
 
 ### 관리자 (ROLE_ADMIN)
 | 메서드 | 엔드포인트 | 인증 |
