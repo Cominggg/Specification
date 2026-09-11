@@ -1,3 +1,9 @@
+## 2026-09-11
+
+- `spec/features.md` — POST-07 "게시글 댓글" 신규 추가 (P1). 게시판 섹션 상단의 "댓글·신고 기능은 없다" 문구를 "신고 기능은 없다(댓글은 POST-07 참고)"로 정정 — 게시글 상세 페이지 리디자인 논의 중 댓글 기능을 이 게시판(POST-01~06)에 포함하기로 확정
+- `spec/api/posts.md` — 댓글 API 5종 신규 추가: 목록 조회(`GET /api/posts/{id}/comments`, 답글 1단계 중첩), 작성(`POST /api/posts/{id}/comments`), 삭제(`DELETE /api/comments/{commentId}`), 좋아요(`POST`/`DELETE /api/comments/{commentId}/like`). `GET /api/posts/{id}` 응답에 `commentCount` 필드 추가. 답글 있는 댓글의 삭제 처리 방식(하드/소프트)은 비고에 BE 협의 필요 항목으로 명시
+- `spec/api/_index.md` — 전체 엔드포인트 목록의 게시판 섹션에 댓글 API 5종 추가
+
 ## 2026-09-10
 
 - `spec/api/posts.md` — 신규 추가: 게시판(Post) API 9종 명세 (⚠️ 설계 확정, 구현 예정 — 이슈 #116, 브랜치 `feat/#116-post-board`). 멘션 자동완성(`GET /api/mentions/search`), 게시글 CRUD(`/api/posts`), 추천(`/api/posts/{id}/recommend`), 엔티티별 백링크(`GET /api/entities/{type}/{id}/posts`), 통합 검색(`GET /api/search`)
