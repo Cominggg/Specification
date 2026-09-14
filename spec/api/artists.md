@@ -17,6 +17,7 @@
 | `following` | Boolean | N | — | `true`이면 팔로잉 아티스트만 조회. 미인증 또는 팔로잉 없으면 빈 페이지 반환 |
 | `page` | int | N | `0` | 페이지 번호 (0-based) |
 | `size` | int | N | `25` | 페이지 크기 |
+| `sort` | String | N | `sortName,asc` | 정렬 기준 (`필드명,방향`). 허용 필드: `sortName`, `followerCount`. 두 필드를 동시에 지정할 수 없음 |
 
 ### 응답
 
@@ -30,6 +31,7 @@
 | `hasUpcomingConcert` | Boolean | 예정 내한 공연 여부 (`artist.is_coming`) |
 | `isFollowing` | Boolean | 팔로우 여부 (비인증 시 `false`) |
 | `spotifyUrl` | String? | Spotify 아티스트 URL (없으면 `null`) |
+| `followerCount` | long | 팔로워 수 (`user_follow_artist` COUNT) |
 
 ```json
 {
@@ -40,7 +42,8 @@
       "imageUrl": null,
       "hasUpcomingConcert": true,
       "isFollowing": false,
-      "spotifyUrl": "https://open.spotify.com/artist/..."
+      "spotifyUrl": "https://open.spotify.com/artist/...",
+      "followerCount": 42
     }
   ],
   "page": 0,
@@ -50,12 +53,19 @@
 }
 ```
 
+### 에러
+
+| 코드 | 상태 코드 | 설명 |
+|------|-----------|------|
+| `INVALID_INPUT` | 400 | `sort` 필드가 `sortName`·`followerCount` 외의 값이거나, 두 필드를 함께 지정한 경우 |
+
 ### 비고
 
 - `name`, `isComing`, `following` 세 파라미터는 모두 독립적으로 조합 가능
 - `following=true` 시 인증 없거나 팔로잉 아티스트가 없으면 빈 페이지 반환
 - 검색어 변경 시 FE에서 `page=0`으로 초기화
 - `name` 검색은 `artist.name` 및 `artist_alias.name` 모두 포함 (대소문자 무시)
+- `sort=followerCount`는 팔로워 수 기준 전용 집계 쿼리로 처리되어 `sortName`과 동시에 적용할 수 없음 (동시 지정 시 400)
 
 ---
 

@@ -1,3 +1,57 @@
+## 2026-09-11
+
+- `spec/features.md` — POST-07 "게시글 댓글" 신규 추가 (P1). 게시판 섹션 상단의 "댓글·신고 기능은 없다" 문구를 "신고 기능은 없다(댓글은 POST-07 참고)"로 정정 — 게시글 상세 페이지 리디자인 논의 중 댓글 기능을 이 게시판(POST-01~06)에 포함하기로 확정
+- `spec/api/posts.md` — 댓글 API 5종 신규 추가: 목록 조회(`GET /api/posts/{id}/comments`, 답글 1단계 중첩), 작성(`POST /api/posts/{id}/comments`), 삭제(`DELETE /api/comments/{commentId}`), 좋아요(`POST`/`DELETE /api/comments/{commentId}/like`). `GET /api/posts/{id}` 응답에 `commentCount` 필드 추가. 답글 있는 댓글의 삭제 처리 방식(하드/소프트)은 비고에 BE 협의 필요 항목으로 명시
+- `spec/api/_index.md` — 전체 엔드포인트 목록의 게시판 섹션에 댓글 API 5종 추가
+
+## 2026-09-10
+
+- `spec/api/posts.md` — 신규 추가: 게시판(Post) API 9종 명세 (⚠️ 설계 확정, 구현 예정 — 이슈 #116, 브랜치 `feat/#116-post-board`). 멘션 자동완성(`GET /api/mentions/search`), 게시글 CRUD(`/api/posts`), 추천(`/api/posts/{id}/recommend`), 엔티티별 백링크(`GET /api/entities/{type}/{id}/posts`), 통합 검색(`GET /api/search`)
+- `spec/api/_index.md` — 도메인별 문서 표·전체 엔드포인트 목록에 "게시판" 섹션 추가 (posts.md 링크)
+- `spec/features.md` — POST-01~06 게시판 기능 명세 신규 추가 (P1~P2); ART-05(아티스트 게시판) 비고에 신규 게시판과의 관계 명시
+- `spec/api/posts.md` — FE 리뷰 반영: `GET /api/posts` 목록 응답(`PostSummary`)에 `viewCount` 추가(백링크·통합검색에도 동일 적용); `GET /api/posts/{id}` 응답에 `isAuthor: Boolean` 추가(닉네임 문자열 비교 대신 본인 여부 판별용); `PATCH /api/posts/{id}`에 `category` 수정 지원 추가(선택 필드, 검증은 최종 category 기준); `POST`/`DELETE /api/posts/{id}/recommend` 응답에 `recommendCount` 포함
+
+## 2026-09-06
+
+- `spec/api/concerts.md` — `GET /api/concerts`에 `q`·`followedOnly`·`ticketOpenPending` 파라미터 추가, `sort` 허용 필드(`startDate`·`ticketOpenAt`) 명시 및 위반 시 400 반영; `GET /api/concerts/search`·`GET /api/concerts/following`는 위 엔드포인트로 통합되어 제거; `inCalendar`·`status` 동시 사용 시 우선순위가 있다는 기존 오기재를 AND 조합으로 정정
+- `spec/api/concerts.md` — `GET /api/concerts`, `GET /api/concerts/{id}` 응답의 아티스트 필드를 `artistName`(단일 문자열, `confidence` 기준)에서 `artists`(배열, `{artistId, name, koreanName}[]`)로 정정 — `confidence` 컬럼은 이미 제거되어 다중 아티스트 배열 구조로 전환된 상태였음
+- `spec/api/releases.md` — `GET /api/releases`에 `q` 파라미터 추가 및 `type`을 `Album`·`Single`만 허용하도록 변경(그 외 값은 400); `GET /api/releases/search`는 위 엔드포인트로 통합되어 제거
+- `spec/api/artists.md` — `GET /api/artists`에 `sort` 파라미터 추가(`sortName`·`followerCount`, 동시 지정 시 400), 응답에 `followerCount` 필드 추가
+- `spec/features.md` — ART-01 정렬 옵션 추가; CON-01 통합 필터 및 기본 정렬 방향(내림차순) 오기재 정정; CON-08·REL-04 검색 API 경로를 통합 엔드포인트로 갱신; REL-03 `type` 필터를 `Album`·`Single`로 정정, 해소된 "BE 경로 충돌" 비고 제거
+
+## 2026-08-11
+
+- `spec/legal/terms-of-service.md` — 브랜드 표기 "Coming" → "커밍" 전환 (제1조·제2조, 프론트엔드 실제 약관 텍스트와 동기화)
+- `spec/legal/privacy-policy.md` — 브랜드 표기 "Coming" → "커밍" 전환 (도입부, 프론트엔드 실제 방침 텍스트와 동기화)
+- `spec/overview.md` — 프로젝트 소개 문구를 "**커밍**(Coming)"으로 갱신 (공식 표시 브랜드명 변경 반영, 기술 레포지토리명은 변경 없음)
+
+## 2026-07-04
+
+- `spec/api/admin.md` — `POST /api/admin/concerts/{id}/candidates`, `DELETE /api/admin/concerts/{id}/candidates/{artistId}` 신규 추가 (PENDING 공연 후보 아티스트 관리); `POST /api/admin/concerts/{id}/artists`, `DELETE /api/admin/concerts/{id}/artists/{artistId}`에 `CONCERT_IS_PENDING(400)` 에러 추가 및 PENDING 공연 사용 불가 비고 반영
+- `spec/admin/features.md` — ADM-02 비고 갱신: 후보 아티스트 보완 API를 `/candidates` 엔드포인트로 변경
+
+## 2026-07-03
+
+- `spec/data/pipeline.md` — 함수별 로직·예외 처리·외부 API 상세를 하위 문서로 분리한 인덱스로 재구성; 릴리즈 수집을 MusicBrainz+Cover Art Archive에서 Spotify 단독 방식으로, Wikipedia alias 수집을 로마자→한글 변환(`ja_romanize`)으로 코드 실체에 맞게 갱신; `prfcast` 기반 매칭 단계 폐기(현재는 title 구문 매칭 단일 전략) 반영
+- `spec/data/scheduler.md` — 신규 추가: 잡별 cron 시각·진입점·의존관계, 체크포인트·복구 파일, CLI 커맨드, 내부 API(`api.py`) 동시 실행 가드 명세
+- `spec/data/matchers.md` — 신규 추가: `has_match`·`match_concert`·`_phrase_match_title` 함수별 로직 명세
+- `spec/data/error-handling.md` — 신규 추가: 재시도/백오프 정책, Spotify 429 밴 처리, 체크포인트 기반 재개, 로깅 규칙 명세
+- `spec/data/collectors/musicbrainz.md` — 신규 추가: MusicBrainz 아티스트 수집 함수·API 요청/응답 상세 (Last.fm 인기도 필터는 코드에서 제거되어 명세에 미포함)
+- `spec/data/collectors/release.md` — 신규 추가: Spotify 릴리즈 수집 함수·API 상세
+- `spec/data/collectors/kopis.md` — 신규 추가: KOPIS 공연 수집 함수·API 상세
+- `spec/data/collectors/setlist.md` — 신규 추가: setlist.fm 수집 함수·API 상세
+- `spec/data/collectors/ja_romanize.md` — 신규 추가: 로마자→한글 alias 변환 규칙·함수 로직 상세
+- `spec/data/collectors/artist_image.md` — 신규 추가: Spotify 이미지 수집·Client Credentials 인증 함수 상세
+
+## 2026-07-03
+
+- `spec/api/pipeline.md` — `POST /api/admin/data/collect/artists`, `POST /api/admin/data/collect/concerts`, `POST /api/admin/data/collect/concerts/{id}/setlist` 동기 처리로 전환: 응답 바디 없음 → 수집 결과 DTO 반환; `PIPELINE_NOT_FOUND`(404)·`PIPELINE_CONFLICT`(409) 에러 추가
+- `spec/data/pipeline.md` — ⑤ 관리자 수집 함수 동기/비동기 분리: 아티스트·공연·셋리스트 수집은 동기(결과 반환), 릴리즈·커버아트는 비동기 유지
+
+## 2026-07-01
+
+- `spec/api/auth.md` — `PATCH /api/auth/me/marketing` 응답을 `200 OK`에서 `204 No Content`로 수정
+
 ## 2026-07-01
 
 - `spec/api/auth.md` — `GET /api/auth/me` 응답에 `agreedMarketing: Boolean` 추가; `PATCH /api/auth/me/marketing` 엔드포인트 신규 추가
