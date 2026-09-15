@@ -1,3 +1,8 @@
+## 2026-09-15
+
+- `spec/api/posts.md` — 게시판 API 전체를 실제 구현(main 병합 완료) 기준으로 갱신: `[예정]`·설계 확정 배너 제거. `GET /api/mentions/search`에 `type=TRACK`(앨범 내 개별 트랙 멘션) 추가, `page` 파라미터 도입·응답을 페이지네이션 형태로 변경(`limit` 기본값 10→20), 응답 카드에 `releaseGroupId`(TRACK 전용) 필드 추가. `GET /api/posts/{id}`·`GET /api/posts` 등 응답의 `entityTags`(`EntityTag`)에도 `releaseGroupId` 반영. `GET /api/posts/popular`·`GET /api/posts/trending-tags` 신규 엔드포인트 문서화. 답글 있는 댓글 삭제 정책을 소프트 삭제로 확정 반영(비고의 "BE 설계 시 확정 필요" 문구 제거). `title`(255자)·`entityTags`(10개)·댓글(500자) 길이 제한, 목록류 `size` 최대 100, 검색어 최소 2자, `content` JSON 50000자 제한 등 누락됐던 검증 규칙 보강. `GET /api/entities/{type}/{id}/posts`가 엔티티 존재 여부를 검증하지 않는다는(404 없음) 실제 동작 정정
+- `spec/features.md` — 게시판 섹션 설계 확정 배너 제거. POST-02(엔티티 인라인 멘션)에 TRACK 타입 분리(2026-09-15) 반영, POST-04·POST-05에 트랙 포함 명시, POST-07(댓글) 삭제 정책·API 경로 확정 반영, POST-08(인기 게시글)·POST-09(트렌딩 태그) 신규 추가
+
 ## 2026-09-11
 
 - `spec/features.md` — POST-07 "게시글 댓글" 신규 추가 (P1). 게시판 섹션 상단의 "댓글·신고 기능은 없다" 문구를 "신고 기능은 없다(댓글은 POST-07 참고)"로 정정 — 게시글 상세 페이지 리디자인 논의 중 댓글 기능을 이 게시판(POST-01~06)에 포함하기로 확정
