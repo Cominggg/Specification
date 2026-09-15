@@ -88,7 +88,7 @@ ADMIN 전용 엔드포인트는 일반 사용자 접근 시 `403` 반환합니�
 | 캘린더 | [calendar.md](calendar.md) |
 | 음악 발매 | [releases.md](releases.md) |
 | 마이페이지·문의 | [my.md](my.md) |
-| 게시판 | [posts.md](posts.md) — ⚠️ 설계 확정, 구현 예정 (이슈 #116) |
+| 게시판 | [posts.md](posts.md) |
 | 관리자 | [admin.md](admin.md) |
 | Data 파이프라인 연동 | [pipeline.md](pipeline.md) |
 
@@ -152,13 +152,15 @@ ADMIN 전용 엔드포인트는 일반 사용자 접근 시 `403` 반환합니�
 | GET | `/api/inquiries/my` | 필요 |
 | GET | `/api/inquiries/my/{id}` | 필요 |
 
-### 게시판 ⚠️ 설계 확정, 구현 예정 (이슈 #116)
+### 게시판
 | 메서드 | 엔드포인트 | 인증 |
 |--------|------------|------|
 | GET | `/api/mentions/search` | 불필요 |
 | POST | `/api/posts` | 필요 |
 | GET | `/api/posts/{id}` | 불필요 |
 | GET | `/api/posts` | 불필요 |
+| GET | `/api/posts/popular` | 불필요 |
+| GET | `/api/posts/trending-tags` | 불필요 |
 | PATCH | `/api/posts/{id}` | 필요 |
 | DELETE | `/api/posts/{id}` | 필요 |
 | POST | `/api/posts/{id}/recommend` | 필요 |
