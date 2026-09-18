@@ -186,6 +186,7 @@ ADMIN 전용 엔드포인트는 일반 사용자 접근 시 `403` 반환합니�
 | GET | `/api/admin/inquiries` | ADMIN |
 | GET | `/api/admin/inquiries/{id}` | ADMIN |
 | PATCH | `/api/admin/inquiries/{id}/status` | ADMIN |
+| POST | `/api/admin/policies` | ADMIN |
 
 ### Data 파이프라인 연동 (ROLE_ADMIN)
 | 메서드 | 엔드포인트 | 인증 |
