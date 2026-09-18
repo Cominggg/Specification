@@ -743,7 +743,6 @@
 | `effectiveDate` | String | Y | 시행일 (`YYYY-MM-DD`) |
 | `changeSummary` | String | Y | 변경 사항·사유 요약 (이메일 본문에 노출) |
 | `detailUrl` | String | Y | 약관 원문 페이지 URL (최대 500자) |
-| `requiresReconsent` | Boolean | Y | `true`이면 재동의 필요 정책으로 간주 |
 
 ### 응답
 
@@ -757,7 +756,6 @@
 | `effectiveDate` | String | 시행일 (`YYYY-MM-DD`) |
 | `changeSummary` | String | 변경 사항·사유 요약 |
 | `detailUrl` | String | 약관 원문 페이지 URL |
-| `requiresReconsent` | Boolean | 재동의 필요 여부 |
 
 ### 에러
 
@@ -770,3 +768,4 @@
 - 약관 원문 전체 텍스트는 저장하지 않는다. `detailUrl`로 FE가 SSOT로 관리하는 약관 페이지에 연결한다.
 - 등록 완료(커밋) 후 알림 대상 생성 및 메일 발송 배치(`policyNotificationJob`)가 자동 실행된다. 발송 실패 대상은 1시간 간격으로 최대 3회까지 재시도한다.
 - `POST /api/auth/register` 회원가입 시점에 시행 중인 최신 TERMS·PRIVACY 정책에 대한 동의 이력이 함께 기록된다. **시행 중인 정책이 하나도 등록되어 있지 않으면 회원가입이 `POLICY_NOT_FOUND`(404)로 실패**하므로, 배포 후 신규 가입을 받기 전 초기 정책 버전을 반드시 먼저 등록해야 한다.
+- 기존 회원에 대한 정책 변경 고지는 [terms-of-service.md](../legal/terms-of-service.md) 제3조 3항의 묵시적 동의(고지 후 계속 이용 시 동의 간주) 원칙을 따른다. 로그인 시점 재동의 강제(하드 게이트)는 별도 기능으로 구현하지 않는다 — 민감정보 수집 목적 추가·제3자 제공 신설처럼 능동적 동의가 법적으로 필요한 개정이 실제로 생기기 전까지는 과설계로 판단.

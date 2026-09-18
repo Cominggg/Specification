@@ -5,6 +5,7 @@
 - `spec/api/admin.md` — 정책 버전 등록 엔드포인트(`POST /api/admin/policies`) 신규 문서화. 등록 커밋 후 정책 알림 배치 자동 실행, `POLICY_VERSION_DUPLICATE`(409) 에러, 회원가입 시 시행 중인 정책 미등록 상태면 `POLICY_NOT_FOUND`로 실패하는 운영 제약 반영
 - `spec/api/_index.md` — 전체 엔드포인트 목록의 관리자 섹션에 `POST /api/admin/policies` 행 추가
 - `spec/admin/features.md` — ADM-11 "정책 변경 이메일 고지" 신규 추가 (P1). 정책 등록 → 배치 트리거 → 메일 발송·재시도, 회원가입 시 동의 이력 기록까지의 파이프라인 요약
+- `spec/api/admin.md` — `POST /api/admin/policies`의 `requiresReconsent` 필드 제거. 기존 회원에 대한 정책 변경 고지는 하드 게이트(로그인 시 재동의 강제) 없이 `terms-of-service.md` 제3조 3항의 묵시적 동의 원칙만으로 처리하기로 확정 — 소비 로직 없는 필드였으며, 능동적 동의가 실제로 필요한 개정이 생기기 전까지는 재동의 플로우를 미구현 상태로 유지
 
 ## 2026-09-15
 
