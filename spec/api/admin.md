@@ -928,6 +928,7 @@
 | `reason` | String | 신고 사유 |
 | `status` | String | `PENDING` \| `RESOLVED` \| `REJECTED` |
 | `reporterId` | Long | 신고자 사용자 ID |
+| `reporterNickname` | String | 신고자 닉네임. 탈퇴 등으로 조회 불가 시 빈 문자열 |
 | `createdAt` | String | 신고 접수일시 |
 
 ---
