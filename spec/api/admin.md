@@ -769,3 +769,222 @@
 - 등록 완료(커밋) 후 알림 대상 생성 및 메일 발송 배치(`policyNotificationJob`)가 자동 실행된다. 발송 실패 대상은 1시간 간격으로 최대 3회까지 재시도한다.
 - `POST /api/auth/register` 회원가입 시점에 시행 중인 최신 TERMS·PRIVACY 정책에 대한 동의 이력이 함께 기록된다. **시행 중인 정책이 하나도 등록되어 있지 않으면 회원가입이 `POLICY_NOT_FOUND`(404)로 실패**하므로, 배포 후 신규 가입을 받기 전 초기 정책 버전을 반드시 먼저 등록해야 한다.
 - 기존 회원에 대한 정책 변경 고지는 [terms-of-service.md](../legal/terms-of-service.md) 제3조 3항의 묵시적 동의(고지 후 계속 이용 시 동의 간주) 원칙을 따른다. 로그인 시점 재동의 강제(하드 게이트)는 별도 기능으로 구현하지 않는다 — 민감정보 수집 목적 추가·제3자 제공 신설처럼 능동적 동의가 법적으로 필요한 개정이 실제로 생기기 전까지는 과설계로 판단.
+
+---
+
+## GET /api/admin/notices
+
+**용도**: 전체 공지사항 목록을 활성 여부 무관하게 조회합니다.
+
+### 요청
+
+**Query Parameters**
+
+| 이름 | 타입 | 필수 | 기본값 | 설명 |
+|------|------|------|--------|------|
+| `page` | int | N | `0` | 페이지 번호 |
+| `size` | int | N | `20` | 페이지 크기 |
+
+### 응답
+
+[페이지네이션 응답](_index.md#페이지네이션-응답) 형태. `content` 항목:
+
+| 필드 | 타입 | 설명 |
+|------|------|------|
+| `id` | Long | 공지사항 ID |
+| `title` | String | 제목 |
+| `active` | Boolean | 노출 여부 |
+| `createdAt` | String | 작성일시 |
+
+---
+
+## GET /api/admin/notices/{id}
+
+**용도**: 공지사항 상세를 활성 여부 무관하게 조회합니다.
+
+### 요청
+
+**Path Parameters**
+
+| 이름 | 타입 | 필수 | 설명 |
+|------|------|------|------|
+| `id` | Long | Y | 공지사항 ID |
+
+### 응답
+
+| 필드 | 타입 | 설명 |
+|------|------|------|
+| `id` | Long | 공지사항 ID |
+| `title` | String | 제목 |
+| `content` | String | 본문 (plain text) |
+| `active` | Boolean | 노출 여부 |
+| `createdAt` | String | 작성일시 |
+| `updatedAt` | String | 수정일시 |
+
+### 에러
+
+| 코드 | 상태 코드 | 설명 |
+|------|-----------|------|
+| `NOTICE_NOT_FOUND` | 404 | 존재하지 않는 공지사항 |
+
+---
+
+## POST /api/admin/notices
+
+**용도**: 공지사항을 작성합니다.
+
+### 요청
+
+**Request Body** (`application/json`)
+
+| 필드 | 타입 | 필수 | 설명 |
+|------|------|------|------|
+| `title` | String | Y | 제목 |
+| `content` | String | Y | 본문 (plain text) |
+| `active` | Boolean | N | 노출 여부. 생략 시 `true`(즉시 노출) |
+
+### 응답
+
+`201 Created`
+
+```json
+{ "noticeId": 1 }
+```
+
+---
+
+## PATCH /api/admin/notices/{id}
+
+**용도**: 공지사항을 수정합니다. 노출 여부(`active`) 토글도 이 API로 처리합니다.
+
+### 요청
+
+**Path Parameters**: `id` (Long, Y)
+
+**Request Body** (`application/json`)
+
+| 필드 | 타입 | 필수 | 설명 |
+|------|------|------|------|
+| `title` | String | N | 생략·`null`이면 기존 값 유지 |
+| `content` | String | N | 생략·`null`이면 기존 값 유지 |
+| `active` | Boolean | N | 생략·`null`이면 기존 값 유지 |
+
+### 응답
+
+`200 OK` (바디 없음)
+
+### 에러
+
+| 코드 | 상태 코드 | 설명 |
+|------|-----------|------|
+| `NOTICE_NOT_FOUND` | 404 | 존재하지 않는 공지사항 |
+
+---
+
+## DELETE /api/admin/notices/{id}
+
+**용도**: 공지사항을 삭제합니다.
+
+### 요청
+
+**Path Parameters**: `id` (Long, Y)
+
+### 응답
+
+`204 No Content`
+
+### 에러
+
+| 코드 | 상태 코드 | 설명 |
+|------|-----------|------|
+| `NOTICE_NOT_FOUND` | 404 | 존재하지 않는 공지사항 |
+
+---
+
+## GET /api/admin/reports
+
+**용도**: 전체 신고 목록을 조회합니다.
+
+### 요청
+
+**Query Parameters**
+
+| 이름 | 타입 | 필수 | 기본값 | 설명 |
+|------|------|------|--------|------|
+| `targetType` | String | N | — | `POST` \| `COMMENT` |
+| `status` | String | N | — | `PENDING` \| `RESOLVED` \| `REJECTED` |
+| `page` | int | N | `0` | 페이지 번호 |
+| `size` | int | N | `20` | 페이지 크기 |
+
+### 응답
+
+[페이지네이션 응답](_index.md#페이지네이션-응답) 형태. `content` 항목:
+
+| 필드 | 타입 | 설명 |
+|------|------|------|
+| `id` | Long | 신고 ID |
+| `targetType` | String | `POST` \| `COMMENT` |
+| `targetId` | Long | 신고 대상 ID |
+| `reason` | String | 신고 사유 |
+| `status` | String | `PENDING` \| `RESOLVED` \| `REJECTED` |
+| `reporterId` | Long | 신고자 사용자 ID |
+| `createdAt` | String | 신고 접수일시 |
+
+---
+
+## GET /api/admin/reports/{id}
+
+**용도**: 신고 상세를 조회합니다.
+
+### 요청
+
+**Path Parameters**: `id` (Long, Y)
+
+### 응답
+
+`GET /api/admin/reports` `content` 항목과 동일 구조에 아래 필드 추가:
+
+| 필드 | 타입 | 설명 |
+|------|------|------|
+| `detail` | String? | 상세 사유 |
+| `adminNote` | String? | 관리자 처리 메모 |
+
+### 에러
+
+| 코드 | 상태 코드 | 설명 |
+|------|-----------|------|
+| `REPORT_NOT_FOUND` | 404 | 존재하지 않는 신고 |
+
+---
+
+## PATCH /api/admin/reports/{id}/status
+
+**용도**: 신고 처리 상태를 변경합니다. `deleteTarget=true`를 함께 보내면 같은 트랜잭션에서 신고 대상 게시글·댓글을 강제 삭제합니다.
+
+### 요청
+
+**Path Parameters**: `id` (Long, Y)
+
+**Request Body** (`application/json`)
+
+| 필드 | 타입 | 필수 | 설명 |
+|------|------|------|------|
+| `status` | String | Y | `PENDING` \| `RESOLVED` \| `REJECTED` |
+| `adminNote` | String | N | 처리 메모 |
+| `deleteTarget` | Boolean | N | `true`면 신고 대상을 함께 강제 삭제. 생략·`false`면 삭제하지 않음 |
+
+### 응답
+
+`200 OK` (바디 없음)
+
+### 에러
+
+| 코드 | 상태 코드 | 설명 |
+|------|-----------|------|
+| `REPORT_NOT_FOUND` | 404 | 존재하지 않는 신고 |
+
+### 비고
+
+- `deleteTarget=true`이고 `targetType=POST`이면 게시글이 물리 삭제(연관 댓글·추천·태그 포함)됩니다. `targetType=COMMENT`이면 댓글이 소프트 삭제됩니다(`DELETE /api/comments/{commentId}`와 동일한 삭제 방식).
+- 대상 삭제는 신고 건별로 개별 처리됩니다. 동일 대상에 대한 다른 신고 건의 상태는 자동으로 바뀌지 않습니다.
+- 신고자 정보(`reporterId`)는 관리자 화면에서만 노출되며, 피신고자에게는 노출되지 않습니다.
