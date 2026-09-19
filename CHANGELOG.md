@@ -1,3 +1,11 @@
+## 2026-09-19
+
+- `spec/api/posts.md` — 인기글 카테고리(`GET /api/posts/popular-board`), 게시글·댓글 신고(`POST /api/reports`), 공지사항 공개 조회(`GET /api/notices`, `GET /api/notices/{id}`) 엔드포인트 신규 문서화
+- `spec/api/admin.md` — 관리자 공지사항 CRUD(`GET/POST /api/admin/notices`, `GET/PATCH/DELETE /api/admin/notices/{id}`), 관리자 신고 처리(`GET /api/admin/reports`, `GET /api/admin/reports/{id}`, `PATCH /api/admin/reports/{id}/status`) 엔드포인트 신규 문서화. `deleteTarget=true` 시 신고 대상 게시글(물리 삭제)·댓글(소프트 삭제) 강제 삭제 동작 명시
+- `spec/api/_index.md` — 위 8개 엔드포인트 행 추가 (게시판 섹션 3건, 관리자 섹션 8건 — 신고 생성 포함)
+- `spec/features.md` — 게시판 섹션 상단 "신고 기능은 없다" 문구를 "게시글·댓글 신고 기능을 포함한다"로 정정. POST-10(인기글 카테고리)·POST-11(게시글·댓글 신고)·POST-12(공지사항 노출) 신규 추가 (모두 P1)
+- `spec/admin/features.md` — ADM-12(공지사항 관리)·ADM-13(신고 목록 조회 및 처리) 신규 추가 (P1). 유저 계정 정지는 이번 기능 범위 밖(ADM-05로 유지, 별도 이슈)
+
 ## 2026-09-18
 
 - `spec/legal/terms-of-service.md` — 커뮤니티(게시글·댓글 작성/추천/신고), 공연·릴리스 평점 기능 도입 반영. 제2조에 "게시물"·"평점" 정의 추가, 제6조 이용자 의무에 명예훼손·불법정보 게시·허위 신고·평점 조작 금지 항목 추가, 제7조에 게시물 조치와 계정 제재 병과 근거 추가, 제8조(게시물의 관리 — UGC 저작권 귀속 및 이용허락 범위)·제9조(신고 및 처리) 신설, 제11조(저작권)·제12조(면책 조항)에 게시물·평점 관련 내용 반영. 부칙으로 개정 사유·시행일(공지일로부터 30일 후인 2026-10-18)·시행 전 임시 배포 시 적용 예외 명시
