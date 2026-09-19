@@ -5,6 +5,7 @@
 - `spec/api/_index.md` — 위 8개 엔드포인트 행 추가 (게시판 섹션 3건, 관리자 섹션 8건 — 신고 생성 포함)
 - `spec/features.md` — 게시판 섹션 상단 "신고 기능은 없다" 문구를 "게시글·댓글 신고 기능을 포함한다"로 정정. POST-10(인기글 카테고리)·POST-11(게시글·댓글 신고)·POST-12(공지사항 노출) 신규 추가 (모두 P1)
 - `spec/admin/features.md` — ADM-12(공지사항 관리)·ADM-13(신고 목록 조회 및 처리) 신규 추가 (P1). 유저 계정 정지는 이번 기능 범위 밖(ADM-05로 유지, 별도 이슈)
+- `spec/api/admin.md` — FE에서 신고자 식별 불가 문제 보고에 따라 `GET /api/admin/reports`·`GET /api/admin/reports/{id}` 응답에 `reporterNickname` 필드 추가
 
 ## 2026-09-18
 
