@@ -160,6 +160,7 @@ ADMIN 전용 엔드포인트는 일반 사용자 접근 시 `403` 반환합니�
 | GET | `/api/posts/{id}` | 불필요 |
 | GET | `/api/posts` | 불필요 |
 | GET | `/api/posts/popular` | 불필요 |
+| GET | `/api/posts/popular-board` | 불필요 |
 | GET | `/api/posts/trending-tags` | 불필요 |
 | PATCH | `/api/posts/{id}` | 필요 |
 | DELETE | `/api/posts/{id}` | 필요 |
@@ -172,6 +173,9 @@ ADMIN 전용 엔드포인트는 일반 사용자 접근 시 `403` 반환합니�
 | DELETE | `/api/comments/{commentId}` | 필요 |
 | POST | `/api/comments/{commentId}/like` | 필요 |
 | DELETE | `/api/comments/{commentId}/like` | 필요 |
+| POST | `/api/reports` | 필요 |
+| GET | `/api/notices` | 불필요 |
+| GET | `/api/notices/{id}` | 불필요 |
 
 ### 관리자 (ROLE_ADMIN)
 | 메서드 | 엔드포인트 | 인증 |
@@ -187,6 +191,14 @@ ADMIN 전용 엔드포인트는 일반 사용자 접근 시 `403` 반환합니�
 | GET | `/api/admin/inquiries/{id}` | ADMIN |
 | PATCH | `/api/admin/inquiries/{id}/status` | ADMIN |
 | POST | `/api/admin/policies` | ADMIN |
+| GET | `/api/admin/notices` | ADMIN |
+| GET | `/api/admin/notices/{id}` | ADMIN |
+| POST | `/api/admin/notices` | ADMIN |
+| PATCH | `/api/admin/notices/{id}` | ADMIN |
+| DELETE | `/api/admin/notices/{id}` | ADMIN |
+| GET | `/api/admin/reports` | ADMIN |
+| GET | `/api/admin/reports/{id}` | ADMIN |
+| PATCH | `/api/admin/reports/{id}/status` | ADMIN |
 
 ### Data 파이프라인 연동 (ROLE_ADMIN)
 | 메서드 | 엔드포인트 | 인증 |
