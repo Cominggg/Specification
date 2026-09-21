@@ -1,3 +1,10 @@
+## 2026-09-21
+
+- `spec/api/concerts.md` — 공연 별점 등록·수정(`PUT /api/concerts/{id}/rating`), 내 별점 조회(`GET /api/concerts/{id}/rating/me`), 별점 취소(`DELETE /api/concerts/{id}/rating`) 엔드포인트 신규 문서화. `CONCERT_NOT_ENDED`(400, 공연 상태가 ENDED가 아니면 등록·수정 거부) 에러 반영. `GET /api/concerts`·`GET /api/concerts/{id}` 응답에 `averageRating`·`ratingCount` 필드 추가
+- `spec/api/releases.md` — 릴리즈 별점 등록·수정(`PUT /api/releases/{id}/rating`), 내 별점 조회(`GET /api/releases/{id}/rating/me`), 별점 취소(`DELETE /api/releases/{id}/rating`) 엔드포인트 신규 문서화 (상태 제약 없이 항상 등록 가능). `GET /api/releases`·`GET /api/releases/{id}` 응답에 `averageRating`·`ratingCount` 필드 추가
+- `spec/api/_index.md` — 위 공연·릴리즈 별점 엔드포인트 6건을 전체 목록에 추가
+- `spec/features.md` — CON-10(공연 별점 평가), REL-05(음악 별점 평가) 신규 추가 (모두 P1)
+
 ## 2026-09-19
 
 - `spec/api/posts.md` — 인기글 카테고리(`GET /api/posts/popular-board`), 게시글·댓글 신고(`POST /api/reports`), 공지사항 공개 조회(`GET /api/notices`, `GET /api/notices/{id}`) 엔드포인트 신규 문서화
