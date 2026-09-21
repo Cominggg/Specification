@@ -40,6 +40,8 @@
 | `status` | String | `UPCOMING` \| `ONGOING` \| `ENDED` \| `CANCELLED` |
 | `isInCalendar` | Boolean | 내 캘린더 추가 여부 (비인증 시 `false`) |
 | `ticketOpenAt` | String? | 티켓 오픈 일시 (ISO 8601 datetime, 관리자 입력값, 미입력 시 `null`) |
+| `averageRating` | Double? | 평균 별점 (0.5~5.0, 소수 첫째 자리 반올림). 등록된 별점이 없으면 `null` |
+| `ratingCount` | long | 등록된 별점 개수 (없으면 `0`) |
 
 ```json
 {
@@ -56,7 +58,9 @@
       "venue": "KSPO DOME, 서울",
       "status": "UPCOMING",
       "isInCalendar": false,
-      "ticketOpenAt": "2025-07-01T10:00:00"
+      "ticketOpenAt": "2025-07-01T10:00:00",
+      "averageRating": 4.5,
+      "ratingCount": 12
     }
   ],
   "page": 0,
@@ -197,6 +201,8 @@
 | `ticketLinks[].id` | Long | 예매처 ID (`concert_booking_link.id`) |
 | `ticketLinks[].label` | String | 예매처 표시명 (`concert_booking_link.name`) |
 | `ticketLinks[].url` | String | 예매처 URL |
+| `averageRating` | Double? | 평균 별점 (0.5~5.0, 소수 첫째 자리 반올림). 등록된 별점이 없으면 `null` |
+| `ratingCount` | long | 등록된 별점 개수 (없으면 `0`) |
 
 ```json
 {
@@ -216,7 +222,9 @@
   "ticketOpenAt": "2025-07-01T10:00:00",
   "ticketLinks": [
     { "id": 1, "label": "인터파크", "url": "https://..." }
-  ]
+  ],
+  "averageRating": 4.5,
+  "ratingCount": 12
 }
 ```
 
@@ -273,3 +281,106 @@
 ### 비고
 
 - `sourceUrl`이 `null`인 경우(셋리스트 데이터 없음) FE는 `https://www.setlist.fm/`으로 폴백
+
+---
+
+## PUT /api/concerts/{id}/rating
+
+**용도**: 공연에 별점을 등록하거나 수정합니다. 등록·수정이 하나의 API로 통합되어 있어, 이미 등록된 별점이 있으면 갱신합니다.
+
+### 요청
+
+인증 필요.
+
+**Path Parameters**
+
+| 이름 | 타입 | 필수 | 설명 |
+|------|------|------|------|
+| `id` | Long | Y | 공연 ID |
+
+**Body**
+
+| 필드 | 타입 | 필수 | 설명 |
+|------|------|------|------|
+| `score` | BigDecimal | Y | 0.5~5.0 범위의 0.5 단위 점수 |
+
+```json
+{ "score": 4.5 }
+```
+
+### 응답
+
+`200 OK`, 본문 없음.
+
+### 에러
+
+| 코드 | 상태 코드 | 설명 |
+|------|-----------|------|
+| `INVALID_RATING_SCORE` | 400 | `score`가 0.5~5.0 범위를 벗어나거나 0.5 단위가 아닌 경우 |
+| `CONCERT_NOT_ENDED` | 400 | 공연 상태가 `ENDED`(공연완료)가 아닌 경우 |
+| `RATING_TARGET_NOT_FOUND` | 404 | 존재하지 않는 공연 |
+| `UNAUTHORIZED` | 401 | 비인증 요청 |
+
+### 비고
+
+- 공연은 상태가 `ENDED`일 때만 별점을 등록·수정할 수 있음 (음악 발매 별점과 다른 정책 — [releases.md](releases.md) 참고)
+- 사용자당 공연당 별점 1개만 유지됨 (동일 사용자가 재요청하면 기존 값 갱신)
+
+---
+
+## GET /api/concerts/{id}/rating/me
+
+**용도**: 로그인한 사용자가 해당 공연에 등록한 자신의 별점을 조회합니다.
+
+### 요청
+
+인증 필요.
+
+**Path Parameters**
+
+| 이름 | 타입 | 필수 | 설명 |
+|------|------|------|------|
+| `id` | Long | Y | 공연 ID |
+
+### 응답
+
+| 필드 | 타입 | 설명 |
+|------|------|------|
+| `score` | BigDecimal? | 등록한 별점. 등록한 적 없으면 `null` |
+
+```json
+{ "score": 4.5 }
+```
+
+### 에러
+
+| 코드 | 상태 코드 | 설명 |
+|------|-----------|------|
+| `UNAUTHORIZED` | 401 | 비인증 요청 |
+
+---
+
+## DELETE /api/concerts/{id}/rating
+
+**용도**: 등록한 별점을 취소합니다.
+
+### 요청
+
+인증 필요.
+
+**Path Parameters**
+
+| 이름 | 타입 | 필수 | 설명 |
+|------|------|------|------|
+| `id` | Long | Y | 공연 ID |
+
+### 응답
+
+`200 OK`, 본문 없음.
+
+### 에러
+
+| 코드 | 상태 코드 | 설명 |
+|------|-----------|------|
+| `RATING_NOT_FOUND` | 404 | 등록된 별점이 없는 경우 |
+| `UNAUTHORIZED` | 401 | 비인증 요청 |
