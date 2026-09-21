@@ -43,6 +43,7 @@
 | CON-07 | 공연 상세 데이터 없음 Empty View | 공연 상세 조회(`GET /api/concerts/{id}`) 결과가 존재하지 않을 때(404) 전용 empty view 표시.<br>▸ 메시지: "공연 정보가 존재하지 않습니다"<br>▸ 액션 링크: "공연 목록으로" (`/concerts`)<br>▸ `!concert` 분기의 빈 렌더를 EmptyState 컴포넌트로 교체. BE `GET /api/concerts/{id}` 404 응답 body 포맷 확인 선행 필요. | P0 | CON-02 의존 |
 | CON-08 | 공연 검색 | 공연명·아티스트명·아티스트 alias 키워드로 공연 목록 검색. `GET /api/concerts?q=` 사용(CON-01과 동일 엔드포인트로 통합). `q` 생략·공백 시 검색어 없이 나머지 필터만 적용. | P1 | |
 | CON-09 | 티켓 오픈 예정 공연 조회 | 현재 시각 이후 티켓 오픈이 예정된 공연 목록 표시. 오픈 임박 순(ticket_open_at ASC) 정렬, 최대 20건.<br>▸ `following=true` 파라미터로 팔로우한 아티스트 공연만 필터링 가능 (인증 필요).<br>▸ API: `GET /api/concerts/ticketing?following=false` | P1 | |
+| CON-10 | 공연 별점 평가 | 공연 상세 페이지에서 0.5~5.0 범위(0.5 단위)의 별점을 등록·수정·조회·취소.<br>▸ 공연 상태가 `ENDED`(공연완료)일 때만 등록·수정 가능. 그 외 상태에서는 서버가 거부(`CONCERT_NOT_ENDED`).<br>▸ 평균 별점·평가 수는 공연 목록·상세 응답에 함께 노출.<br>▸ API: `PUT/DELETE /api/concerts/{id}/rating`, `GET /api/concerts/{id}/rating/me` | P1 | REL-05와 동일 정책 기반(상태 제약만 다름) |
 
 ## 캘린더 / 일정
 
@@ -71,6 +72,7 @@
 | REL-02 | 앨범·싱글·EP 상세 조회 | 릴리즈 상세 페이지(`/releases/:id`). ALBUM / SINGLE / EP 타입 공통 구조.<br>▸ **기본 정보**: 앨범 커버(MusicBrainz Cover Art Archive), 타이틀, 아티스트명, 발매일, 레이블, 타입 배지.<br>▸ **트랙리스트**: 트랙 번호·제목·재생 시간 표시. 스트리밍 기능 없음.<br>▸ ART-02 디스코그래피 및 REL-01 목록에서 진입. | P2 | MusicBrainz API |
 | REL-03 | 음악 전체 목록 조회 | 릴리즈(앨범·싱글·EP) 전체 목록 페이지(`/releases`). ALBUM / SINGLE / EP 타입 배지.<br>▸ **필터**: 아티스트(`artistId`), 타입(`Album`·`Single`만 허용, 그 외 값은 400), 관심 아티스트(`following=true`). `following=true`이면 `artistId` 필터 무시; `type` 필터는 동시 적용 가능. 미인증 시 빈 페이지 반환.<br>▸ **정렬**: 발매일 내림차순 NULLS LAST 고정 (발매일 없는 항목 항상 마지막).<br>▸ **페이지네이션**: 20건/페이지. 필터 변경 시 1페이지로 초기화.<br>▸ **진입점**: ① 홈 "새 앨범·싱글" 섹션 헤더 "전체 보기" 링크 ② 상단 네비게이션 "음악" 탭(캘린더 우측).<br>▸ 카드 클릭 시 `/releases/:id` 상세 페이지(REL-02) 진입.<br>▸ REL-04 검색과 `GET /api/releases` 하나로 통합 제공됨.<br>▸ API: `GET /api/releases?q=&artistId=&type=&following=&page=&size=20`<br>▸ 결과 0건 시 "아직 수집된 음반 정보가 없습니다" 빈 상태 표시. | P2 | REL-01·REL-02 의존 |
 | REL-04 | 음악 검색 | 릴리즈명·트랙명·아티스트명(alias 포함)으로 음악을 검색한다. `q` 선택 파라미터(부분 일치, 대소문자 무시), `type`(`Album`·`Single`), `following`(팔로우 아티스트 필터) 조합 지원. `q` 생략 시 다른 필터만 적용. 정렬은 발매일 DESC NULLS LAST 고정.<br>▸ API: `GET /api/releases?q=&type=&following=` (REL-03과 동일 엔드포인트로 통합) | P1 | |
+| REL-05 | 음악 별점 평가 | 릴리즈(앨범·싱글) 상세 페이지에서 0.5~5.0 범위(0.5 단위)의 별점을 등록·수정·조회·취소.<br>▸ 공연 별점(CON-10)과 달리 상태 제약 없이 항상 등록·수정 가능.<br>▸ 평균 별점·평가 수는 릴리즈 목록·상세 응답에 함께 노출.<br>▸ API: `PUT/DELETE /api/releases/{id}/rating`, `GET /api/releases/{id}/rating/me` | P1 | CON-10과 동일 정책 기반(상태 제약만 다름) |
 
 ## 게시판
 
