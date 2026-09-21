@@ -128,6 +128,9 @@ ADMIN 전용 엔드포인트는 일반 사용자 접근 시 `403` 반환합니�
 | GET | `/api/concerts/stats` | 불필요 |
 | GET | `/api/concerts/{id}` | 불필요 |
 | GET | `/api/concerts/{id}/setlist` | 불필요 |
+| PUT | `/api/concerts/{id}/rating` | 필요 |
+| GET | `/api/concerts/{id}/rating/me` | 필요 |
+| DELETE | `/api/concerts/{id}/rating` | 필요 |
 
 ### 캘린더
 | 메서드 | 엔드포인트 | 인증 |
@@ -143,6 +146,9 @@ ADMIN 전용 엔드포인트는 일반 사용자 접근 시 `403` 반환합니�
 | GET | `/api/releases` | 불필요 |
 | GET | `/api/releases/search` | 불필요 |
 | GET | `/api/releases/{id}` | 불필요 |
+| PUT | `/api/releases/{id}/rating` | 필요 |
+| GET | `/api/releases/{id}/rating/me` | 필요 |
+| DELETE | `/api/releases/{id}/rating` | 필요 |
 
 ### 마이페이지·문의
 | 메서드 | 엔드포인트 | 인증 |
