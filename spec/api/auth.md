@@ -78,7 +78,8 @@ Cookie에서 Refresh Token 자동 추출 (별도 바디 없음).
 
 - 호출마다 Refresh Token을 회전(새 값으로 교체)하고 `Set-Cookie`로 새 Refresh Token을 내려준다. 이전 Refresh Token은 즉시 사용 불가
 - 세션(기기) 단위로 검증·교체하며 다른 기기 세션에는 영향이 없다 (`policy/auth-policy.md` "다중 기기 로그인 정책")
-- 같은 Refresh Token으로 동시에 요청하면 1건만 성공하고 나머지는 `REFRESH_TOKEN_INVALID`
+- 이미 회전된 Refresh Token이 다시 제출되면(재사용) 해당 세션을 폐기하고 `REFRESH_TOKEN_INVALID` — 해당 기기 재로그인 필요. 같은 Refresh Token으로 동시에 요청해도 재사용으로 판정되므로 클라이언트는 refresh 호출을 직렬화해야 한다
+- Access Token(`typ=access`)을 Cookie에 넣어 호출하면 `REFRESH_TOKEN_INVALID`
 
 ---
 
