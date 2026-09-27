@@ -1,5 +1,6 @@
 ## 2026-09-27
 
+- `spec/policy/auth-policy.md` — "다중 기기 로그인 정책"의 BE 미반영 안내 문구("BE 반영 전까지 실제 동작은 사용자당 세션 1개") 제거. BE 구현 완료(Cominggg/Backend#131)
 - `spec/policy/auth-policy.md` — 토큰 종류 claim(`typ=access`/`typ=refresh`) 구분 추가: Refresh Token은 `Authorization: Bearer`로 제출해도 인증되지 않음(로그아웃·세션 제거 후에도 서명이 유효한 Refresh Token이 만료 전까지 API 인증에 쓰이던 빈틈 차단). "재사용 감지" 항목 신설: 이미 회전된 Refresh Token 재제출 시 탈취로 간주해 해당 세션 즉시 폐기, 동시 refresh도 재사용으로 판정되므로 클라이언트 직렬화 필수. Refresh Token 회전 항목의 "동시 요청 1건만 성공" 문구를 재사용 감지 규칙으로 대체 (BE 반영 예정)
 - `spec/api/auth.md` — `POST /api/auth/refresh` 비고에 재사용 감지 시 세션 폐기, Access Token 제출 시 `REFRESH_TOKEN_INVALID` 명시
 - `spec/policy/auth-policy.md` — "다중 기기 로그인 정책" 섹션 신설: 동시 로그인 허용, 사용자당 최대 세션 5개(초과 시 가장 오래된 세션 제거), Refresh Token 회전 시 세션 식별자 유지·원자적 검증·교체(유예 구간 없음), 로그아웃은 현재 기기 세션만 종료, 탈퇴 시 전체 세션 삭제, 전체 기기 로그아웃 미제공. 로그아웃 행의 "서버 Refresh Token 블랙리스트 등록"을 실제 동작(Access Token 블랙리스트 + Refresh Token 삭제)으로 정정. 기존 구현이 사용자당 Refresh Token 1개만 저장해 새 기기 로그인 시 다른 기기가 로그아웃되는 문제를 FE 조사 중 발견해 정책을 확정함 (BE 반영 예정)
