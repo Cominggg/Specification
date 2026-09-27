@@ -74,6 +74,12 @@ Cookie에서 Refresh Token 자동 추출 (별도 바디 없음).
 | `REFRESH_TOKEN_EXPIRED` | 401 | Refresh Token 만료 — 재로그인 필요 |
 | `REFRESH_TOKEN_INVALID` | 401 | 유효하지 않은 Refresh Token |
 
+### 비고
+
+- 호출마다 Refresh Token을 회전(새 값으로 교체)하고 `Set-Cookie`로 새 Refresh Token을 내려준다. 이전 Refresh Token은 즉시 사용 불가
+- 세션(기기) 단위로 검증·교체하며 다른 기기 세션에는 영향이 없다 (`policy/auth-policy.md` "다중 기기 로그인 정책")
+- 같은 Refresh Token으로 동시에 요청하면 1건만 성공하고 나머지는 `REFRESH_TOKEN_INVALID`
+
 ---
 
 ## POST /api/auth/logout
@@ -90,8 +96,10 @@ Cookie에서 Refresh Token 자동 추출 (별도 바디 없음).
 
 ### 비고
 
+- Cookie의 Refresh Token으로 현재 기기 세션을 식별해 해당 세션만 삭제 (다른 기기 세션 유지)
+- Refresh Token Cookie가 없거나 유효하지 않아도 `200 OK` (세션은 TTL 만료로 정리)
+- 현재 Access Token 블랙리스트 등록
 - Refresh Token Cookie 삭제
-- 서버 측 토큰 블랙리스트 처리
 
 ---
 
@@ -110,6 +118,7 @@ Cookie에서 Refresh Token 자동 추출 (별도 바디 없음).
 ### 비고
 
 - 연관 데이터(캘린더, 팔로우, 문의) 함께 삭제
+- 해당 사용자의 모든 기기 세션(Refresh Token) 삭제
 
 ---
 
