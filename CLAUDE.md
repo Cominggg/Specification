@@ -9,6 +9,7 @@ Jpop 아티스트 내한 공연 정보 통합 웹 플랫폼 **Coming**의 기획
 | coming-frontend | React 19 + Vite (JavaScript/JSX) |
 | coming-backend | Java 21 + Spring Boot 4.x |
 | coming-data | Python 데이터 수집 파이프라인 |
+| coming-app | Kotlin Multiplatform + Compose Multiplatform (Android / iOS) |
 
 ## 명세 파일 구성
 

@@ -1,3 +1,7 @@
+## 2026-10-19
+
+- `README.md`, `CLAUDE.md` — 관련 레포지토리 표에 모바일 앱 레포(Cominggg/App, Kotlin Multiplatform + Compose Multiplatform) 추가. 앱은 기존 API 명세를 그대로 사용하며 관리자 기능은 범위에서 제외(웹 유지). 앱 대응으로 BE 협의가 필요한 항목은 별도 이슈로 진행 (Cominggg/App#1)
+
 ## 2026-09-27
 
 - `spec/policy/auth-policy.md` — "다중 기기 로그인 정책"의 BE 미반영 안내 문구("BE 반영 전까지 실제 동작은 사용자당 세션 1개") 제거. BE 구현 완료(Cominggg/Backend#131)

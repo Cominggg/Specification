@@ -26,7 +26,7 @@
 
 **커밍**(Coming)은 Jpop 아티스트의 국내 내한 공연 정보를 한곳에서 확인할 수 있는 웹 플랫폼입니다. KOPIS(공연예술통합전산망)·MusicBrainz·setlist.fm·Spotify 등 여러 외부 소스에 흩어진 아티스트·공연·발매 정보를 자동으로 수집·매칭해, 공연 탐색부터 아티스트 팔로우, 캘린더 관리, 커뮤니티 게시판까지 하나의 서비스로 제공합니다.
 
-이 레포지토리는 코드가 아닌 **기획·정책·API·DB 명세**만을 담당하며, 아래 세 레포지토리가 이 명세를 기준으로 구현됩니다.
+이 레포지토리는 코드가 아닌 **기획·정책·API·DB 명세**만을 담당하며, 아래 네 레포지토리가 이 명세를 기준으로 구현됩니다.
 
 ## 관련 레포지토리
 
@@ -35,6 +35,7 @@
 | [Frontend](https://github.com/Cominggg/Frontend) | 웹 클라이언트 | React 19 + Vite, JavaScript (JSX) |
 | [Backend](https://github.com/Cominggg/Backend) | REST API 서버 | Java 21 + Spring Boot 4.x |
 | [Data](https://github.com/Cominggg/Data) | 데이터 수집 파이프라인 | Python (APScheduler + FastAPI) |
+| [App](https://github.com/Cominggg/App) | 모바일 앱 (Android / iOS) | Kotlin Multiplatform + Compose Multiplatform |
 
 ## 프로젝트 개요
 
