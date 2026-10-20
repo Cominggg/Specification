@@ -23,7 +23,10 @@
 |------|------|------|
 | `concertId` | Long | 공연 ID |
 | `type` | String | `CONCERT` (공연 날짜 기준) \| `TICKETING` (티켓 오픈 날짜 기준) |
-| `artistName` | String? | 아티스트명 |
+| `artists` | Object[] | 출연 아티스트 목록 (연결된 아티스트가 없으면 빈 배열) |
+| `artists[].id` | Long | 아티스트 ID |
+| `artists[].name` | String | 아티스트명 |
+| `artists[].koreanName` | String? | 한글 표기명 (`locale=ko` alias, 없으면 `null`) |
 | `title` | String | 공연명 |
 | `startDate` | String | 공연 시작일 (`YYYY-MM-DD`) |
 | `endDate` | String? | 공연 종료일 (`YYYY-MM-DD`) |
@@ -38,7 +41,9 @@
   {
     "concertId": 2,
     "type": "TICKETING",
-    "artistName": "뉴진스",
+    "artists": [
+      { "id": 3, "name": "NewJeans", "koreanName": "뉴진스" }
+    ],
     "title": "NewJeans 콘서트",
     "startDate": "2025-09-01",
     "endDate": "2025-09-01",
@@ -51,7 +56,9 @@
   {
     "concertId": 1,
     "type": "CONCERT",
-    "artistName": "YOASOBI",
+    "artists": [
+      { "id": 1, "name": "YOASOBI", "koreanName": null }
+    ],
     "title": "YOASOBI ARENA TOUR 2025",
     "startDate": "2025-08-15",
     "endDate": "2025-08-16",
