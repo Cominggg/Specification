@@ -3,6 +3,7 @@
 - `spec/api/releases.md` — `GET /api/releases/{id}` 응답에 `artistKoreanName`(String?, 아티스트 `locale=ko` alias, 없으면 `null`) 필드 추가 (`artistName` 다음). 기존 구현 대비 명세 누락분 반영
 - `spec/api/releases.md` — `GET /api/releases` 목록 응답(`content` 항목)에 `artistKoreanName`(String?, 아티스트 `locale=ko` alias, 없으면 `null`) 필드 추가 (`artistName` 다음, JSON 예시 포함). 기존 구현 대비 명세 누락분 반영
 - `spec/api/calendar.md` — `GET /api/calendar` 응답의 `artistName`(String?)을 `artists`(Object[]: `id`·`name`·`koreanName`)로 정정. 기존 구현 대비 명세 누락분 반영
+- `spec/api/my.md` — `GET /api/me/concerts/history` 응답(`content` 항목)의 `artistName`(String?)을 `artists`(Object[]: `id`·`name`·`koreanName`, 아티스트가 없으면 빈 배열)로 정정. 기존 구현 대비 명세 누락분 반영
 
 ## 2026-10-19
 
