@@ -1,3 +1,8 @@
+## 2026-10-20
+
+- `spec/api/releases.md` — `GET /api/releases/{id}` 응답에 `artistKoreanName`(String?, 아티스트 `locale=ko` alias, 없으면 `null`) 필드 추가 (`artistName` 다음). 기존 구현 대비 명세 누락분 반영
+- `spec/api/calendar.md` — `GET /api/calendar` 응답의 `artistName`(String?)을 `artists`(Object[]: `id`·`name`·`koreanName`)로 정정. 기존 구현 대비 명세 누락분 반영
+
 ## 2026-10-19
 
 - `README.md`, `CLAUDE.md` — 관련 레포지토리 표에 모바일 앱 레포(Cominggg/App, Kotlin Multiplatform + Compose Multiplatform) 추가. 앱은 기존 API 명세를 그대로 사용하며 관리자 기능은 범위에서 제외(웹 유지). 앱 대응으로 BE 협의가 필요한 항목은 별도 이슈로 진행 (Cominggg/App#1)
