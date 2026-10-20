@@ -47,7 +47,10 @@
 | 필드 | 타입 | 설명 |
 |------|------|------|
 | `id` | Long | 공연 ID |
-| `artistName` | String? | 아티스트명 (없으면 `null`) |
+| `artists` | Object[] | 출연 아티스트 목록 (연결된 아티스트가 없으면 빈 배열) |
+| `artists[].id` | Long | 아티스트 ID |
+| `artists[].name` | String | 아티스트명 |
+| `artists[].koreanName` | String? | 한글 표기명 (`locale=ko` alias, 없으면 `null`) |
 | `title` | String | 공연명 |
 | `startDate` | String | 시작일 |
 | `endDate` | String? | 종료일 |
