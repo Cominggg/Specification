@@ -28,6 +28,7 @@
 | `id` | Long | 릴리즈 ID |
 | `coverUrl` | String? | 커버 이미지 URL |
 | `artistName` | String | 아티스트명 |
+| `artistKoreanName` | String? | 아티스트 한글 표기명 (`locale=ko` alias, 없으면 `null`) |
 | `title` | String | 타이틀 |
 | `type` | String | `Album` \| `Single` 또는 기타 |
 | `releaseDate` | String? | 발매일 |
@@ -42,6 +43,7 @@
       "id": 1,
       "coverUrl": null,
       "artistName": "Kenshi Yonezu",
+      "artistKoreanName": "요네즈 켄시",
       "title": "LOST CORNER",
       "type": "Album",
       "releaseDate": "2024-08-28",
