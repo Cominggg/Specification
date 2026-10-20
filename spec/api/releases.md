@@ -99,6 +99,7 @@
 | `totalTracks` | int? | 전체 트랙 수 |
 | `artistId` | Long | 아티스트 ID |
 | `artistName` | String | 아티스트명 |
+| `artistKoreanName` | String? | 아티스트 한글 표기명 (`locale=ko` alias, 없으면 `null`) |
 | `spotifyId` | String? | Spotify 릴리즈 ID (`release_group.spotify_id`) |
 | `tracks` | Object[] | 수록곡 목록 |
 | `tracks[].position` | int | 트랙 순서 |
@@ -121,6 +122,7 @@
   "totalTracks": 13,
   "artistId": 2,
   "artistName": "Kenshi Yonezu",
+  "artistKoreanName": "요네즈 켄시",
   "spotifyId": "4CPMuGYB4TP0BdHiWlVMOA",
   "tracks": [
     { "position": 1, "title": "LOST CORNER", "lengthMs": 262000, "discNumber": 1, "explicit": false, "spotifyId": "1YHEuThB7dJjBBjDaJZJyO" },
