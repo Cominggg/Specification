@@ -13,13 +13,13 @@
 | 이름 | 타입 | 필수 | 기본값 | 설명 |
 |------|------|------|--------|------|
 | `q` | String | N | — | 검색어 (공연명·아티스트명·아티스트 alias 대소문자 무관 부분 일치). 생략·공백이면 텍스트 조건 없이 나머지 필터만 적용 |
-| `status` | String | N | — | `UPCOMING` \| `ONGOING` \| `ENDED` \| `CANCELLED` |
+| `status` | String[] | N | — | `UPCOMING` \| `ONGOING` \| `ENDED` \| `CANCELLED`. 여러 값은 반복 파라미터로 전달 (`status=UPCOMING&status=ONGOING`) — 그중 하나에 해당하는 공연 반환(OR). 단일 값도 그대로 사용 가능 |
 | `inCalendar` | Boolean | N | — | `true`이면 내 캘린더에 추가한 공연만 반환 (인증 필요, 미인증 시 빈 페이지) |
 | `followedOnly` | Boolean | N | — | `true`이면 팔로우한 아티스트의 공연만 반환 (미인증·팔로잉 없으면 빈 페이지) |
 | `ticketOpenPending` | Boolean | N | `false` | `true`이면 티켓 오픈 예정(`ticketOpenAt > 현재 시각`) 공연만 반환 |
 | `page` | int | N | `0` | 페이지 번호 |
 | `size` | int | N | `20` | 페이지 크기 |
-| `sort` | String | N | `startDate,desc` | 정렬 기준 (`필드명,방향`). 허용 필드: `startDate`, `ticketOpenAt` |
+| `sort` | String | N | `startDate,desc` | 정렬 기준 (`필드명,방향`). 허용 필드: `startDate`, `ticketOpenAt`. 방향: `asc`(오름차순) \| `desc`(내림차순) — 예: `sort=startDate,asc` |
 
 ### 응답
 
@@ -75,12 +75,15 @@
 | 코드 | 상태 코드 | 설명 |
 |------|-----------|------|
 | `INVALID_INPUT` | 400 | `sort` 필드가 `startDate`·`ticketOpenAt` 외의 값인 경우 |
+| `INVALID_INPUT` | 400 | `status`에 정의되지 않은 값이 포함된 경우 |
 
 ### 비고
 
 - 기본 정렬: `startDate` 내림차순 (최신 공연 우선)
+- 정렬 값이 같은 공연은 `id` 오름차순으로 보조 정렬되어 페이지 간 중복·누락이 없음
+- 요청 예시: `GET /api/concerts?status=UPCOMING&status=ONGOING&sort=startDate,asc`
 - `status` 미전달 시 전체 공연 반환. `EXCLUDED`·`PENDING` 상태는 `status` 값과 무관하게 항상 숨겨짐
-- `q`·`status`·`inCalendar`·`followedOnly`·`ticketOpenPending`은 모두 AND로 조합됨
+- `status` 여러 값 사이는 OR, `q`·`status`·`inCalendar`·`followedOnly`·`ticketOpenPending`은 모두 AND로 조합됨
 - 비인증 요청 허용 — `isInCalendar`는 비인증 시 항상 `false`, 인증 시 실제 값 반환
 - 기존 `GET /api/concerts/search`(공연 검색), `GET /api/concerts/following`(관심 아티스트 공연)는 이 엔드포인트로 통합되어 제거됨 — 각각 `q`, `followedOnly=true` 파라미터로 대체
 
