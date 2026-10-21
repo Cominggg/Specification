@@ -1,3 +1,7 @@
+## 2026-10-21
+
+- `spec/api/concerts.md` — `GET /api/concerts`의 `status`를 여러 값(String[], 반복 파라미터 `status=UPCOMING&status=ONGOING`, OR 조합)으로 확장. 단일 값은 기존과 동일(하위 호환), 정의되지 않은 값은 `INVALID_INPUT`(400). `sort` 방향(`asc`·`desc`) 지정 방법과 동일 정렬 값의 `id` 오름차순 보조 정렬(페이지 간 중복·누락 없음) 명시 (Cominggg/Backend#137)
+
 ## 2026-10-20
 
 - `spec/api/releases.md` — `GET /api/releases/{id}` 응답에 `artistKoreanName`(String?, 아티스트 `locale=ko` alias, 없으면 `null`) 필드 추가 (`artistName` 다음). 기존 구현 대비 명세 누락분 반영
