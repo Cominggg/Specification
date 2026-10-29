@@ -6,7 +6,6 @@ CREATE TABLE "user" (
     provider varchar(20) NOT NULL,
     provider_id varchar(255) NOT NULL,
     nickname varchar(50) NOT NULL,
-    profile_image_url text,
     role varchar(20) NOT NULL,
     status varchar(20) NOT NULL,
     created_at timestamp,
@@ -203,4 +202,5 @@ CREATE TABLE inquiry (
 | 2026-06-11 | concert.venue_address 컬럼 제거 — 파이프라인 미수집, API 미노출 |
 | 2026-06-11 | artist, artist_alias, concert, concert_artist, concert_artist_candidate audit 컬럼(created_at/updated_at) 제거 — 파이프라인 수집 테이블은 감사 이력 미관리. user, user_follow_artist, user_concert_calendar, inquiry는 유지 |
 | 2026-06-30 | setlist.attribution_url(text) 컬럼 추가 — setlist.fm 저작자 표시 URL 저장 (V21 마이그레이션) |
+| 2026-10-29 | user.profile_image_url 컬럼 제거 반영 — V20 마이그레이션에서 삭제됨, 개인정보처리방침 수집 항목에서도 제외 |
 | 2026-06-30 | concert_artist_candidate.matched_by 컬럼 제거 — title 단일 전략만 사용, write-only 고정값으로 의미 없음 (V22 마이그레이션) |

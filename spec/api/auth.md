@@ -42,14 +42,15 @@ Refresh Token을 HttpOnly Cookie에 설정한 뒤 아래 URL로 302 리다이렉
 
 | 쿼리 파라미터 | 타입 | 설명 |
 |--------------|------|------|
-| `isNewUser` | Boolean | `true`: PENDING 역할 (신규 가입 또는 탈퇴 후 재가입) / `false`: 기존 사용자 |
+| `isNewUser` | Boolean | `true`: PENDING 역할 (신규 가입 또는 탈퇴 후 새 계정으로 재가입) / `false`: 기존 사용자 |
 
 ### 비고
 
 - Refresh Token은 HttpOnly Cookie에 설정 (7일 만료)
 - `isNewUser=true` → FE는 회원가입 완료 페이지로 이동, `POST /api/auth/register` 완료 후 Access Token 발급
 - `isNewUser=false` → FE는 `POST /api/auth/refresh` 호출 후 홈으로 이동
-- SUSPENDED 계정 로그인 시 OAuth2 인증 단계에서 차단, `USER_SUSPENDED` 에러로 실패 핸들러 호출
+- SUSPENDED 계정 로그인 시 OAuth2 인증 단계에서 차단, `USER_SUSPENDED` 에러로 실패 핸들러 호출(정지 기간·사유 포함, 전달 형식은 BE 구현 후 동기화)
+- 정지 중 탈퇴한 회원이 보관 기간 내 로그인하면 가입 거부(재가입 제한 에러, 코드명은 BE 구현 시 확정)
 
 ---
 
@@ -118,7 +119,10 @@ Cookie에서 Refresh Token 자동 추출 (별도 바디 없음).
 
 ### 비고
 
-- 연관 데이터(캘린더, 팔로우, 문의) 함께 삭제
+- 개인정보(이메일·닉네임·출생연도·마케팅 동의) 즉시 파기, 연관 데이터(별점, 캘린더, 팔로우, 문의) 함께 삭제
+- 게시글·댓글은 삭제하지 않고 작성자를 "탈퇴 회원"으로 표시
+- Kakao 가입자는 연결 끊기(unlink) API 호출
+- 시행일(2026-12-02) 이후 탈퇴부터 소셜 로그인 식별자 HMAC 해시를 보관 기간 동안 별도 보관(`auth-policy.md` "회원 탈퇴 및 재가입 제한")
 - 해당 사용자의 모든 기기 세션(Refresh Token) 삭제
 
 ---
