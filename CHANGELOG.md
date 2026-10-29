@@ -2,16 +2,16 @@
 
 - `spec/legal/privacy-policy.md` — v1.2 개정(2026-11-02 공지, 2026-12-02 시행). 제1조 수집 항목의 "나이"를 실제 수집 항목인 "출생연도"로 정정하고 소셜 로그인 식별자·서비스 이용 과정 생성 정보(게시글·댓글, 평점, 신고 내역, 이용 제한 이력) 추가. 제2조 3호 부정 이용 방지에 재가입 남용·이용 제한 회피 방지 명시. 제3조 원칙에 탈퇴 시 즉시 파기 항목 열거(별점 포함), 소셜 로그인 식별자 보관(일반 탈퇴 30일, 정지 중 탈퇴는 30일과 정지 종료일 중 늦은 날, 영구 정지는 1년, 복원 불가 형태로 분리 보관) 예외 추가, 탈퇴 후 게시글·댓글 "탈퇴 회원" 표시 명시, 적용 대상이 아닌 "소비자 불만 또는 분쟁 처리 기록 3년(전자상거래법)" 삭제. 제5조 AWS 보유 기간을 제3조와 일치시킴. 제6조 파기 절차 추가. 제7조 이메일 탈퇴 요청 시 가입 이메일로 본인 확인. 부칙으로 개정 사유·시행일·적용례(시행일 이후 탈퇴자부터 식별자 보관) 명시
 - `spec/legal/terms-of-service.md` — v1.2 개정(2026-11-02 공지, 2026-12-02 시행). 제4조 제3항에 정지 중 탈퇴자의 보관 기간 내 재가입 거부 사유 추가. 제7조에 조치 종류(경고·일시 정지·영구 정지), 세부 기준의 운영정책 위임, 사유·기간 통지(이메일·로그인 화면), 7일 이내 이의신청 절차 추가. 제8조 제2항 이용허락이 탈퇴 후 유지되는 게시물에도 유효하도록 수정. 제10조에 정지 회원의 이메일 탈퇴 요청, 탈퇴 시 삭제 항목, 게시물 "탈퇴 회원" 존치 및 탈퇴 전 삭제 안내, 새 계정 재가입 원칙 추가. 부칙 교체
-- `spec/policy/auth-policy.md` — "탈퇴(INACTIVE) 후 재로그인 시 계정 재활성화" 문구를 새 계정 가입으로 정정, 정지 중 탈퇴자 재가입 거부 행 추가, `USER_SUSPENDED`에 정지 기간·사유 포함 명시, 다중 기기 정책에 정지 시 전체 세션 삭제 추가. "회원 정지 정책"·"회원 탈퇴 및 재가입 제한" 섹션 신설 (BE 반영 예정)
+- `spec/policy/auth-policy.md` — "탈퇴(INACTIVE) 후 재로그인 시 계정 재활성화" 문구를 새 계정 가입으로 정정, 정지 중 탈퇴자 재가입 거부 행 추가, `USER_SUSPENDED`에 정지 기간·사유 포함 명시, 다중 기기 정책에 정지 시 전체 세션 삭제 추가. "회원 정지 정책"·"회원 탈퇴 및 재가입 제한" 섹션 신설 (BE 반영 예정, Cominggg/Backend#139·#140)
 - `spec/features.md` — AUTH-01 탈퇴 후 재가입·정지 계정 설명 갱신, AUTH-03 탈퇴 처리 범위(개인정보 즉시 파기, 별점 삭제, Kakao 연결 끊기, 게시글·댓글 "탈퇴 회원" 표시, 이메일 대리 탈퇴) 반영
 - `spec/admin/features.md` — ADM-05에 회원 정지·해제(7일·30일·영구), 신고 처리와 함께 정지, 관리자 대리 탈퇴 추가, 우선순위 P2 → P1. ADM-13 비고의 "계정 정지는 범위 밖" 문구 정정
 - `spec/api/auth.md` — 소셜 로그인 콜백 비고에 정지 기간·사유 포함과 재가입 제한 에러 추가, `DELETE /api/auth/withdraw` 비고에 탈퇴 처리 범위 반영 (엔드포인트·에러 코드 세부는 BE 구현 후 동기화)
 - `spec/data/erd.md` — `user.profile_image_url` 컬럼 제거 반영(V20)
 - `spec/legal/terms-of-service.md` — v1.2 제10조 제1항에 탈퇴 경로 3가지(설정 메뉴, 로그인 없이 볼 수 있는 웹 탈퇴 안내 페이지, 개인정보 보호책임자 이메일) 명시 (Google Play 계정 삭제 요구사항 대응, FE 요청)
 - `spec/legal/privacy-policy.md` — v1.2 제7조에 웹 탈퇴 안내 페이지 안내 추가
-- `spec/api/posts.md` — 댓글·답글 응답에 `isDeleted`(Boolean) 추가. `authorNickname=null`은 탈퇴 회원을 뜻하며 삭제 여부 판단에는 `isDeleted`를 사용하도록 정리(탈퇴 회원의 정상 댓글이 삭제 댓글로 보이던 문제) (BE 반영 예정)
-- `spec/api/auth.md` — 소셜 로그인 콜백의 정지 리다이렉트 형식(`error=USER_SUSPENDED&suspendedUntil=...&reason=...`, 영구 정지면 `suspendedUntil` 생략, 자유 서술 사유는 URL 미포함) 및 앱 JSON 에러 필드 명시. `POST /api/auth/refresh`에 정지 회원은 `USER_SUSPENDED`(403, 정지 정보 포함) 반환 추가 (BE 반영 예정)
-- `spec/api/admin.md` — `GET /api/admin/reports/{id}` 응답에 `targetAuthorId`·`targetAuthorNickname`·`targetAuthorSuspendedUntil` 추가, `PATCH /api/admin/reports/{id}/status`에 `suspend`(신고 처리와 정지를 한 트랜잭션으로) 추가 (BE 반영 예정, 필드 이름은 구현 후 동기화)
+- `spec/api/posts.md` — 댓글·답글 응답에 `isDeleted`(Boolean) 추가. `authorNickname=null`은 탈퇴 회원을 뜻하며 삭제 여부 판단에는 `isDeleted`를 사용하도록 정리(탈퇴 회원의 정상 댓글이 삭제 댓글로 보이던 문제) (BE 반영 예정, Cominggg/Backend#139)
+- `spec/api/auth.md` — 소셜 로그인 콜백의 정지 리다이렉트 형식(`error=USER_SUSPENDED&suspendedUntil=...&reason=...`, 영구 정지면 `suspendedUntil` 생략, 자유 서술 사유는 URL 미포함) 및 앱 JSON 에러 필드 명시. `POST /api/auth/refresh`에 정지 회원은 `USER_SUSPENDED`(403, 정지 정보 포함) 반환 추가 (BE 반영 예정, Cominggg/Backend#139)
+- `spec/api/admin.md` — `GET /api/admin/reports/{id}` 응답에 `targetAuthorId`·`targetAuthorNickname`·`targetAuthorSuspendedUntil` 추가, `PATCH /api/admin/reports/{id}/status`에 `suspend`(신고 처리와 정지를 한 트랜잭션으로) 추가 (BE 반영 예정, Cominggg/Backend#139, 필드 이름은 구현 후 동기화)
 - `spec/admin/features.md` — ADM-05에 회원 검색(탈퇴하지 않은 회원만), 정지 사유 코드·상세 사유, 신고 처리 동시 정지 반영
 
 ## 2026-10-21
