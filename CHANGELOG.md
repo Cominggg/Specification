@@ -7,6 +7,12 @@
 - `spec/admin/features.md` — ADM-05에 회원 정지·해제(7일·30일·영구), 신고 처리와 함께 정지, 관리자 대리 탈퇴 추가, 우선순위 P2 → P1. ADM-13 비고의 "계정 정지는 범위 밖" 문구 정정
 - `spec/api/auth.md` — 소셜 로그인 콜백 비고에 정지 기간·사유 포함과 재가입 제한 에러 추가, `DELETE /api/auth/withdraw` 비고에 탈퇴 처리 범위 반영 (엔드포인트·에러 코드 세부는 BE 구현 후 동기화)
 - `spec/data/erd.md` — `user.profile_image_url` 컬럼 제거 반영(V20)
+- `spec/legal/terms-of-service.md` — v1.2 제10조 제1항에 탈퇴 경로 3가지(설정 메뉴, 로그인 없이 볼 수 있는 웹 탈퇴 안내 페이지, 개인정보 보호책임자 이메일) 명시 (Google Play 계정 삭제 요구사항 대응, FE 요청)
+- `spec/legal/privacy-policy.md` — v1.2 제7조에 웹 탈퇴 안내 페이지 안내 추가
+- `spec/api/posts.md` — 댓글·답글 응답에 `isDeleted`(Boolean) 추가. `authorNickname=null`은 탈퇴 회원을 뜻하며 삭제 여부 판단에는 `isDeleted`를 사용하도록 정리(탈퇴 회원의 정상 댓글이 삭제 댓글로 보이던 문제) (BE 반영 예정)
+- `spec/api/auth.md` — 소셜 로그인 콜백의 정지 리다이렉트 형식(`error=USER_SUSPENDED&suspendedUntil=...&reason=...`, 영구 정지면 `suspendedUntil` 생략, 자유 서술 사유는 URL 미포함) 및 앱 JSON 에러 필드 명시. `POST /api/auth/refresh`에 정지 회원은 `USER_SUSPENDED`(403, 정지 정보 포함) 반환 추가 (BE 반영 예정)
+- `spec/api/admin.md` — `GET /api/admin/reports/{id}` 응답에 `targetAuthorId`·`targetAuthorNickname`·`targetAuthorSuspendedUntil` 추가, `PATCH /api/admin/reports/{id}/status`에 `suspend`(신고 처리와 정지를 한 트랜잭션으로) 추가 (BE 반영 예정, 필드 이름은 구현 후 동기화)
+- `spec/admin/features.md` — ADM-05에 회원 검색(탈퇴하지 않은 회원만), 정지 사유 코드·상세 사유, 신고 처리 동시 정지 반영
 
 ## 2026-10-21
 

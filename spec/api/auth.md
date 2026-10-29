@@ -40,6 +40,19 @@ Refresh Token을 HttpOnly Cookie에 설정한 뒤 아래 URL로 302 리다이렉
 {redirectBaseUri}?isNewUser=true|false
 ```
 
+정지 계정이면 토큰을 발급하지 않고 아래 URL로 리다이렉트한다.
+
+```
+{redirectBaseUri}?error=USER_SUSPENDED&suspendedUntil=2026-12-09T00:00:00+09:00&reason=SPAM
+```
+
+| 쿼리 파라미터 | 타입 | 설명 |
+|--------------|------|------|
+| `suspendedUntil` | String | 정지 종료 시각(ISO 8601, KST 오프셋). 영구 정지면 생략 |
+| `reason` | String | 정지 사유 코드. 신고 사유(`ReportReason`)와 같은 값: `SPAM` \| `ABUSE` \| `SEXUAL` \| `ILLEGAL` \| `COPYRIGHT` \| `PRIVACY` \| `ETC`. 자유 서술 사유는 URL에 넣지 않고(GA4가 전체 URL을 수집) 정지 통지 메일에만 담는다 |
+
+앱(JSON 응답)은 에러 응답에 같은 이름의 `suspendedUntil`·`reason` 필드를 담는다.
+
 | 쿼리 파라미터 | 타입 | 설명 |
 |--------------|------|------|
 | `isNewUser` | Boolean | `true`: PENDING 역할 (신규 가입 또는 탈퇴 후 새 계정으로 재가입) / `false`: 기존 사용자 |
@@ -49,7 +62,7 @@ Refresh Token을 HttpOnly Cookie에 설정한 뒤 아래 URL로 302 리다이렉
 - Refresh Token은 HttpOnly Cookie에 설정 (7일 만료)
 - `isNewUser=true` → FE는 회원가입 완료 페이지로 이동, `POST /api/auth/register` 완료 후 Access Token 발급
 - `isNewUser=false` → FE는 `POST /api/auth/refresh` 호출 후 홈으로 이동
-- SUSPENDED 계정 로그인 시 OAuth2 인증 단계에서 차단, `USER_SUSPENDED` 에러로 실패 핸들러 호출(정지 기간·사유 포함, 전달 형식은 BE 구현 후 동기화)
+- SUSPENDED 계정 로그인 시 OAuth2 인증 단계에서 차단, `USER_SUSPENDED` 에러로 실패 핸들러 호출(위 정지 리다이렉트 형식 참고)
 - 정지 중 탈퇴한 회원이 보관 기간 내 로그인하면 가입 거부(재가입 제한 에러, 코드명은 BE 구현 시 확정)
 
 ---
@@ -74,6 +87,7 @@ Cookie에서 Refresh Token 자동 추출 (별도 바디 없음).
 |------|-----------|------|
 | `REFRESH_TOKEN_EXPIRED` | 401 | Refresh Token 만료 — 재로그인 필요 |
 | `REFRESH_TOKEN_INVALID` | 401 | 유효하지 않은 Refresh Token |
+| `USER_SUSPENDED` | 403 | 정지된 회원. 에러 응답에 `suspendedUntil`(영구 정지면 생략)·`reason` 포함 |
 
 ### 비고
 
@@ -81,6 +95,7 @@ Cookie에서 Refresh Token 자동 추출 (별도 바디 없음).
 - 세션(기기) 단위로 검증·교체하며 다른 기기 세션에는 영향이 없다 (`policy/auth-policy.md` "다중 기기 로그인 정책")
 - 이미 회전된 Refresh Token이 다시 제출되면(재사용) 해당 세션을 폐기하고 `REFRESH_TOKEN_INVALID` — 해당 기기 재로그인 필요. 같은 Refresh Token으로 동시에 요청해도 재사용으로 판정되므로 클라이언트는 refresh 호출을 직렬화해야 한다
 - Access Token(`typ=access`)을 Cookie에 넣어 호출하면 `REFRESH_TOKEN_INVALID`
+- 정지된 회원이면 `REFRESH_TOKEN_INVALID` 대신 `USER_SUSPENDED`(정지 정보 포함)를 반환한다
 
 ---
 

@@ -949,6 +949,9 @@
 |------|------|------|
 | `detail` | String? | 상세 사유 |
 | `adminNote` | String? | 관리자 처리 메모 |
+| `targetAuthorId` | Long? | 신고 대상 게시글·댓글의 작성자 ID |
+| `targetAuthorNickname` | String? | 신고 대상 작성자 닉네임. `null`이면 탈퇴 회원 |
+| `targetAuthorSuspendedUntil` | String? | 신고 대상 작성자의 정지 종료 시각. 정지 중이 아니면 `null` (영구 정지 표기는 BE 구현 후 동기화) |
 
 ### 에러
 
@@ -973,6 +976,7 @@
 | `status` | String | Y | `PENDING` \| `RESOLVED` \| `REJECTED` |
 | `adminNote` | String | N | 처리 메모 |
 | `deleteTarget` | Boolean | N | `true`면 신고 대상을 함께 강제 삭제. 생략·`false`면 삭제하지 않음 |
+| `suspend` | Object | N | 지정하면 같은 트랜잭션에서 신고 대상 작성자를 정지. `days`(`7` \| `30` \| `null`=영구), `reason`(`ReportReason` 값), `detail`(상세 사유, 정지 통지 메일에 포함). 필드 이름은 BE 구현 후 동기화 |
 
 ### 응답
 

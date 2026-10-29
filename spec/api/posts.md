@@ -519,7 +519,8 @@
 | 필드 | 타입 | 설명 |
 |------|------|------|
 | `id` | Long | 댓글 ID |
-| `authorNickname` | String? | 작성자 닉네임 (탈퇴 회원이면 `null`). 삭제된 댓글이어도 닉네임 자체는 계속 노출됩니다 |
+| `authorNickname` | String? | 작성자 닉네임. `null`이면 탈퇴 회원("탈퇴 회원"으로 표시). 삭제된 댓글이어도 닉네임 자체는 계속 노출됩니다. 삭제 여부 판단에는 쓰지 않고 `isDeleted`를 사용합니다 |
+| `isDeleted` | Boolean | 삭제된 댓글 여부 |
 | `isAuthor` | Boolean | 현재 사용자가 작성자 본인인지 여부. 비인증 시, 또는 삭제된 댓글이면 항상 `false` |
 | `content` | String | 댓글 내용 (plain text, 게시글 본문과 달리 리치 텍스트 아님). 삭제된 댓글이면 `"삭제된 댓글입니다"`로 치환됨 |
 | `likeCount` | Long | 좋아요 수. 삭제된 댓글도 기존 좋아요 수는 그대로 유지됨 |
@@ -534,6 +535,7 @@
       "id": 101,
       "authorNickname": "민트초코최고",
       "isAuthor": false,
+      "isDeleted": false,
       "content": "오프닝으로 KICK BACK 나왔을 때 심장 떨어지는 줄... 후기 잘 봤습니다 ㅠㅠ",
       "likeCount": 8,
       "isLiked": false,
@@ -543,6 +545,7 @@
           "id": 108,
           "authorNickname": "요네즈러버",
           "isAuthor": true,
+          "isDeleted": false,
           "content": "저도 그 순간 진짜 소름이었어요! 다음에도 같이 가요 ㅎㅎ",
           "likeCount": 2,
           "isLiked": false,
@@ -628,7 +631,7 @@
 ### 비고
 
 - 소프트 삭제로 처리됩니다 — 레코드는 남고 `content`만 `"삭제된 댓글입니다"`로 치환됩니다. 답글이 달린 최상위 댓글을 삭제해도 답글은 그대로 유지됩니다(하위 답글까지 연쇄 삭제되지 않음).
-- 삭제된 댓글도 `authorNickname`·`likeCount`는 그대로 노출됩니다. `isAuthor`·`isLiked`만 각각 `false`·`null`로 고정됩니다.
+- 삭제된 댓글은 `isDeleted=true`로 응답합니다. `authorNickname`·`likeCount`는 그대로 노출되고, `isAuthor`·`isLiked`만 각각 `false`·`null`로 고정됩니다.
 - 게시글 자체가 삭제되는 경우(`DELETE /api/posts/{id}`)는 예외적으로 댓글이 물리 삭제됩니다 — 이 경우는 다시 보여줄 게시글 자체가 없기 때문입니다.
 
 ---
