@@ -66,6 +66,8 @@ ADMIN 전용 엔드포인트는 일반 사용자 접근 시 `403` 반환합니�
 }
 ```
 
+`USER_SUSPENDED`(403)만 예외로 `suspendedUntil`(정지 종료 시각, 오프셋 없는 KST `yyyy-MM-ddTHH:mm:ss`, 영구 정지면 `null`)·`reason`(정지 사유 코드) 필드를 더한다([auth-policy.md](../policy/auth-policy.md) "`USER_SUSPENDED` 응답 형식"). 다른 에러는 위 형식을 유지한다.
+
 공통 HTTP 상태 코드:
 
 | 상태 코드 | 발생 조건 |
@@ -205,6 +207,10 @@ ADMIN 전용 엔드포인트는 일반 사용자 접근 시 `403` 반환합니�
 | GET | `/api/admin/reports` | ADMIN |
 | GET | `/api/admin/reports/{id}` | ADMIN |
 | PATCH | `/api/admin/reports/{id}/status` | ADMIN |
+| GET | `/api/admin/users` | ADMIN |
+| POST | `/api/admin/users/{id}/suspension` | ADMIN |
+| DELETE | `/api/admin/users/{id}/suspension` | ADMIN |
+| DELETE | `/api/admin/users/{id}` | ADMIN |
 
 ### Data 파이프라인 연동 (ROLE_ADMIN)
 | 메서드 | 엔드포인트 | 인증 |

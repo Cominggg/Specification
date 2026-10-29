@@ -43,15 +43,17 @@ Refresh Token을 HttpOnly Cookie에 설정한 뒤 아래 URL로 302 리다이렉
 정지 계정이면 토큰을 발급하지 않고 아래 URL로 리다이렉트한다.
 
 ```
-{redirectBaseUri}?error=USER_SUSPENDED&suspendedUntil=2026-12-09T00:00:00+09:00&reason=SPAM
+{redirectBaseUri}?error=USER_SUSPENDED&suspendedUntil=2026-12-09T00:00:00&reason=SPAM
 ```
 
 | 쿼리 파라미터 | 타입 | 설명 |
 |--------------|------|------|
-| `suspendedUntil` | String | 정지 종료 시각(ISO 8601, KST 오프셋). 영구 정지면 생략 |
+| `suspendedUntil` | String | 정지 종료 시각. 오프셋 없는 KST `yyyy-MM-ddTHH:mm:ss`(앱 JSON 응답과 같은 형식). 영구 정지면 생략 |
 | `reason` | String | 정지 사유 코드. 신고 사유(`ReportReason`)와 같은 값: `SPAM` \| `ABUSE` \| `SEXUAL` \| `ILLEGAL` \| `COPYRIGHT` \| `PRIVACY` \| `ETC`. 자유 서술 사유는 URL에 넣지 않고(GA4가 전체 URL을 수집) 정지 통지 메일에만 담는다 |
 
-앱(JSON 응답)은 에러 응답에 같은 이름의 `suspendedUntil`·`reason` 필드를 담는다.
+앱(JSON 응답)은 에러 응답에 같은 이름의 `suspendedUntil`(영구 정지면 `null`)·`reason` 필드를 담는다(`policy/auth-policy.md` "`USER_SUSPENDED` 응답 형식").
+
+그 밖의 로그인 실패는 `{redirectBaseUri}?error=OAUTH2_FAILED`로 리다이렉트한다.
 
 | 쿼리 파라미터 | 타입 | 설명 |
 |--------------|------|------|
@@ -62,7 +64,8 @@ Refresh Token을 HttpOnly Cookie에 설정한 뒤 아래 URL로 302 리다이렉
 - Refresh Token은 HttpOnly Cookie에 설정 (7일 만료)
 - `isNewUser=true` → FE는 회원가입 완료 페이지로 이동, `POST /api/auth/register` 완료 후 Access Token 발급
 - `isNewUser=false` → FE는 `POST /api/auth/refresh` 호출 후 홈으로 이동
-- SUSPENDED 계정 로그인 시 OAuth2 인증 단계에서 차단, `USER_SUSPENDED` 에러로 실패 핸들러 호출(위 정지 리다이렉트 형식 참고)
+- SUSPENDED 계정 로그인 시 OAuth2 인증 단계에서 차단, `USER_SUSPENDED` 에러로 실패 핸들러 호출(위 정지 리다이렉트 형식 참고). 정지 종료 시각이 지난 계정은 이 로그인에서 자동 해제되어 정상 로그인된다
+- 탈퇴한 회원이 같은 소셜 계정으로 로그인하면 새 PENDING 계정으로 가입된다(`isNewUser=true`)
 - 정지 중 탈퇴한 회원이 보관 기간 내 로그인하면 가입 거부(재가입 제한 에러, 코드명은 BE 구현 시 확정)
 
 ---
@@ -87,7 +90,7 @@ Cookie에서 Refresh Token 자동 추출 (별도 바디 없음).
 |------|-----------|------|
 | `REFRESH_TOKEN_EXPIRED` | 401 | Refresh Token 만료 — 재로그인 필요 |
 | `REFRESH_TOKEN_INVALID` | 401 | 유효하지 않은 Refresh Token |
-| `USER_SUSPENDED` | 403 | 정지된 회원. 에러 응답에 `suspendedUntil`(영구 정지면 생략)·`reason` 포함 |
+| `USER_SUSPENDED` | 403 | 정지된 회원. 에러 응답에 `suspendedUntil`(영구 정지면 `null`)·`reason` 포함 |
 
 ### 비고
 
@@ -95,7 +98,7 @@ Cookie에서 Refresh Token 자동 추출 (별도 바디 없음).
 - 세션(기기) 단위로 검증·교체하며 다른 기기 세션에는 영향이 없다 (`policy/auth-policy.md` "다중 기기 로그인 정책")
 - 이미 회전된 Refresh Token이 다시 제출되면(재사용) 해당 세션을 폐기하고 `REFRESH_TOKEN_INVALID` — 해당 기기 재로그인 필요. 같은 Refresh Token으로 동시에 요청해도 재사용으로 판정되므로 클라이언트는 refresh 호출을 직렬화해야 한다
 - Access Token(`typ=access`)을 Cookie에 넣어 호출하면 `REFRESH_TOKEN_INVALID`
-- 정지된 회원이면 `REFRESH_TOKEN_INVALID` 대신 `USER_SUSPENDED`(정지 정보 포함)를 반환한다
+- 정지 중인 회원이면 `REFRESH_TOKEN_INVALID` 대신 `USER_SUSPENDED`(정지 정보 포함)를 반환한다. 정지 시 모든 세션이 삭제되므로 정상 흐름에서는 정지 후 첫 refresh에서 발생한다
 
 ---
 
@@ -132,11 +135,20 @@ Cookie에서 Refresh Token 자동 추출 (별도 바디 없음).
 
 `200 OK` (바디 없음)
 
+### 에러
+
+| 코드 | 상태 코드 | 설명 |
+|------|-----------|------|
+| `USER_SUSPENDED` | 403 | 정지 중인 회원. 본인 탈퇴 불가 — 운영 이메일로 요청하면 관리자 대리 탈퇴(`DELETE /api/admin/users/{id}`). 에러 응답에 `suspendedUntil`·`reason` 포함 |
+| `USER_NOT_FOUND` | 404 | 이미 탈퇴한 회원 |
+
 ### 비고
 
 - 개인정보(이메일·닉네임·출생연도·마케팅 동의) 즉시 파기, 연관 데이터(별점, 캘린더, 팔로우, 문의) 함께 삭제
-- 게시글·댓글은 삭제하지 않고 작성자를 "탈퇴 회원"으로 표시
-- Kakao 가입자는 연결 끊기(unlink) API 호출
+- `provider_id`를 `withdrawn:{id}`로 바꿔 같은 소셜 계정으로 재로그인하면 새 PENDING 계정으로 가입된다(종전 계정 재활성화 없음)
+- 게시글·댓글은 삭제하지 않고 작성자를 "탈퇴 회원"으로 표시(작성자 닉네임 `null`)
+- Kakao 가입자는 Admin 키로 연결 끊기(unlink), Apple 가입자는 토큰 revoke를 탈퇴 커밋 후 호출. 실패해도 탈퇴는 유지
+- 현재 Access Token 블랙리스트 등록, Refresh Token Cookie 삭제
 - 시행일(2026-12-02) 이후 탈퇴부터 소셜 로그인 식별자 HMAC 해시를 보관 기간 동안 별도 보관(`auth-policy.md` "회원 탈퇴 및 재가입 제한")
 - 해당 사용자의 모든 기기 세션(Refresh Token) 삭제
 

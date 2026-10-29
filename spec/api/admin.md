@@ -527,7 +527,7 @@
 | 필드 | 타입 | 설명 |
 |------|------|------|
 | `userId` | Long | 문의 등록 사용자 ID |
-| `userNickname` | String | 사용자 닉네임 |
+| `userNickname` | String | 사용자 닉네임. 탈퇴 등으로 조회 불가 시 빈 문자열 |
 
 ---
 
@@ -766,7 +766,7 @@
 ### 비고
 
 - 약관 원문 전체 텍스트는 저장하지 않는다. `detailUrl`로 FE가 SSOT로 관리하는 약관 페이지에 연결한다.
-- 등록 완료(커밋) 후 알림 대상 생성 및 메일 발송 배치(`policyNotificationJob`)가 자동 실행된다. 발송 실패 대상은 1시간 간격으로 최대 3회까지 재시도한다.
+- 등록 완료(커밋) 후 알림 대상 생성 및 메일 발송 배치(`policyNotificationJob`)가 자동 실행된다. 발송 대상은 `ACTIVE`·`SUSPENDED` 상태 회원이다(탈퇴 회원 제외). 발송 실패 대상은 1시간 간격으로 최대 3회까지 재시도한다.
 - `POST /api/auth/register` 회원가입 시점에 시행 중인 최신 TERMS·PRIVACY 정책에 대한 동의 이력이 함께 기록된다. **시행 중인 정책이 하나도 등록되어 있지 않으면 회원가입이 `POLICY_NOT_FOUND`(404)로 실패**하므로, 배포 후 신규 가입을 받기 전 초기 정책 버전을 반드시 먼저 등록해야 한다.
 - 기존 회원에 대한 정책 변경 고지는 [terms-of-service.md](../legal/terms-of-service.md) 제3조 3항의 묵시적 동의(고지 후 계속 이용 시 동의 간주) 원칙을 따른다. 로그인 시점 재동의 강제(하드 게이트)는 별도 기능으로 구현하지 않는다 — 민감정보 수집 목적 추가·제3자 제공 신설처럼 능동적 동의가 법적으로 필요한 개정이 실제로 생기기 전까지는 과설계로 판단.
 
@@ -949,9 +949,10 @@
 |------|------|------|
 | `detail` | String? | 상세 사유 |
 | `adminNote` | String? | 관리자 처리 메모 |
-| `targetAuthorId` | Long? | 신고 대상 게시글·댓글의 작성자 ID |
-| `targetAuthorNickname` | String? | 신고 대상 작성자 닉네임. `null`이면 탈퇴 회원 |
-| `targetAuthorSuspendedUntil` | String? | 신고 대상 작성자의 정지 종료 시각. 정지 중이 아니면 `null` (영구 정지 표기는 BE 구현 후 동기화) |
+| `targetAuthorId` | Long? | 신고 대상 게시글·댓글의 작성자 ID. 대상 게시글이 삭제돼 작성자를 알 수 없으면 `null` |
+| `targetAuthorNickname` | String? | 신고 대상 작성자 닉네임. `null`이면 탈퇴 회원이거나 대상이 삭제됨 |
+| `targetAuthorSuspended` | Boolean | 신고 대상 작성자가 정지(`SUSPENDED`) 상태인지 여부. 작성자를 알 수 없으면 `false` |
+| `targetAuthorSuspendedUntil` | String? | 신고 대상 작성자의 정지 종료 시각(`yyyy-MM-ddTHH:mm:ss`, KST). 정지 중이 아니거나 영구 정지면 `null` — 영구 정지는 `targetAuthorSuspended=true`이면서 `null`인 경우 |
 
 ### 에러
 
@@ -976,7 +977,10 @@
 | `status` | String | Y | `PENDING` \| `RESOLVED` \| `REJECTED` |
 | `adminNote` | String | N | 처리 메모 |
 | `deleteTarget` | Boolean | N | `true`면 신고 대상을 함께 강제 삭제. 생략·`false`면 삭제하지 않음 |
-| `suspend` | Object | N | 지정하면 같은 트랜잭션에서 신고 대상 작성자를 정지. `days`(`7` \| `30` \| `null`=영구), `reason`(`ReportReason` 값), `detail`(상세 사유, 정지 통지 메일에 포함). 필드 이름은 BE 구현 후 동기화 |
+| `suspend` | Object | N | 지정하면 같은 트랜잭션에서 신고 대상 작성자를 정지. 생략·`null`이면 정지하지 않음 |
+| `suspend.days` | Integer | N | `7` \| `30` \| `null`(영구 정지) |
+| `suspend.reason` | String | Y | 정지 사유 코드(`ReportReason` 값) |
+| `suspend.detail` | String | N | 상세 사유. 정지 통지 메일에 포함 |
 
 ### 응답
 
@@ -987,9 +991,150 @@
 | 코드 | 상태 코드 | 설명 |
 |------|-----------|------|
 | `REPORT_NOT_FOUND` | 404 | 존재하지 않는 신고 |
+| `REPORT_TARGET_NOT_FOUND` | 404 | `suspend` 지정 시 신고 대상(게시글·댓글)이 없어 작성자를 찾을 수 없음 |
+| `USER_NOT_FOUND` | 404 | `suspend` 지정 시 대상 작성자가 탈퇴한 회원 |
+| `INVALID_INPUT` | 400 | `suspend.days`가 지원하지 않는 값, `suspend.reason` 누락 |
 
 ### 비고
 
+- `suspend`와 `deleteTarget=true`를 함께 보내면 작성자 정지를 먼저 처리한 뒤 대상을 삭제합니다(게시글이 물리 삭제되면 작성자를 알 수 없기 때문). 정지 처리 내용은 `POST /api/admin/users/{id}/suspension`과 같습니다.
 - `deleteTarget=true`이고 `targetType=POST`이면 게시글이 물리 삭제(연관 댓글·추천·태그 포함)됩니다. `targetType=COMMENT`이면 댓글이 소프트 삭제됩니다(`DELETE /api/comments/{commentId}`와 동일한 삭제 방식).
 - 대상 삭제는 신고 건별로 개별 처리됩니다. 동일 대상에 대한 다른 신고 건의 상태는 자동으로 바뀌지 않습니다.
 - 신고자 정보(`reporterId`)는 관리자 화면에서만 노출되며, 피신고자에게는 노출되지 않습니다.
+
+
+---
+
+## GET /api/admin/users
+
+**용도**: 회원을 이메일·닉네임으로 검색합니다. 탈퇴 회원은 제외합니다.
+
+### 요청
+
+**Query Parameters**
+
+| 이름 | 타입 | 필수 | 기본값 | 설명 |
+|------|------|------|--------|------|
+| `keyword` | String | N | — | 이메일 또는 닉네임 부분 일치(대소문자 무시). 생략·공백이면 전체 회원 조회 |
+| `page` | int | N | `0` | 페이지 번호 |
+| `size` | int | N | `20` | 페이지 크기 |
+
+### 응답
+
+[페이지네이션 응답](_index.md#페이지네이션-응답) 형태. `content` 항목:
+
+| 필드 | 타입 | 설명 |
+|------|------|------|
+| `id` | Long | 사용자 ID |
+| `email` | String? | 이메일 |
+| `nickname` | String? | 닉네임 (회원가입 미완료(PENDING)면 `null`) |
+| `provider` | String | `google` \| `kakao` \| `apple` |
+| `role` | String | `USER` \| `ADMIN` \| `PENDING` |
+| `status` | String | `ACTIVE` \| `SUSPENDED` |
+| `suspendedUntil` | String? | 정지 종료 시각(`yyyy-MM-ddTHH:mm:ss`, KST). `status=SUSPENDED`에서 `null`이면 영구 정지 |
+| `suspensionReason` | String? | 정지 사유 코드(`ReportReason`). 정지 상태가 아니면 `null` |
+| `createdAt` | String | 가입일 (`yyyy-MM-dd`) |
+
+```json
+{
+  "content": [
+    {
+      "id": 12,
+      "email": "user@example.com",
+      "nickname": "라이브덕후",
+      "provider": "kakao",
+      "role": "USER",
+      "status": "SUSPENDED",
+      "suspendedUntil": "2026-11-05T12:00:00",
+      "suspensionReason": "SPAM",
+      "createdAt": "2026-09-01"
+    }
+  ],
+  "page": 0,
+  "size": 20,
+  "totalElements": 1,
+  "totalPages": 1
+}
+```
+
+---
+
+## POST /api/admin/users/{id}/suspension
+
+**용도**: 회원을 정지합니다. 정지 시 모든 기기 세션을 삭제하고, 이메일이 있으면 정지 통지 메일을 보냅니다.
+
+### 요청
+
+**Path Parameters**: `id` (Long, Y) — 사용자 ID
+
+**Request Body** (`application/json`)
+
+| 필드 | 타입 | 필수 | 설명 |
+|------|------|------|------|
+| `days` | Integer | N | `7` \| `30` \| `null`(영구 정지) |
+| `reason` | String | Y | 정지 사유 코드(`ReportReason`): `SPAM` \| `ABUSE` \| `SEXUAL` \| `ILLEGAL` \| `COPYRIGHT` \| `PRIVACY` \| `ETC` |
+| `detail` | String | N | 상세 사유. 정지 통지 메일에 포함 |
+
+```json
+{ "days": 7, "reason": "SPAM", "detail": "동일 홍보 게시글 반복 작성" }
+```
+
+### 응답
+
+`200 OK` (바디 없음)
+
+### 에러
+
+| 코드 | 상태 코드 | 설명 |
+|------|-----------|------|
+| `INVALID_INPUT` | 400 | 지원하지 않는 `days` 값, `reason` 누락 |
+| `USER_NOT_FOUND` | 404 | 존재하지 않거나 탈퇴한 회원 |
+
+### 비고
+
+- 정지 종료 시각은 정지 시각 + `days`일(초 단위). 이미 정지 중이면 새 기간·사유로 덮어씁니다.
+- 정책은 [auth-policy.md](../policy/auth-policy.md) "회원 정지 정책" 참고.
+
+---
+
+## DELETE /api/admin/users/{id}/suspension
+
+**용도**: 회원 정지를 해제합니다.
+
+### 요청
+
+**Path Parameters**: `id` (Long, Y) — 사용자 ID
+
+### 응답
+
+`204 No Content`. 정지 상태가 아니면 아무것도 하지 않고 `204`를 반환합니다.
+
+### 에러
+
+| 코드 | 상태 코드 | 설명 |
+|------|-----------|------|
+| `USER_NOT_FOUND` | 404 | 존재하지 않거나 탈퇴한 회원 |
+
+---
+
+## DELETE /api/admin/users/{id}
+
+**용도**: 회원을 대리 탈퇴 처리합니다. 정지 중이라 본인 탈퇴할 수 없는 회원의 이메일 요청 처리용입니다.
+
+### 요청
+
+**Path Parameters**: `id` (Long, Y) — 사용자 ID
+
+### 응답
+
+`204 No Content`
+
+### 에러
+
+| 코드 | 상태 코드 | 설명 |
+|------|-----------|------|
+| `USER_NOT_FOUND` | 404 | 존재하지 않거나 이미 탈퇴한 회원 |
+
+### 비고
+
+- 본인 탈퇴(`DELETE /api/auth/withdraw`)와 같은 탈퇴 처리를 합니다([auth.md](auth.md) 참고). 정지 중인 회원도 처리됩니다.

@@ -116,6 +116,7 @@ services:
 | `REDIS_PASSWORD` | Redis 인증 비밀번호 |
 | `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Google OAuth |
 | `KAKAO_CLIENT_ID` / `KAKAO_CLIENT_SECRET` | Kakao OAuth |
+| `KAKAO_APP_ID` / `KAKAO_ADMIN_KEY` | Kakao 앱 로그인 토큰 검증 / 탈퇴 시 연결 끊기(Admin 키) |
 | `CORS_ALLOWED_ORIGINS` | 허용 오리진 |
 | `OAUTH2_REDIRECT_BASE_URI` | OAuth2 콜백 기본 URI |
 | `DATA_PIPELINE_SECRET` | 내부 서비스 인증 |

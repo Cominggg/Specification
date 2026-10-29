@@ -100,6 +100,7 @@
 |------|-----------|------|
 | `INVALID_INPUT` | 400 | `category`가 `REVIEW`\|`INFO`인데 `entityTags`가 비어 있음, `title`/`entityTags` 개수 초과 등 |
 | `POST_CONTENT_TOO_LONG` | 400 | `content`에서 추출한 본문 텍스트가 10000자 초과, 또는 `content` JSON 자체가 50000자 초과 |
+| `USER_SUSPENDED` | 403 | 정지 중인 회원. 에러 응답에 `suspendedUntil`·`reason` 포함 ([auth-policy.md](../policy/auth-policy.md) "`USER_SUSPENDED` 응답 형식") |
 
 ### 비고
 
@@ -200,7 +201,7 @@
 | 필드 | 타입 | 설명 |
 |------|------|------|
 | `id` | Long | 게시글 ID |
-| `authorNickname` | String? | 작성자 닉네임 |
+| `authorNickname` | String? | 작성자 닉네임 (탈퇴 회원이면 `null`) |
 | `category` | String | `REVIEW` \| `INFO` \| `FREE` |
 | `title` | String | 제목 |
 | `entityTags` | Object[] | 멘션 엔티티 목록 (`EntityTag`, 위 상세 API 참고) |
@@ -339,6 +340,7 @@
 | `FORBIDDEN` | 403 | 작성자 본인이 아님 |
 | `INVALID_INPUT` | 400 | 수정 후 최종 `category`가 `REVIEW`\|`INFO`인데 `entityTags`가 비어 있음, `title`이 공백뿐이거나 개수 초과 등 |
 | `POST_CONTENT_TOO_LONG` | 400 | `content` 변경 시 본문 텍스트 10000자 초과 또는 `content` JSON 50000자 초과 |
+| `USER_SUSPENDED` | 403 | 정지 중인 회원. 에러 응답에 `suspendedUntil`·`reason` 포함 ([auth-policy.md](../policy/auth-policy.md) "`USER_SUSPENDED` 응답 형식") |
 
 ### 비고
 
@@ -394,6 +396,7 @@
 |------|-----------|------|
 | `POST_NOT_FOUND` | 404 | 존재하지 않는 게시글 |
 | `ALREADY_RECOMMENDED` | 409 | 이미 추천한 게시글 |
+| `USER_SUSPENDED` | 403 | 정지 중인 회원. 에러 응답에 `suspendedUntil`·`reason` 포함 ([auth-policy.md](../policy/auth-policy.md) "`USER_SUSPENDED` 응답 형식") |
 
 ### 비고
 
@@ -606,6 +609,7 @@
 | `POST_NOT_FOUND` | 404 | 존재하지 않는 게시글 |
 | `COMMENT_NOT_FOUND` | 404 | `parentCommentId`에 해당하는 댓글이 존재하지 않음 |
 | `INVALID_REPLY_DEPTH` | 400 | `parentCommentId`가 이미 답글(최상위 댓글이 아님)인 경우 — 2단계 이상 중첩 금지 |
+| `USER_SUSPENDED` | 403 | 정지 중인 회원. 에러 응답에 `suspendedUntil`·`reason` 포함 ([auth-policy.md](../policy/auth-policy.md) "`USER_SUSPENDED` 응답 형식") |
 
 ---
 
@@ -658,6 +662,7 @@
 |------|-----------|------|
 | `COMMENT_NOT_FOUND` | 404 | 존재하지 않는 댓글 |
 | `ALREADY_LIKED` | 409 | 이미 좋아요한 댓글 |
+| `USER_SUSPENDED` | 403 | 정지 중인 회원. 에러 응답에 `suspendedUntil`·`reason` 포함 ([auth-policy.md](../policy/auth-policy.md) "`USER_SUSPENDED` 응답 형식") |
 
 ### 비고
 
@@ -724,6 +729,7 @@
 | `REPORT_DETAIL_REQUIRED` | 400 | `reason`이 `ETC`인데 `detail`이 비어 있음 |
 | `REPORT_TARGET_NOT_FOUND` | 404 | 신고 대상(게시글/댓글)이 존재하지 않음 |
 | `REPORT_ALREADY_EXISTS` | 409 | 동일 사용자가 동일 대상을 이미 신고함 |
+| `USER_SUSPENDED` | 403 | 정지 중인 회원. 에러 응답에 `suspendedUntil`·`reason` 포함 ([auth-policy.md](../policy/auth-policy.md) "`USER_SUSPENDED` 응답 형식") |
 
 ### 비고
 

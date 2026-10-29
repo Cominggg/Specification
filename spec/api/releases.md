@@ -178,6 +178,7 @@
 | `INVALID_RATING_SCORE` | 400 | `score`가 0.5~5.0 범위를 벗어나거나 0.5 단위가 아닌 경우 |
 | `RATING_TARGET_NOT_FOUND` | 404 | 존재하지 않는 릴리즈 |
 | `UNAUTHORIZED` | 401 | 비인증 요청 |
+| `USER_SUSPENDED` | 403 | 정지 중인 회원. 에러 응답에 `suspendedUntil`·`reason` 포함 ([auth-policy.md](../policy/auth-policy.md) "`USER_SUSPENDED` 응답 형식") |
 
 ### 비고
 

@@ -323,6 +323,7 @@
 | `CONCERT_NOT_ENDED` | 400 | 공연 상태가 `ENDED`(공연완료)가 아닌 경우 |
 | `RATING_TARGET_NOT_FOUND` | 404 | 존재하지 않는 공연 |
 | `UNAUTHORIZED` | 401 | 비인증 요청 |
+| `USER_SUSPENDED` | 403 | 정지 중인 회원. 에러 응답에 `suspendedUntil`·`reason` 포함 ([auth-policy.md](../policy/auth-policy.md) "`USER_SUSPENDED` 응답 형식") |
 
 ### 비고
 
