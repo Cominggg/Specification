@@ -97,6 +97,7 @@
 |------|-----------|------|
 | `INQUIRY_ALREADY_PENDING` | 409 | 동일 `targetId`로 PENDING 상태 문의 존재 |
 | `TARGET_NOT_FOUND` | 404 | 존재하지 않는 대상 ID |
+| `USER_SUSPENDED` | 403 | 정지 중인 회원. 에러 응답에 `suspendedUntil`·`reason` 포함 ([auth-policy.md](../policy/auth-policy.md) "`USER_SUSPENDED` 응답 형식") |
 
 ### 비고
 

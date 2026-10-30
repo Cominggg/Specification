@@ -1,3 +1,10 @@
+## 2026-10-30
+
+- `spec/policy/auth-policy.md` — 정지 회원 쓰기 차단 범위를 "비회원과 같이 조회만 가능"으로 확대: 게시글·댓글 삭제, 추천·좋아요·별점 취소, 팔로우·언팔로우, 캘린더 추가·삭제, 문의 등록, 닉네임·마케팅 동의 변경도 `USER_SUSPENDED`(403). 탈퇴 후 다른 기기에 남은 Access Token으로 쓰기·수정·삭제 시 `USER_NOT_FOUND`(404) 행 추가 (Cominggg/Backend#139)
+- `spec/api/posts.md`, `spec/api/concerts.md`, `spec/api/releases.md`, `spec/api/artists.md`, `spec/api/calendar.md`, `spec/api/my.md` — 게시글·댓글 삭제, 추천·좋아요 취소, 별점 삭제, 팔로우·언팔로우, 캘린더 추가·삭제, 문의 등록 에러에 `USER_SUSPENDED`(403) 추가
+- `spec/api/auth.md` — `PUT /api/auth/me`, `PATCH /api/auth/me/marketing`, `POST /api/auth/register` 에러에 `USER_SUSPENDED`(403)·`USER_NOT_FOUND`(404, 탈퇴 회원) 추가
+- `spec/features.md` — AUTH-01 정지 중 이용 범위를 조회만 가능으로 정정
+
 ## 2026-10-29
 
 - `spec/policy/auth-policy.md` — BE 구현 반영(Cominggg/Backend#139): 정지 기간 경과 시 로그인 자동 해제, 정지 종료 시각 초 단위, 단독 정지·재정지 덮어쓰기, 정지 통지 메일 발송 시점·내용, 정지 회원 쓰기 차단 범위(삭제·취소는 허용), 정지 중 본인 탈퇴 차단(`USER_SUSPENDED`), 정지 회원 정책 변경 고지 대상 포함, `USER_SUSPENDED` 응답 형식(`suspendedUntil` 오프셋 없는 KST·영구 정지 `null`, `reason`) 섹션 신설. 탈퇴 시 `withdrawn_at` 기록·같은 소셜 계정 재로그인 시 새 PENDING 계정, Kakao Admin 키 연결 끊기·Apple revoke(커밋 후, 실패해도 탈퇴 유지), 이미 탈퇴한 회원 재요청 `USER_NOT_FOUND` 추가

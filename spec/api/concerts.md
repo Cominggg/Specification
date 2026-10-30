@@ -388,3 +388,4 @@
 |------|-----------|------|
 | `RATING_NOT_FOUND` | 404 | 등록된 별점이 없는 경우 |
 | `UNAUTHORIZED` | 401 | 비인증 요청 |
+| `USER_SUSPENDED` | 403 | 정지 중인 회원. 에러 응답에 `suspendedUntil`·`reason` 포함 ([auth-policy.md](../policy/auth-policy.md) "`USER_SUSPENDED` 응답 형식") |

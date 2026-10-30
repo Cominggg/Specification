@@ -201,6 +201,8 @@ Cookie에서 Refresh Token 자동 추출 (별도 바디 없음).
 | 코드 | 상태 코드 | 설명 |
 |------|-----------|------|
 | `NICKNAME_TOO_LONG` | 400 | 닉네임 20자 초과 |
+| `USER_SUSPENDED` | 403 | 정지 중인 회원. 에러 응답에 `suspendedUntil`·`reason` 포함 ([auth-policy.md](../policy/auth-policy.md) "`USER_SUSPENDED` 응답 형식") |
+| `USER_NOT_FOUND` | 404 | 탈퇴한 회원(탈퇴 직후 다른 기기에 남은 Access Token으로 요청) |
 
 ---
 
@@ -219,6 +221,13 @@ Cookie에서 Refresh Token 자동 추출 (별도 바디 없음).
 ### 응답
 
 `204 No Content` (바디 없음)
+
+### 에러
+
+| 코드 | 상태 코드 | 설명 |
+|------|-----------|------|
+| `USER_SUSPENDED` | 403 | 정지 중인 회원. 에러 응답에 `suspendedUntil`·`reason` 포함 ([auth-policy.md](../policy/auth-policy.md) "`USER_SUSPENDED` 응답 형식") |
+| `USER_NOT_FOUND` | 404 | 탈퇴한 회원(탈퇴 직후 다른 기기에 남은 Access Token으로 요청) |
 
 ---
 
@@ -253,6 +262,8 @@ Cookie에서 Refresh Token 자동 추출 (별도 바디 없음).
 | `NICKNAME_TOO_LONG` | 400 | 닉네임 20자 초과 |
 | `BIRTH_YEAR_REQUIRED` | 400 | 출생연도 미입력 |
 | `NICKNAME_DUPLICATE` | 409 | 닉네임 중복 |
+| `USER_SUSPENDED` | 403 | 정지 중인 회원. 에러 응답에 `suspendedUntil`·`reason` 포함 ([auth-policy.md](../policy/auth-policy.md) "`USER_SUSPENDED` 응답 형식") |
+| `USER_NOT_FOUND` | 404 | 탈퇴한 회원(탈퇴 직후 다른 기기에 남은 Access Token으로 요청) |
 
 ---
 

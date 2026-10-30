@@ -367,6 +367,7 @@
 |------|-----------|------|
 | `POST_NOT_FOUND` | 404 | 존재하지 않는 게시글 |
 | `FORBIDDEN` | 403 | 작성자 본인이 아님 |
+| `USER_SUSPENDED` | 403 | 정지 중인 회원. 에러 응답에 `suspendedUntil`·`reason` 포함 ([auth-policy.md](../policy/auth-policy.md) "`USER_SUSPENDED` 응답 형식") |
 
 ### 비고
 
@@ -427,6 +428,7 @@
 |------|-----------|------|
 | `POST_NOT_FOUND` | 404 | 존재하지 않는 게시글 |
 | `NOT_RECOMMENDED` | 400 | 추천하지 않은 게시글 |
+| `USER_SUSPENDED` | 403 | 정지 중인 회원. 에러 응답에 `suspendedUntil`·`reason` 포함 ([auth-policy.md](../policy/auth-policy.md) "`USER_SUSPENDED` 응답 형식") |
 
 ---
 
@@ -631,6 +633,7 @@
 |------|-----------|------|
 | `COMMENT_NOT_FOUND` | 404 | 존재하지 않는 댓글 |
 | `FORBIDDEN` | 403 | 작성자 본인이 아님 |
+| `USER_SUSPENDED` | 403 | 정지 중인 회원. 에러 응답에 `suspendedUntil`·`reason` 포함 ([auth-policy.md](../policy/auth-policy.md) "`USER_SUSPENDED` 응답 형식") |
 
 ### 비고
 
@@ -692,6 +695,7 @@
 |------|-----------|------|
 | `COMMENT_NOT_FOUND` | 404 | 존재하지 않는 댓글 |
 | `NOT_LIKED` | 400 | 좋아요하지 않은 댓글 |
+| `USER_SUSPENDED` | 403 | 정지 중인 회원. 에러 응답에 `suspendedUntil`·`reason` 포함 ([auth-policy.md](../policy/auth-policy.md) "`USER_SUSPENDED` 응답 형식") |
 
 ---
 

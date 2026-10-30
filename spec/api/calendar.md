@@ -103,6 +103,7 @@
 |------|-----------|------|
 | `CONCERT_NOT_FOUND` | 404 | 존재하지 않는 공연 |
 | `ALREADY_IN_CALENDAR` | 409 | 이미 캘린더에 추가된 공연 |
+| `USER_SUSPENDED` | 403 | 정지 중인 회원. 에러 응답에 `suspendedUntil`·`reason` 포함 ([auth-policy.md](../policy/auth-policy.md) "`USER_SUSPENDED` 응답 형식") |
 
 ---
 
@@ -127,4 +128,5 @@
 | 코드 | 상태 코드 | 설명 |
 |------|-----------|------|
 | `NOT_IN_CALENDAR` | 400 | 캘린더에 없는 공연 |
+| `USER_SUSPENDED` | 403 | 정지 중인 회원. 에러 응답에 `suspendedUntil`·`reason` 포함 ([auth-policy.md](../policy/auth-policy.md) "`USER_SUSPENDED` 응답 형식") |
 

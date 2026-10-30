@@ -239,6 +239,7 @@
 |------|-----------|------|
 | `ARTIST_NOT_FOUND` | 404 | 존재하지 않는 아티스트 |
 | `ALREADY_FOLLOWING` | 409 | 이미 팔로우한 아티스트 |
+| `USER_SUSPENDED` | 403 | 정지 중인 회원. 에러 응답에 `suspendedUntil`·`reason` 포함 ([auth-policy.md](../policy/auth-policy.md) "`USER_SUSPENDED` 응답 형식") |
 
 ---
 
@@ -264,6 +265,7 @@
 |------|-----------|------|
 | `ARTIST_NOT_FOUND` | 404 | 존재하지 않는 아티스트 |
 | `NOT_FOLLOWING` | 400 | 팔로우하지 않은 아티스트 |
+| `USER_SUSPENDED` | 403 | 정지 중인 회원. 에러 응답에 `suspendedUntil`·`reason` 포함 ([auth-policy.md](../policy/auth-policy.md) "`USER_SUSPENDED` 응답 형식") |
 
 ---
 
