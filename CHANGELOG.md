@@ -2,6 +2,7 @@
 
 - `spec/api/posts.md` — 게시글 대표 공연 `coverConcertId` 추가(작성·수정 요청, 상세·`PostSummary` 응답. 수정 시 생략하면 유지·태그 교체로 빠지면 비움, 응답 태그에 없으면 `null`). 작성·수정 에러에 `POST_CONCERT_TAG_HIDDEN`(400, 숨김 공연 `EXCLUDED`·`PENDING` 태그)·`POST_COVER_CONCERT_NOT_TAGGED`(400) 추가, 수정 시 기존 저장 태그는 숨김이어도 허용. `PATCH /api/posts/{id}`의 `entityTags`를 선택(생략 시 기존 유지)으로 코드에 맞게 정정. 상세 본문에서 숨김·없는 공연 멘션 노드 제거, `entityTags`·트렌딩 태그·통합 검색 공연명 매치에서 숨김 공연 제외, 숨김 공연 백링크는 빈 페이지. 댓글 응답에 `isPostAuthor` 추가. `commentCount`를 삭제되지 않은 댓글·답글 수로 정정(소프트 삭제 시 감소) (Cominggg/Backend#144)
 - `spec/features.md` — POST-01 대표 공연·숨김 공연 태그 차단, POST-04·05·09 숨김 공연 제외, POST-07 글쓴이 표시·댓글 수 기준 반영
+- `spec/api/posts.md`, `spec/features.md` — `REVIEW`·`INFO` 카테고리의 엔티티 태그 1개 이상 필수 규칙 삭제(BE에 해당 검증이 없음). 작성·수정의 `entityTags`는 카테고리와 관계없이 선택이며 이 사유의 `INVALID_INPUT` 설명 제거, `PATCH /api/posts/{id}`의 "최종 `category` 기준 태그 검증" 비고 삭제 (Cominggg/Backend#144)
 
 ## 2026-10-30
 
