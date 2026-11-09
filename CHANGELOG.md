@@ -1,3 +1,8 @@
+## 2026-11-09
+
+- `spec/api/posts.md` — 게시글 대표 공연 `coverConcertId` 추가(작성·수정 요청, 상세·`PostSummary` 응답. 수정 시 생략하면 유지·태그 교체로 빠지면 비움, 응답 태그에 없으면 `null`). 작성·수정 에러에 `POST_CONCERT_TAG_HIDDEN`(400, 숨김 공연 `EXCLUDED`·`PENDING` 태그)·`POST_COVER_CONCERT_NOT_TAGGED`(400) 추가, 수정 시 기존 저장 태그는 숨김이어도 허용. `PATCH /api/posts/{id}`의 `entityTags`를 선택(생략 시 기존 유지)으로 코드에 맞게 정정. 상세 본문에서 숨김·없는 공연 멘션 노드 제거, `entityTags`·트렌딩 태그·통합 검색 공연명 매치에서 숨김 공연 제외, 숨김 공연 백링크는 빈 페이지. 댓글 응답에 `isPostAuthor` 추가. `commentCount`를 삭제되지 않은 댓글·답글 수로 정정(소프트 삭제 시 감소) (Cominggg/Backend#144)
+- `spec/features.md` — POST-01 대표 공연·숨김 공연 태그 차단, POST-04·05·09 숨김 공연 제외, POST-07 글쓴이 표시·댓글 수 기준 반영
+
 ## 2026-10-30
 
 - `spec/policy/auth-policy.md` — 정지 회원 쓰기 차단 범위를 "비회원과 같이 조회만 가능"으로 확대: 게시글·댓글 삭제, 추천·좋아요·별점 취소, 팔로우·언팔로우, 캘린더 추가·삭제, 문의 등록, 닉네임·마케팅 동의 변경도 `USER_SUSPENDED`(403). 탈퇴 후 다른 기기에 남은 Access Token으로 쓰기·수정·삭제 시 `USER_NOT_FOUND`(404) 행 추가 (Cominggg/Backend#139)
