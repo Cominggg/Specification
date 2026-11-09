@@ -76,13 +76,15 @@
 | `entityTags` | Object[] | N | 본문에서 멘션한 엔티티 목록. `category`가 `REVIEW`\|`INFO`면 1개 이상 필수. 최대 10개 |
 | `entityTags[].entityType` | String | Y | `CONCERT` \| `ARTIST` \| `RELEASE` \| `TRACK` |
 | `entityTags[].entityId` | Long | Y | 엔티티 ID |
+| `coverConcertId` | Long | N | 대표 공연 ID. `entityTags`의 `CONCERT` 태그 중 하나여야 함. 생략·`null`이면 대표 공연 없음 |
 
 ```json
 {
   "category": "REVIEW",
   "title": "요네즈 켄시 내한 첫 공연, 앙코르만 3번",
   "content": { "type": "doc", "content": [] },
-  "entityTags": [ { "entityType": "CONCERT", "entityId": 1 } ]
+  "entityTags": [ { "entityType": "CONCERT", "entityId": 1 } ],
+  "coverConcertId": 1
 }
 ```
 
@@ -100,10 +102,14 @@
 |------|-----------|------|
 | `INVALID_INPUT` | 400 | `category`가 `REVIEW`\|`INFO`인데 `entityTags`가 비어 있음, `title`/`entityTags` 개수 초과 등 |
 | `POST_CONTENT_TOO_LONG` | 400 | `content`에서 추출한 본문 텍스트가 10000자 초과, 또는 `content` JSON 자체가 50000자 초과 |
+| `POST_CONCERT_TAG_HIDDEN` | 400 | `entityTags`에 숨김 상태(`EXCLUDED`·`PENDING`) 공연이 포함됨 |
+| `POST_COVER_CONCERT_NOT_TAGGED` | 400 | `coverConcertId`가 `entityTags`의 `CONCERT` 태그에 없음 |
 | `USER_SUSPENDED` | 403 | 정지 중인 회원. 에러 응답에 `suspendedUntil`·`reason` 포함 ([auth-policy.md](../policy/auth-policy.md) "`USER_SUSPENDED` 응답 형식") |
 
 ### 비고
 
+- 숨김 상태(`EXCLUDED`·`PENDING`) 공연은 태그할 수 없습니다. 그 밖에 `entityTags`가 가리키는 엔티티의 실존 여부는 검증하지 않으며, 존재하지 않는 엔티티 태그는 조회 시점에 응답에서 빠집니다.
+- 숨김 공연 태그 검사를 대표 공연 검사보다 먼저 합니다. 둘 다 해당하면 `POST_CONCERT_TAG_HIDDEN`을 반환합니다.
 - BE가 `content`에서 텍스트 노드만 추출해 검색 전용 `content_text` 컬럼을 서버 측에서 생성합니다. FE가 별도로 평문을 보낼 필요는 없습니다.
 - 본문 텍스트 길이(10000자)와 별개로 `content` JSON 자체의 길이(50000자)도 제한합니다 — 구조만 방대한 JSON으로 텍스트 길이 제한을 우회하는 것을 막기 위함입니다.
 
@@ -131,11 +137,12 @@
 | `authorNickname` | String? | 작성자 닉네임 (탈퇴 회원이면 `null`) |
 | `category` | String | `REVIEW` \| `INFO` \| `FREE` |
 | `title` | String | 제목 |
-| `content` | Object | Tiptap 에디터 JSON |
-| `entityTags` | Object[] | 멘션 엔티티 목록 (아래 `EntityTag` 참고) |
+| `content` | Object | Tiptap 에디터 JSON. 숨김·존재하지 않는 공연 멘션 노드는 빠진 상태로 응답 (아래 비고 참고) |
+| `entityTags` | Object[] | 멘션 엔티티 목록 (아래 `EntityTag` 참고). 삭제된 엔티티와 숨김 상태(`EXCLUDED`·`PENDING`) 공연은 제외 |
+| `coverConcertId` | Long? | 대표 공연 ID. 대표 공연이 없거나, 응답 `entityTags`에 없는 공연(숨김·삭제)이면 `null` |
 | `recommendCount` | Long | 추천 수 |
 | `viewCount` | Long | 조회 수 |
-| `commentCount` | Long | 댓글 수 (답글 포함 전체 개수). 댓글 API(하단 참고)와 별도 카운터로 관리 |
+| `commentCount` | Long | 삭제되지 않은 댓글·답글 수. 댓글 API(하단 참고)와 별도 카운터로 관리하며 작성 시 1 증가, 소프트 삭제 시 1 감소 |
 | `isRecommended` | Boolean? | 현재 사용자의 추천 여부. 비인증 시 `null` |
 | `isAuthor` | Boolean | 현재 사용자가 작성자 본인인지 여부. 비인증 시 `false` |
 | `createdAt` | String | 작성일시 (ISO 8601) |
@@ -162,6 +169,7 @@
   "entityTags": [
     { "entityType": "CONCERT", "entityId": 1, "title": "요네즈 켄시 KOREA LIVE 2026", "subtitle": "2026-11-14 · KSPO DOME", "thumbnailUrl": "https://...", "releaseGroupId": null }
   ],
+  "coverConcertId": 1,
   "recommendCount": 128,
   "viewCount": 3204,
   "commentCount": 4,
@@ -177,6 +185,11 @@
 | 코드 | 상태 코드 | 설명 |
 |------|-----------|------|
 | `POST_NOT_FOUND` | 404 | 존재하지 않는 게시글 |
+
+### 비고
+
+- 본문의 공연 멘션 노드(`type`이 `entityMentionCard`·`entityMentionChip`이고 `attrs.entityType`이 `CONCERT`인 노드) 중 숨김 상태(`EXCLUDED`·`PENDING`)이거나 존재하지 않는 공연, `attrs.entityId`가 정수가 아닌 노드는 응답 `content`에서 뺍니다. DB에 저장된 본문은 바꾸지 않습니다. 멘션 노드 `attrs`에는 작성 시점의 제목·포스터가 저장돼 있어 공연이 숨겨져도 본문에 그대로 남기 때문입니다.
+- `coverConcertId`도 DB 값은 그대로 두고, 대표 공연이 응답 `entityTags`에 남아 있을 때만 내려줍니다. 공연이 다시 공개되면 대표 공연도 다시 노출됩니다.
 
 ---
 
@@ -204,7 +217,8 @@
 | `authorNickname` | String? | 작성자 닉네임 (탈퇴 회원이면 `null`) |
 | `category` | String | `REVIEW` \| `INFO` \| `FREE` |
 | `title` | String | 제목 |
-| `entityTags` | Object[] | 멘션 엔티티 목록 (`EntityTag`, 위 상세 API 참고) |
+| `entityTags` | Object[] | 멘션 엔티티 목록 (`EntityTag`, 위 상세 API 참고). 삭제된 엔티티와 숨김 상태 공연은 제외 |
+| `coverConcertId` | Long? | 대표 공연 ID. 상세 API와 같은 규칙(응답 `entityTags`에 없으면 `null`) |
 | `recommendCount` | Long | 추천 수 |
 | `viewCount` | Long | 조회 수 |
 | `createdAt` | String | 작성일시 |
@@ -218,6 +232,7 @@
       "category": "REVIEW",
       "title": "요네즈 켄시 내한 첫 공연, 앙코르만 3번",
       "entityTags": [ { "entityType": "CONCERT", "entityId": 1, "title": "요네즈 켄시 KOREA LIVE 2026", "subtitle": null, "thumbnailUrl": null, "releaseGroupId": null } ],
+      "coverConcertId": 1,
       "recommendCount": 128,
       "viewCount": 3204,
       "createdAt": "2026-09-08T10:00:00"
@@ -227,7 +242,7 @@
 }
 ```
 
-`PostSummary`는 이 목록 API·인기 게시글 API·트렌딩 태그 API의 게시글 목록·백링크 API(`GET /api/entities/{type}/{id}/posts`)·통합 검색 API(`GET /api/search`)에서 공통으로 사용되며 `viewCount`를 동일하게 포함합니다.
+`PostSummary`는 이 목록 API·인기 게시글 API·트렌딩 태그 API의 게시글 목록·백링크 API(`GET /api/entities/{type}/{id}/posts`)·통합 검색 API(`GET /api/search`)에서 공통으로 사용되며 `viewCount`·`coverConcertId`를 동일하게 포함합니다.
 
 ---
 
@@ -250,7 +265,7 @@
 
 ```json
 [
-  { "id": 10, "authorNickname": "moonlit_haze", "category": "REVIEW", "title": "요네즈 켄시 내한 첫 공연", "entityTags": [], "recommendCount": 128, "viewCount": 3204, "createdAt": "2026-09-08T10:00:00" }
+  { "id": 10, "authorNickname": "moonlit_haze", "category": "REVIEW", "title": "요네즈 켄시 내한 첫 공연", "entityTags": [], "coverConcertId": null, "recommendCount": 128, "viewCount": 3204, "createdAt": "2026-09-08T10:00:00" }
 ]
 ```
 
@@ -309,6 +324,11 @@
 ]
 ```
 
+### 비고
+
+- 숨김 상태(`EXCLUDED`·`PENDING`) 공연은 집계에서 제외합니다. 상위 K개를 자르기 전에 제외하므로 숨김 공연 때문에 결과 개수가 줄지 않습니다.
+- 삭제된 엔티티는 상위 K개를 자른 뒤 응답에서 빠집니다.
+
 ---
 
 ## PATCH /api/posts/{id}
@@ -326,7 +346,8 @@
 | `category` | String | N | `REVIEW` \| `INFO` \| `FREE`. 생략·`null`이면 기존 값 유지 |
 | `title` | String | N | 생략·`null`이면 기존 값 유지. 공백만으로는 불가, 최대 255자 |
 | `content` | Object | N | 생략·`null`이면 기존 값 유지 |
-| `entityTags` | Object[] | Y | 항상 전체 교체(기존 태그 전체 삭제 후 재삽입). 수정 후 최종 `category`(요청값 또는 기존값)가 `REVIEW`\|`INFO`면 1개 이상 필수. 최대 10개 |
+| `entityTags` | Object[] | N | 생략·`null`이면 기존 태그 유지. 보내면 전체 교체(기존 태그 전체 삭제 후 재삽입). 수정 후 최종 `category`(요청값 또는 기존값)가 `REVIEW`\|`INFO`면 1개 이상 필수. 최대 10개 |
+| `coverConcertId` | Long | N | 대표 공연 ID. 최종 태그(`entityTags`를 보냈으면 요청 태그, 아니면 저장된 태그)의 `CONCERT` 태그 중 하나여야 함. 생략·`null`이면 기존 대표 공연 유지(아래 비고 참고) |
 
 ### 응답
 
@@ -340,11 +361,15 @@
 | `FORBIDDEN` | 403 | 작성자 본인이 아님 |
 | `INVALID_INPUT` | 400 | 수정 후 최종 `category`가 `REVIEW`\|`INFO`인데 `entityTags`가 비어 있음, `title`이 공백뿐이거나 개수 초과 등 |
 | `POST_CONTENT_TOO_LONG` | 400 | `content` 변경 시 본문 텍스트 10000자 초과 또는 `content` JSON 50000자 초과 |
+| `POST_CONCERT_TAG_HIDDEN` | 400 | 새로 추가한 공연 태그 또는 `coverConcertId`로 지정한 공연이 숨김 상태(`EXCLUDED`·`PENDING`) |
+| `POST_COVER_CONCERT_NOT_TAGGED` | 400 | `coverConcertId`가 최종 태그의 `CONCERT` 태그에 없음 |
 | `USER_SUSPENDED` | 403 | 정지 중인 회원. 에러 응답에 `suspendedUntil`·`reason` 포함 ([auth-policy.md](../policy/auth-policy.md) "`USER_SUSPENDED` 응답 형식") |
 
 ### 비고
 
-- `entityTags`는 부분 수정을 지원하지 않습니다. 수정 시 항상 전체 목록을 보내야 합니다.
+- `entityTags`는 부분 수정을 지원하지 않습니다. 태그를 바꿀 때는 항상 전체 목록을 보내야 합니다.
+- 숨김 공연 검사는 새로 추가한 공연 태그(기존에 저장되지 않은 것)와 `coverConcertId`로 지정한 공연에만 적용합니다. 이미 저장돼 있던 공연 태그는 그 사이 공연이 숨겨졌어도 다시 보내면 통과합니다(수정 화면이 같은 태그를 다시 보내기 때문).
+- `coverConcertId`를 생략·`null`로 보내면 기존 대표 공연을 유지합니다. 단, `entityTags` 교체로 기존 대표 공연이 태그에서 빠지면 대표 공연을 비웁니다. `null`을 보내는 것만으로는 대표 공연을 해제할 수 없습니다.
 - `category`를 변경해도 `entityTags` 검증은 우회되지 않습니다 — 검증은 항상 변경 후 최종 `category` 기준으로 수행됩니다.
 
 ---
@@ -466,6 +491,7 @@
 ### 비고
 
 - `type`+`id`에 해당하는 엔티티 존재 여부는 검증하지 않습니다. 존재하지 않는 엔티티를 조회해도 404가 아닌, 빈 `content` 배열과 함께 200이 반환됩니다.
+- `type=CONCERT`이고 공연이 숨김 상태(`EXCLUDED`·`PENDING`)이면 빈 `content` 배열(`totalElements=0`, `totalPages=0`)과 함께 200을 반환합니다.
 
 ---
 
@@ -497,6 +523,7 @@
 
 - 제목·`content_text` LIKE 매치 또는 `entityTags`를 통한 엔티티명(공연명·아티스트명·발매명·트랙명) 매치를 단일 DB 쿼리로 처리합니다. 텍스트 매치와 멘션 매치를 애플리케이션 레벨에서 별도로 병합하지 않습니다.
 - 트랙명 매치는 태그된 `entityTags`가 `TRACK` 타입인 경우에만 적용되며, 트랙이 속한 앨범명으로는 매치되지 않습니다(트랙 제목 자체만 대상).
+- 공연명 매치는 숨김 상태(`EXCLUDED`·`PENDING`)가 아닌 공연에만 적용합니다. 제목·본문 텍스트 매치는 공연 상태와 무관합니다.
 
 ---
 
@@ -515,7 +542,7 @@
 | `page` | int | N | `0` | 최상위 댓글 기준 페이지 번호 |
 | `size` | int | N | `20` | 페이지 크기. 최대 `100` |
 
-인증 불필요. 단, `isLiked`·`isAuthor`는 인증 요청일 때만 계산됩니다.
+인증 불필요. 단, `isLiked`·`isAuthor`는 인증 요청일 때만 계산됩니다. `isPostAuthor`는 인증 여부와 무관하게 계산됩니다.
 
 ### 응답
 
@@ -527,6 +554,7 @@
 | `authorNickname` | String? | 작성자 닉네임. `null`이면 탈퇴 회원("탈퇴 회원"으로 표시). 삭제된 댓글이어도 닉네임 자체는 계속 노출됩니다. 삭제 여부 판단에는 쓰지 않고 `isDeleted`를 사용합니다 |
 | `isDeleted` | Boolean | 삭제된 댓글 여부 |
 | `isAuthor` | Boolean | 현재 사용자가 작성자 본인인지 여부. 비인증 시, 또는 삭제된 댓글이면 항상 `false` |
+| `isPostAuthor` | Boolean | 댓글 작성자가 게시글 작성자와 같은 회원인지 여부(글쓴이 표시용, 현재 사용자와 무관). 삭제된 댓글이면 항상 `false` |
 | `content` | String | 댓글 내용 (plain text, 게시글 본문과 달리 리치 텍스트 아님). 삭제된 댓글이면 `"삭제된 댓글입니다"`로 치환됨 |
 | `likeCount` | Long | 좋아요 수. 삭제된 댓글도 기존 좋아요 수는 그대로 유지됨 |
 | `isLiked` | Boolean? | 현재 사용자의 좋아요 여부. 비인증 시, 또는 삭제된 댓글이면 `null` |
@@ -540,6 +568,7 @@
       "id": 101,
       "authorNickname": "민트초코최고",
       "isAuthor": false,
+      "isPostAuthor": false,
       "isDeleted": false,
       "content": "오프닝으로 KICK BACK 나왔을 때 심장 떨어지는 줄... 후기 잘 봤습니다 ㅠㅠ",
       "likeCount": 8,
@@ -550,6 +579,7 @@
           "id": 108,
           "authorNickname": "요네즈러버",
           "isAuthor": true,
+          "isPostAuthor": true,
           "isDeleted": false,
           "content": "저도 그 순간 진짜 소름이었어요! 다음에도 같이 가요 ㅎㅎ",
           "likeCount": 2,
@@ -572,7 +602,7 @@
 
 ### 비고
 
-- `totalElements`·`totalPages`는 최상위 댓글 기준입니다. 답글까지 포함한 전체 개수는 `GET /api/posts/{id}` 응답의 `commentCount`를 사용합니다.
+- `totalElements`·`totalPages`는 최상위 댓글 기준입니다. 답글까지 포함한 삭제되지 않은 댓글 수는 `GET /api/posts/{id}` 응답의 `commentCount`를 사용합니다.
 
 ---
 
@@ -638,7 +668,8 @@
 ### 비고
 
 - 소프트 삭제로 처리됩니다 — 레코드는 남고 `content`만 `"삭제된 댓글입니다"`로 치환됩니다. 답글이 달린 최상위 댓글을 삭제해도 답글은 그대로 유지됩니다(하위 답글까지 연쇄 삭제되지 않음).
-- 삭제된 댓글은 `isDeleted=true`로 응답합니다. `authorNickname`·`likeCount`는 그대로 노출되고, `isAuthor`·`isLiked`만 각각 `false`·`null`로 고정됩니다.
+- 삭제된 댓글은 `isDeleted=true`로 응답합니다. `authorNickname`·`likeCount`는 그대로 노출되고, `isAuthor`·`isPostAuthor`·`isLiked`만 각각 `false`·`false`·`null`로 고정됩니다.
+- 삭제 시 게시글의 `commentCount`를 1 줄입니다. 이미 삭제된 댓글을 다시 삭제하면 200을 반환하고 `commentCount`는 바뀌지 않습니다. 같은 댓글을 동시에 삭제해도 한 번만 줄어듭니다.
 - 게시글 자체가 삭제되는 경우(`DELETE /api/posts/{id}`)는 예외적으로 댓글이 물리 삭제됩니다 — 이 경우는 다시 보여줄 게시글 자체가 없기 때문입니다.
 
 ---
