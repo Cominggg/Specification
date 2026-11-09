@@ -73,7 +73,7 @@
 | `category` | String | Y | `REVIEW`(후기) \| `INFO`(정보·제보) \| `FREE`(자유) |
 | `title` | String | Y | 제목. 최대 255자 |
 | `content` | Object | Y | Tiptap 에디터 JSON (본문) |
-| `entityTags` | Object[] | N | 본문에서 멘션한 엔티티 목록. `category`가 `REVIEW`\|`INFO`면 1개 이상 필수. 최대 10개 |
+| `entityTags` | Object[] | N | 본문에서 멘션한 엔티티 목록. `category`와 관계없이 선택(생략·빈 배열 가능). 최대 10개 |
 | `entityTags[].entityType` | String | Y | `CONCERT` \| `ARTIST` \| `RELEASE` \| `TRACK` |
 | `entityTags[].entityId` | Long | Y | 엔티티 ID |
 | `coverConcertId` | Long | N | 대표 공연 ID. `entityTags`의 `CONCERT` 태그 중 하나여야 함. 생략·`null`이면 대표 공연 없음 |
@@ -100,7 +100,7 @@
 
 | 코드 | 상태 코드 | 설명 |
 |------|-----------|------|
-| `INVALID_INPUT` | 400 | `category`가 `REVIEW`\|`INFO`인데 `entityTags`가 비어 있음, `title`/`entityTags` 개수 초과 등 |
+| `INVALID_INPUT` | 400 | `category`·`title`·`content` 누락, `title` 공백 또는 255자 초과, `entityTags` 10개 초과 등 필드 검증 실패 |
 | `POST_CONTENT_TOO_LONG` | 400 | `content`에서 추출한 본문 텍스트가 10000자 초과, 또는 `content` JSON 자체가 50000자 초과 |
 | `POST_CONCERT_TAG_HIDDEN` | 400 | `entityTags`에 숨김 상태(`EXCLUDED`·`PENDING`) 공연이 포함됨 |
 | `POST_COVER_CONCERT_NOT_TAGGED` | 400 | `coverConcertId`가 `entityTags`의 `CONCERT` 태그에 없음 |
@@ -346,7 +346,7 @@
 | `category` | String | N | `REVIEW` \| `INFO` \| `FREE`. 생략·`null`이면 기존 값 유지 |
 | `title` | String | N | 생략·`null`이면 기존 값 유지. 공백만으로는 불가, 최대 255자 |
 | `content` | Object | N | 생략·`null`이면 기존 값 유지 |
-| `entityTags` | Object[] | N | 생략·`null`이면 기존 태그 유지. 보내면 전체 교체(기존 태그 전체 삭제 후 재삽입). 수정 후 최종 `category`(요청값 또는 기존값)가 `REVIEW`\|`INFO`면 1개 이상 필수. 최대 10개 |
+| `entityTags` | Object[] | N | 생략·`null`이면 기존 태그 유지. 보내면 전체 교체(기존 태그 전체 삭제 후 재삽입). `category`와 관계없이 빈 배열도 가능. 최대 10개 |
 | `coverConcertId` | Long | N | 대표 공연 ID. 최종 태그(`entityTags`를 보냈으면 요청 태그, 아니면 저장된 태그)의 `CONCERT` 태그 중 하나여야 함. 생략·`null`이면 기존 대표 공연 유지(아래 비고 참고) |
 
 ### 응답
@@ -359,7 +359,7 @@
 |------|-----------|------|
 | `POST_NOT_FOUND` | 404 | 존재하지 않는 게시글 |
 | `FORBIDDEN` | 403 | 작성자 본인이 아님 |
-| `INVALID_INPUT` | 400 | 수정 후 최종 `category`가 `REVIEW`\|`INFO`인데 `entityTags`가 비어 있음, `title`이 공백뿐이거나 개수 초과 등 |
+| `INVALID_INPUT` | 400 | `title`이 공백뿐이거나 255자 초과, `entityTags` 10개 초과 등 필드 검증 실패 |
 | `POST_CONTENT_TOO_LONG` | 400 | `content` 변경 시 본문 텍스트 10000자 초과 또는 `content` JSON 50000자 초과 |
 | `POST_CONCERT_TAG_HIDDEN` | 400 | 새로 추가한 공연 태그 또는 `coverConcertId`로 지정한 공연이 숨김 상태(`EXCLUDED`·`PENDING`) |
 | `POST_COVER_CONCERT_NOT_TAGGED` | 400 | `coverConcertId`가 최종 태그의 `CONCERT` 태그에 없음 |
@@ -370,7 +370,6 @@
 - `entityTags`는 부분 수정을 지원하지 않습니다. 태그를 바꿀 때는 항상 전체 목록을 보내야 합니다.
 - 숨김 공연 검사는 새로 추가한 공연 태그(기존에 저장되지 않은 것)와 `coverConcertId`로 지정한 공연에만 적용합니다. 이미 저장돼 있던 공연 태그는 그 사이 공연이 숨겨졌어도 다시 보내면 통과합니다(수정 화면이 같은 태그를 다시 보내기 때문).
 - `coverConcertId`를 생략·`null`로 보내면 기존 대표 공연을 유지합니다. 단, `entityTags` 교체로 기존 대표 공연이 태그에서 빠지면 대표 공연을 비웁니다. `null`을 보내는 것만으로는 대표 공연을 해제할 수 없습니다.
-- `category`를 변경해도 `entityTags` 검증은 우회되지 않습니다 — 검증은 항상 변경 후 최종 `category` 기준으로 수행됩니다.
 
 ---
 
