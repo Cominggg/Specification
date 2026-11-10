@@ -1,3 +1,8 @@
+## 2026-11-10
+
+- `spec/client/post-content.md` — 웹·앱 공통 게시글 본문 스키마 신설(Cominggg/Frontend#181, App#15, Backend#135 합의). 허용 노드(`heading` level 2·3, 목록·인용 1단계, `entityMentionCard`)·마크(`bold`·`strike`·자동 `link`), 언급 카드 attrs, 허용 밖 내용 처리(`POST_CONTENT_INVALID_FORMAT`, 허용 밖 attrs는 BE가 제거), 단축 입력·붙여넣기·메뉴 라벨, 표시 규칙, 본문 글자 수 계산식과 기준 케이스(BE `TiptapTextExtractor` develop 517fe7d) 정의
+- `spec/api/posts.md` — `POST /api/posts`·`PATCH /api/posts/{id}`의 `content` 필드와 `POST_CONTENT_TOO_LONG` 설명에 본문 스키마 문서 링크 추가
+
 ## 2026-11-09
 
 - `spec/api/posts.md` — 게시글 대표 공연 `coverConcertId` 추가(작성·수정 요청, 상세·`PostSummary` 응답. 수정 시 생략하면 유지·태그 교체로 빠지면 비움, 응답 태그에 없으면 `null`). 작성·수정 에러에 `POST_CONCERT_TAG_HIDDEN`(400, 숨김 공연 `EXCLUDED`·`PENDING` 태그)·`POST_COVER_CONCERT_NOT_TAGGED`(400) 추가, 수정 시 기존 저장 태그는 숨김이어도 허용. `PATCH /api/posts/{id}`의 `entityTags`를 선택(생략 시 기존 유지)으로 코드에 맞게 정정. 상세 본문에서 숨김·없는 공연 멘션 노드 제거, `entityTags`·트렌딩 태그·통합 검색 공연명 매치에서 숨김 공연 제외, 숨김 공연 백링크는 빈 페이지. 댓글 응답에 `isPostAuthor` 추가. `commentCount`를 삭제되지 않은 댓글·답글 수로 정정(소프트 삭제 시 감소) (Cominggg/Backend#144)

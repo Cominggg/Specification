@@ -72,7 +72,7 @@
 |------|------|------|------|
 | `category` | String | Y | `REVIEW`(후기) \| `INFO`(정보·제보) \| `FREE`(자유) |
 | `title` | String | Y | 제목. 최대 255자 |
-| `content` | Object | Y | Tiptap 에디터 JSON (본문) |
+| `content` | Object | Y | Tiptap 에디터 JSON (본문). 허용 노드·마크는 [post-content.md](../client/post-content.md) |
 | `entityTags` | Object[] | N | 본문에서 멘션한 엔티티 목록. `category`와 관계없이 선택(생략·빈 배열 가능). 최대 10개 |
 | `entityTags[].entityType` | String | Y | `CONCERT` \| `ARTIST` \| `RELEASE` \| `TRACK` |
 | `entityTags[].entityId` | Long | Y | 엔티티 ID |
@@ -101,7 +101,7 @@
 | 코드 | 상태 코드 | 설명 |
 |------|-----------|------|
 | `INVALID_INPUT` | 400 | `category`·`title`·`content` 누락, `title` 공백 또는 255자 초과, `entityTags` 10개 초과 등 필드 검증 실패 |
-| `POST_CONTENT_TOO_LONG` | 400 | `content`에서 추출한 본문 텍스트가 10000자 초과, 또는 `content` JSON 자체가 50000자 초과 |
+| `POST_CONTENT_TOO_LONG` | 400 | `content`에서 추출한 본문 텍스트가 10000자 초과, 또는 `content` JSON 자체가 50000자 초과 (글자 수 계산식은 [post-content.md](../client/post-content.md) "길이 제한") |
 | `POST_CONCERT_TAG_HIDDEN` | 400 | `entityTags`에 숨김 상태(`EXCLUDED`·`PENDING`) 공연이 포함됨 |
 | `POST_COVER_CONCERT_NOT_TAGGED` | 400 | `coverConcertId`가 `entityTags`의 `CONCERT` 태그에 없음 |
 | `USER_SUSPENDED` | 403 | 정지 중인 회원. 에러 응답에 `suspendedUntil`·`reason` 포함 ([auth-policy.md](../policy/auth-policy.md) "`USER_SUSPENDED` 응답 형식") |
@@ -345,7 +345,7 @@
 |------|------|------|------|
 | `category` | String | N | `REVIEW` \| `INFO` \| `FREE`. 생략·`null`이면 기존 값 유지 |
 | `title` | String | N | 생략·`null`이면 기존 값 유지. 공백만으로는 불가, 최대 255자 |
-| `content` | Object | N | 생략·`null`이면 기존 값 유지 |
+| `content` | Object | N | 생략·`null`이면 기존 값 유지. 허용 노드·마크는 [post-content.md](../client/post-content.md) |
 | `entityTags` | Object[] | N | 생략·`null`이면 기존 태그 유지. 보내면 전체 교체(기존 태그 전체 삭제 후 재삽입). `category`와 관계없이 빈 배열도 가능. 최대 10개 |
 | `coverConcertId` | Long | N | 대표 공연 ID. 최종 태그(`entityTags`를 보냈으면 요청 태그, 아니면 저장된 태그)의 `CONCERT` 태그 중 하나여야 함. 생략·`null`이면 기존 대표 공연 유지(아래 비고 참고) |
 
@@ -360,7 +360,7 @@
 | `POST_NOT_FOUND` | 404 | 존재하지 않는 게시글 |
 | `FORBIDDEN` | 403 | 작성자 본인이 아님 |
 | `INVALID_INPUT` | 400 | `title`이 공백뿐이거나 255자 초과, `entityTags` 10개 초과 등 필드 검증 실패 |
-| `POST_CONTENT_TOO_LONG` | 400 | `content` 변경 시 본문 텍스트 10000자 초과 또는 `content` JSON 50000자 초과 |
+| `POST_CONTENT_TOO_LONG` | 400 | `content` 변경 시 본문 텍스트 10000자 초과 또는 `content` JSON 50000자 초과 (글자 수 계산식은 [post-content.md](../client/post-content.md) "길이 제한") |
 | `POST_CONCERT_TAG_HIDDEN` | 400 | 새로 추가한 공연 태그 또는 `coverConcertId`로 지정한 공연이 숨김 상태(`EXCLUDED`·`PENDING`) |
 | `POST_COVER_CONCERT_NOT_TAGGED` | 400 | `coverConcertId`가 최종 태그의 `CONCERT` 태그에 없음 |
 | `USER_SUSPENDED` | 403 | 정지 중인 회원. 에러 응답에 `suspendedUntil`·`reason` 포함 ([auth-policy.md](../policy/auth-policy.md) "`USER_SUSPENDED` 응답 형식") |
