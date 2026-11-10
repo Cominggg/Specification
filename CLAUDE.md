@@ -26,6 +26,7 @@ Jpop 아티스트 내한 공연 정보 통합 웹 플랫폼 **Coming**의 기획
 | spec/admin/features.md | 관리자 기능 명세 (ADM-xx) |
 | spec/infra.md | 인프라 구성 개요 |
 | spec/infra/ | 아키텍처·배포 파이프라인 상세 |
+| spec/client/ | 웹·앱 클라이언트 공통 명세 (게시글 본문 스키마 등) |
 | spec/legal/ | 법적 문서 (이용약관·개인정보처리방침·마케팅 수신 동의) |
 | CHANGELOG.md | 명세 변경 이력 |
 
