@@ -25,13 +25,13 @@
 
 ## 허용 마크
 
-`text` 노드에만 붙습니다.
+`text` 노드에만 붙습니다. 그 밖의 노드에 붙은 `marks`는 BE가 저장 전에 지웁니다 (아래 [허용 밖 내용 처리](#허용-밖-내용-처리)).
 
 | 마크 | attrs | 비고 |
 |------|-------|------|
 | `bold` | — | |
 | `strike` | — | |
-| `link` | `href` | 자동 링크만. `href`는 `http://`·`https://`로 시작해야 함 |
+| `link` | `href` | 자동 링크만. `href`는 `http://`·`https://`로 시작해야 함 (대소문자 무관) |
 
 - 링크 버튼·수동 링크는 없습니다. 입력한 글자가 URL 형식일 때만 링크가 됩니다
 
@@ -46,9 +46,10 @@
 | `title` | String | Y | `title` |
 | `subtitle` | String? | N | `subtitle` |
 | `thumbnailUrl` | String? | N | `thumbnailUrl` |
-| `releaseGroupId` | Long? | N | `releaseGroupId` (`TRACK`만) |
+| `releaseGroupId` | Long? | N | `releaseGroupId` (`TRACK`만. 다른 타입은 생략하거나 `null`) |
 
 - 고유 카드(`entityType`+`entityId`)는 10개 이하입니다. 같은 엔티티를 여러 번 넣는 것은 1개로 셉니다
+- BE는 본문 카드를 게시글 태그(`entityTags`)로 저장합니다. 요청에 태그 목록을 따로 보내지 않습니다. 응답 `entityTags`는 본문에 카드가 처음 나온 순서입니다
 - 작성 시 카드 바로 뒤에 빈 `paragraph`를 함께 넣습니다. 카드 뒤에 글을 이어 쓸 커서 위치를 보장하기 위함입니다
 - 아티스트 언급도 카드입니다. 인라인 언급(`entityMentionChip`)은 없습니다
 
@@ -57,7 +58,10 @@
 | 대상 | 처리 |
 |------|------|
 | 허용 밖 노드·마크, 위치·중첩 규칙 위반, 허용 밖 `heading` level, `http`·`https` 외 링크 | 400 `POST_CONTENT_INVALID_FORMAT` |
-| 허용 밖 attrs 키 (예: `orderedList.type`) | BE가 저장 전에 지움 (오류 아님) |
+| 언급 카드 attrs 위반 (필수 attr 누락, 타입 불일치, 허용 밖 `entityType`, `TRACK` 외 카드의 `releaseGroupId` 값) | 400 `POST_CONTENT_INVALID_FORMAT` |
+| 고유 언급 카드 10개 초과 | 400 `POST_CONTENT_INVALID_FORMAT` |
+| 허용 밖 attrs 키 (예: `orderedList.type`, `link.target`) | BE가 저장 전에 지움 (오류 아님) |
+| `text` 외 노드에 붙은 `marks` (예: 굵게 구간 안의 `hardBreak`) | BE가 저장 전에 지움 (오류 아님) |
 
 ## 입력 규칙
 
@@ -99,7 +103,7 @@
 | 대상 | 한도 | 오류 |
 |------|------|------|
 | 본문 글자 수 (아래 계산식) | 10,000자 | 400 `POST_CONTENT_TOO_LONG` |
-| `content` JSON 직렬화 길이 | 50,000자 | 400 `POST_CONTENT_TOO_LONG` |
+| `content` JSON 직렬화 길이 (허용 밖 attrs·marks를 지운 뒤 저장되는 JSON 기준) | 50,000자 | 400 `POST_CONTENT_TOO_LONG` |
 
 **본문 글자 수 계산식** (BE 기준, 웹·앱 카운터도 같은 식을 씀)
 1. 문서를 앞에서부터 돌며 `text` 노드의 글자만 이어 붙입니다. 같은 블록 안의 인접 `text` 노드는 공백 없이 붙고, 마크는 무시합니다

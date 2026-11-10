@@ -1,3 +1,9 @@
+## 2026-11-11
+
+- `spec/api/posts.md` — 게시글 태그를 본문 언급 카드에서 BE가 추출하도록 변경(Cominggg/Backend#135). `POST /api/posts`·`PATCH /api/posts/{id}` 요청에서 `entityTags` 필드 삭제(보내도 무시), `PATCH`는 `content`를 보낼 때만 태그 전체 교체·`content` 수정으로 대표 공연 카드가 빠지면 대표 공연을 비움. `coverConcertId`·`POST_CONCERT_TAG_HIDDEN`·`POST_COVER_CONCERT_NOT_TAGGED` 기준을 본문 공연 카드로 정정. 작성·수정 에러에 `POST_CONTENT_INVALID_FORMAT`(400) 추가, `INVALID_INPUT`의 "`entityTags` 10개 초과" 사유 제거. 작성 검사 순서 명시. 상세·목록 응답 `entityTags`가 본문 카드 등장 순서임을 명시
+- `spec/client/post-content.md` — 언급 카드 attrs 위반(필수 누락·타입 불일치·`TRACK` 외 `releaseGroupId` 값)과 고유 카드 10개 초과를 `POST_CONTENT_INVALID_FORMAT`으로 명시. `text` 외 노드의 `marks`는 BE가 지움(굵게 구간에 줄바꿈을 넣거나 줄바꿈이 포함된 구간에 굵게를 적용하면 에디터가 `hardBreak`에 마크를 붙이기 때문). 링크 `http`·`https` 접두어 대소문자 무관, 50,000자 JSON 길이는 정리 후 저장되는 JSON 기준, 본문 카드가 게시글 태그가 되고 응답 태그는 카드 등장 순서임을 명시
+- `spec/features.md` — POST-01 태그를 본문 언급 카드 기준으로 정정
+
 ## 2026-11-10
 
 - `spec/client/post-content.md` — 웹·앱 공통 게시글 본문 스키마 신설(Cominggg/Frontend#181, App#15, Backend#135 합의). 허용 노드(`heading` level 2·3, 목록·인용 1단계, `entityMentionCard`)·마크(`bold`·`strike`·자동 `link`), 언급 카드 attrs, 허용 밖 내용 처리(`POST_CONTENT_INVALID_FORMAT`, 허용 밖 attrs는 BE가 제거), 단축 입력·붙여넣기·메뉴 라벨, 표시 규칙, 본문 글자 수 계산식과 기준 케이스(BE `TiptapTextExtractor` develop 517fe7d) 정의

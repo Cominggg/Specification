@@ -72,18 +72,20 @@
 |------|------|------|------|
 | `category` | String | Y | `REVIEW`(후기) \| `INFO`(정보·제보) \| `FREE`(자유) |
 | `title` | String | Y | 제목. 최대 255자 |
-| `content` | Object | Y | Tiptap 에디터 JSON (본문). 허용 노드·마크는 [post-content.md](../client/post-content.md) |
-| `entityTags` | Object[] | N | 본문에서 멘션한 엔티티 목록. `category`와 관계없이 선택(생략·빈 배열 가능). 최대 10개 |
-| `entityTags[].entityType` | String | Y | `CONCERT` \| `ARTIST` \| `RELEASE` \| `TRACK` |
-| `entityTags[].entityId` | Long | Y | 엔티티 ID |
-| `coverConcertId` | Long | N | 대표 공연 ID. `entityTags`의 `CONCERT` 태그 중 하나여야 함. 생략·`null`이면 대표 공연 없음 |
+| `content` | Object | Y | Tiptap 에디터 JSON (본문). 허용 노드·마크는 [post-content.md](../client/post-content.md). 본문의 언급 카드(`entityMentionCard`)가 게시글 태그가 됨 |
+| `coverConcertId` | Long | N | 대표 공연 ID. 본문 공연 카드(`entityType`이 `CONCERT`) 중 하나여야 함. 생략·`null`이면 대표 공연 없음 |
 
 ```json
 {
   "category": "REVIEW",
   "title": "요네즈 켄시 내한 첫 공연, 앙코르만 3번",
-  "content": { "type": "doc", "content": [] },
-  "entityTags": [ { "entityType": "CONCERT", "entityId": 1 } ],
+  "content": {
+    "type": "doc",
+    "content": [
+      { "type": "entityMentionCard", "attrs": { "entityType": "CONCERT", "entityId": 1, "title": "요네즈 켄시 KOREA LIVE 2026" } },
+      { "type": "paragraph" }
+    ]
+  },
   "coverConcertId": 1
 }
 ```
@@ -100,16 +102,18 @@
 
 | 코드 | 상태 코드 | 설명 |
 |------|-----------|------|
-| `INVALID_INPUT` | 400 | `category`·`title`·`content` 누락, `title` 공백 또는 255자 초과, `entityTags` 10개 초과 등 필드 검증 실패 |
+| `INVALID_INPUT` | 400 | `category`·`title`·`content` 누락, `title` 공백 또는 255자 초과 등 필드 검증 실패 |
+| `POST_CONTENT_INVALID_FORMAT` | 400 | `content`가 본문 스키마 위반(허용 밖 노드·마크, 언급 카드 attrs 위반, 고유 언급 카드 10개 초과 등. [post-content.md](../client/post-content.md) "허용 밖 내용 처리") |
 | `POST_CONTENT_TOO_LONG` | 400 | `content`에서 추출한 본문 텍스트가 10000자 초과, 또는 `content` JSON 자체가 50000자 초과 (글자 수 계산식은 [post-content.md](../client/post-content.md) "길이 제한") |
-| `POST_CONCERT_TAG_HIDDEN` | 400 | `entityTags`에 숨김 상태(`EXCLUDED`·`PENDING`) 공연이 포함됨 |
-| `POST_COVER_CONCERT_NOT_TAGGED` | 400 | `coverConcertId`가 `entityTags`의 `CONCERT` 태그에 없음 |
+| `POST_CONCERT_TAG_HIDDEN` | 400 | 본문 공연 카드에 숨김 상태(`EXCLUDED`·`PENDING`) 공연이 포함됨 |
+| `POST_COVER_CONCERT_NOT_TAGGED` | 400 | `coverConcertId`가 본문 공연 카드에 없음 |
 | `USER_SUSPENDED` | 403 | 정지 중인 회원. 에러 응답에 `suspendedUntil`·`reason` 포함 ([auth-policy.md](../policy/auth-policy.md) "`USER_SUSPENDED` 응답 형식") |
 
 ### 비고
 
-- 숨김 상태(`EXCLUDED`·`PENDING`) 공연은 태그할 수 없습니다. 그 밖에 `entityTags`가 가리키는 엔티티의 실존 여부는 검증하지 않으며, 존재하지 않는 엔티티 태그는 조회 시점에 응답에서 빠집니다.
-- 숨김 공연 태그 검사를 대표 공연 검사보다 먼저 합니다. 둘 다 해당하면 `POST_CONCERT_TAG_HIDDEN`을 반환합니다.
+- BE가 본문의 언급 카드를 처음 나온 순서대로, 같은 (`entityType`, `entityId`)는 하나로 묶어 게시글 태그로 저장합니다. 요청 본문에 `entityTags`를 보내도 무시합니다.
+- 숨김 상태(`EXCLUDED`·`PENDING`) 공연은 태그할 수 없습니다. 그 밖에 카드가 가리키는 엔티티의 실존 여부는 검증하지 않으며, 존재하지 않는 엔티티 태그는 조회 시점에 응답에서 빠집니다.
+- 검사 순서는 본문 스키마(`POST_CONTENT_INVALID_FORMAT`) → 숨김 공연 → 대표 공연 → 길이(`POST_CONTENT_TOO_LONG`)입니다. 숨김 공연과 대표 공연이 둘 다 해당하면 `POST_CONCERT_TAG_HIDDEN`을 반환합니다.
 - BE가 `content`에서 텍스트 노드만 추출해 검색 전용 `content_text` 컬럼을 서버 측에서 생성합니다. FE가 별도로 평문을 보낼 필요는 없습니다.
 - 본문 텍스트 길이(10000자)와 별개로 `content` JSON 자체의 길이(50000자)도 제한합니다 — 구조만 방대한 JSON으로 텍스트 길이 제한을 우회하는 것을 막기 위함입니다.
 
@@ -138,7 +142,7 @@
 | `category` | String | `REVIEW` \| `INFO` \| `FREE` |
 | `title` | String | 제목 |
 | `content` | Object | Tiptap 에디터 JSON. 숨김·존재하지 않는 공연 멘션 노드는 빠진 상태로 응답 (아래 비고 참고) |
-| `entityTags` | Object[] | 멘션 엔티티 목록 (아래 `EntityTag` 참고). 삭제된 엔티티와 숨김 상태(`EXCLUDED`·`PENDING`) 공연은 제외 |
+| `entityTags` | Object[] | 멘션 엔티티 목록 (아래 `EntityTag` 참고). 본문에 카드가 처음 나온 순서. 삭제된 엔티티와 숨김 상태(`EXCLUDED`·`PENDING`) 공연은 제외 |
 | `coverConcertId` | Long? | 대표 공연 ID. 대표 공연이 없거나, 응답 `entityTags`에 없는 공연(숨김·삭제)이면 `null` |
 | `recommendCount` | Long | 추천 수 |
 | `viewCount` | Long | 조회 수 |
@@ -217,7 +221,7 @@
 | `authorNickname` | String? | 작성자 닉네임 (탈퇴 회원이면 `null`) |
 | `category` | String | `REVIEW` \| `INFO` \| `FREE` |
 | `title` | String | 제목 |
-| `entityTags` | Object[] | 멘션 엔티티 목록 (`EntityTag`, 위 상세 API 참고). 삭제된 엔티티와 숨김 상태 공연은 제외 |
+| `entityTags` | Object[] | 멘션 엔티티 목록 (`EntityTag`, 위 상세 API 참고). 본문에 카드가 처음 나온 순서. 삭제된 엔티티와 숨김 상태 공연은 제외 |
 | `coverConcertId` | Long? | 대표 공연 ID. 상세 API와 같은 규칙(응답 `entityTags`에 없으면 `null`) |
 | `recommendCount` | Long | 추천 수 |
 | `viewCount` | Long | 조회 수 |
@@ -345,9 +349,8 @@
 |------|------|------|------|
 | `category` | String | N | `REVIEW` \| `INFO` \| `FREE`. 생략·`null`이면 기존 값 유지 |
 | `title` | String | N | 생략·`null`이면 기존 값 유지. 공백만으로는 불가, 최대 255자 |
-| `content` | Object | N | 생략·`null`이면 기존 값 유지. 허용 노드·마크는 [post-content.md](../client/post-content.md) |
-| `entityTags` | Object[] | N | 생략·`null`이면 기존 태그 유지. 보내면 전체 교체(기존 태그 전체 삭제 후 재삽입). `category`와 관계없이 빈 배열도 가능. 최대 10개 |
-| `coverConcertId` | Long | N | 대표 공연 ID. 최종 태그(`entityTags`를 보냈으면 요청 태그, 아니면 저장된 태그)의 `CONCERT` 태그 중 하나여야 함. 생략·`null`이면 기존 대표 공연 유지(아래 비고 참고) |
+| `content` | Object | N | 생략·`null`이면 기존 본문과 태그 유지. 보내면 본문의 언급 카드로 태그를 전체 교체(기존 태그 전체 삭제 후 재삽입). 허용 노드·마크는 [post-content.md](../client/post-content.md) |
+| `coverConcertId` | Long | N | 대표 공연 ID. 최종 태그(`content`를 보냈으면 그 본문의 공연 카드, 아니면 저장된 태그)의 `CONCERT` 태그 중 하나여야 함. 생략·`null`이면 기존 대표 공연 유지(아래 비고 참고) |
 
 ### 응답
 
@@ -359,17 +362,18 @@
 |------|-----------|------|
 | `POST_NOT_FOUND` | 404 | 존재하지 않는 게시글 |
 | `FORBIDDEN` | 403 | 작성자 본인이 아님 |
-| `INVALID_INPUT` | 400 | `title`이 공백뿐이거나 255자 초과, `entityTags` 10개 초과 등 필드 검증 실패 |
+| `INVALID_INPUT` | 400 | `title`이 공백뿐이거나 255자 초과 등 필드 검증 실패 |
+| `POST_CONTENT_INVALID_FORMAT` | 400 | `content` 변경 시 본문 스키마 위반 (POST와 같은 기준) |
 | `POST_CONTENT_TOO_LONG` | 400 | `content` 변경 시 본문 텍스트 10000자 초과 또는 `content` JSON 50000자 초과 (글자 수 계산식은 [post-content.md](../client/post-content.md) "길이 제한") |
-| `POST_CONCERT_TAG_HIDDEN` | 400 | 새로 추가한 공연 태그 또는 `coverConcertId`로 지정한 공연이 숨김 상태(`EXCLUDED`·`PENDING`) |
+| `POST_CONCERT_TAG_HIDDEN` | 400 | 새로 추가한 공연 카드 또는 `coverConcertId`로 지정한 공연이 숨김 상태(`EXCLUDED`·`PENDING`) |
 | `POST_COVER_CONCERT_NOT_TAGGED` | 400 | `coverConcertId`가 최종 태그의 `CONCERT` 태그에 없음 |
 | `USER_SUSPENDED` | 403 | 정지 중인 회원. 에러 응답에 `suspendedUntil`·`reason` 포함 ([auth-policy.md](../policy/auth-policy.md) "`USER_SUSPENDED` 응답 형식") |
 
 ### 비고
 
-- `entityTags`는 부분 수정을 지원하지 않습니다. 태그를 바꿀 때는 항상 전체 목록을 보내야 합니다.
-- 숨김 공연 검사는 새로 추가한 공연 태그(기존에 저장되지 않은 것)와 `coverConcertId`로 지정한 공연에만 적용합니다. 이미 저장돼 있던 공연 태그는 그 사이 공연이 숨겨졌어도 다시 보내면 통과합니다(수정 화면이 같은 태그를 다시 보내기 때문).
-- `coverConcertId`를 생략·`null`로 보내면 기존 대표 공연을 유지합니다. 단, `entityTags` 교체로 기존 대표 공연이 태그에서 빠지면 대표 공연을 비웁니다. `null`을 보내는 것만으로는 대표 공연을 해제할 수 없습니다.
+- 태그는 `content`와 함께만 바뀝니다. 요청 본문에 `entityTags`를 보내도 무시합니다.
+- 숨김 공연 검사는 새로 추가한 공연 카드(기존에 저장되지 않은 것)와 `coverConcertId`로 지정한 공연에만 적용합니다. 이미 저장돼 있던 공연 태그는 그 사이 공연이 숨겨졌어도 본문에 남겨 다시 보내면 통과합니다(수정 화면이 같은 본문을 다시 보내기 때문).
+- `coverConcertId`를 생략·`null`로 보내면 기존 대표 공연을 유지합니다. 단, `content` 수정으로 기존 대표 공연 카드가 본문에서 빠지면 대표 공연을 비웁니다. `null`을 보내는 것만으로는 대표 공연을 해제할 수 없습니다.
 
 ---
 
