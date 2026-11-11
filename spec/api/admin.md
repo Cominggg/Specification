@@ -816,7 +816,7 @@
 |------|------|------|
 | `id` | Long | 공지사항 ID |
 | `title` | String | 제목 |
-| `content` | String | 본문 (plain text) |
+| `content` | Object | 본문 Tiptap JSON ([post-content.md](../client/post-content.md)). 저장된 그대로 줍니다(숨김 공연 카드 포함) |
 | `active` | Boolean | 노출 여부 |
 | `createdAt` | String | 작성일시 |
 | `updatedAt` | String | 수정일시 |
@@ -840,7 +840,7 @@
 | 필드 | 타입 | 필수 | 설명 |
 |------|------|------|------|
 | `title` | String | Y | 제목 |
-| `content` | String | Y | 본문 (plain text) |
+| `content` | Object | Y | 본문 Tiptap JSON. 게시글과 같은 스키마([post-content.md](../client/post-content.md))로 검증하고 허용 밖 attrs는 지워 저장합니다 |
 | `active` | Boolean | N | 노출 여부. 생략 시 `true`(즉시 노출) |
 
 ### 응답
@@ -850,6 +850,14 @@
 ```json
 { "noticeId": 1 }
 ```
+
+### 에러
+
+| 코드 | 상태 코드 | 설명 |
+|------|-----------|------|
+| `INVALID_INPUT` | 400 | `title` 누락·공백·255자 초과, `content` 누락 |
+| `CONTENT_INVALID_FORMAT` | 400 | `content`가 본문 스키마 위반 ([post-content.md](../client/post-content.md) "허용 밖 내용 처리". 고유 카드 10개 제한은 없음) |
+| `CONTENT_TOO_LONG` | 400 | 본문 텍스트 10000자 초과 또는 `content` JSON 50000자 초과 ([post-content.md](../client/post-content.md) "길이 제한") |
 
 ---
 
@@ -866,7 +874,7 @@
 | 필드 | 타입 | 필수 | 설명 |
 |------|------|------|------|
 | `title` | String | N | 생략·`null`이면 기존 값 유지 |
-| `content` | String | N | 생략·`null`이면 기존 값 유지 |
+| `content` | Object | N | 본문 Tiptap JSON. 생략·`null`이면 기존 값 유지. 작성과 같은 기준으로 검증 |
 | `active` | Boolean | N | 생략·`null`이면 기존 값 유지 |
 
 ### 응답
@@ -878,6 +886,8 @@
 | 코드 | 상태 코드 | 설명 |
 |------|-----------|------|
 | `NOTICE_NOT_FOUND` | 404 | 존재하지 않는 공지사항 |
+| `CONTENT_INVALID_FORMAT` | 400 | `content` 변경 시 본문 스키마 위반 (작성과 같은 기준) |
+| `CONTENT_TOO_LONG` | 400 | `content` 변경 시 본문 텍스트 10000자 초과 또는 `content` JSON 50000자 초과 |
 
 ---
 

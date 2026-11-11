@@ -2,6 +2,8 @@
 
 게시글 `content`(Tiptap JSON)의 웹·앱 공통 계약입니다. 웹 에디터, 앱 블록 에디터, 양쪽 렌더러, BE 검증이 모두 이 문서를 기준으로 합니다. API 요청·응답 형태는 [posts.md](../api/posts.md)를 따릅니다.
 
+공지사항 `content`([admin.md](../api/admin.md) 작성·수정, [posts.md](../api/posts.md) `GET /api/notices/{id}`)도 같은 스키마·길이 제한·오류 코드를 씁니다. 게시글과 다른 점은 [공지사항](#공지사항)에 있습니다.
+
 ---
 
 ## 허용 노드
@@ -57,9 +59,9 @@
 
 | 대상 | 처리 |
 |------|------|
-| 허용 밖 노드·마크, 위치·중첩 규칙 위반, 허용 밖 `heading` level, `http`·`https` 외 링크 | 400 `POST_CONTENT_INVALID_FORMAT` |
-| 언급 카드 attrs 위반 (필수 attr 누락, 타입 불일치, 허용 밖 `entityType`, `TRACK` 외 카드의 `releaseGroupId` 값) | 400 `POST_CONTENT_INVALID_FORMAT` |
-| 고유 언급 카드 10개 초과 | 400 `POST_CONTENT_INVALID_FORMAT` |
+| 허용 밖 노드·마크, 위치·중첩 규칙 위반, 허용 밖 `heading` level, `http`·`https` 외 링크 | 400 `CONTENT_INVALID_FORMAT` |
+| 언급 카드 attrs 위반 (필수 attr 누락, 타입 불일치, 허용 밖 `entityType`, `TRACK` 외 카드의 `releaseGroupId` 값) | 400 `CONTENT_INVALID_FORMAT` |
+| 고유 언급 카드 10개 초과 (게시글만) | 400 `CONTENT_INVALID_FORMAT` |
 | 허용 밖 attrs 키 (예: `orderedList.type`, `link.target`) | BE가 저장 전에 지움 (오류 아님) |
 | `text` 외 노드에 붙은 `marks` (예: 굵게 구간 안의 `hardBreak`) | BE가 저장 전에 지움 (오류 아님) |
 
@@ -102,8 +104,8 @@
 
 | 대상 | 한도 | 오류 |
 |------|------|------|
-| 본문 글자 수 (아래 계산식) | 10,000자 | 400 `POST_CONTENT_TOO_LONG` |
-| `content` JSON 직렬화 길이 (허용 밖 attrs·marks를 지운 뒤 저장되는 JSON 기준) | 50,000자 | 400 `POST_CONTENT_TOO_LONG` |
+| 본문 글자 수 (아래 계산식) | 10,000자 | 400 `CONTENT_TOO_LONG` |
+| `content` JSON 직렬화 길이 (허용 밖 attrs·marks를 지운 뒤 저장되는 JSON 기준) | 50,000자 | 400 `CONTENT_TOO_LONG` |
 
 **본문 글자 수 계산식** (BE 기준, 웹·앱 카운터도 같은 식을 씀)
 1. 문서를 앞에서부터 돌며 `text` 노드의 글자만 이어 붙입니다. 같은 블록 안의 인접 `text` 노드는 공백 없이 붙고, 마크는 무시합니다
@@ -144,9 +146,17 @@
 
 기준값은 BE `TiptapTextExtractor`(develop 517fe7d)로 뽑았습니다. 웹·앱·BE 테스트에 같은 케이스를 넣습니다.
 
+## 공지사항
+
+공지사항 본문은 위 스키마를 그대로 따르고, 다음만 다릅니다.
+
+- 언급 카드를 태그로 저장하지 않습니다. 그래서 고유 카드 10개 제한이 없고, 숨김 공연(`EXCLUDED`·`PENDING`) 카드도 작성 시 거부하지 않습니다
+- `GET /api/notices/{id}` 응답에서는 게시글 상세와 같이 숨김 상태이거나 없는 공연의 카드를 뺍니다(DB 본문은 그대로 둡니다). 관리자 상세(`GET /api/admin/notices/{id}`)는 저장된 본문을 그대로 줍니다
+- 2026-11-11 이전 평문 공지는 줄마다 `paragraph` 하나로 옮겼습니다(빈 줄은 빈 `paragraph`)
+
 ## 오류 코드
 
 | 코드 | HTTP | 원인 |
 |------|------|------|
-| `POST_CONTENT_INVALID_FORMAT` | 400 | [허용 밖 내용 처리](#허용-밖-내용-처리) 참고 |
-| `POST_CONTENT_TOO_LONG` | 400 | [길이 제한](#길이-제한) 초과 |
+| `CONTENT_INVALID_FORMAT` | 400 | [허용 밖 내용 처리](#허용-밖-내용-처리) 참고 |
+| `CONTENT_TOO_LONG` | 400 | [길이 제한](#길이-제한) 초과 |

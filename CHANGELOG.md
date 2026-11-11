@@ -1,5 +1,8 @@
 ## 2026-11-11
 
+- `spec/api/admin.md`, `spec/api/posts.md` — 공지사항 `content`를 평문(String)에서 게시글과 같은 Tiptap JSON(Object)으로 변경(Cominggg/Backend#135). `POST·PATCH /api/admin/notices`에 `CONTENT_INVALID_FORMAT`·`CONTENT_TOO_LONG`(400) 추가, `POST`에 `INVALID_INPUT` 행 추가. `GET /api/notices/{id}`는 숨김·없는 공연 카드를 빼고, 관리자 상세는 저장된 본문을 그대로 줌
+- `spec/client/post-content.md` — 공지사항도 같은 스키마를 씀을 명시하고 "공지사항" 섹션 신설(태그 저장 없음·카드 10개 제한 없음·숨김 공연 카드 작성 허용, 기존 평문 공지는 줄마다 문단으로 변환)
+- `spec/api/posts.md`, `spec/client/post-content.md` — 본문 오류 코드를 게시글·공지 공통으로 `POST_CONTENT_INVALID_FORMAT` → `CONTENT_INVALID_FORMAT`, `POST_CONTENT_TOO_LONG` → `CONTENT_TOO_LONG`으로 이름 변경. 게시글 작성 검사 순서를 본문 스키마 → 길이 → 숨김 공연 → 대표 공연으로 정정
 - `spec/api/posts.md` — 게시글 태그를 본문 언급 카드에서 BE가 추출하도록 변경(Cominggg/Backend#135). `POST /api/posts`·`PATCH /api/posts/{id}` 요청에서 `entityTags` 필드 삭제(보내도 무시), `PATCH`는 `content`를 보낼 때만 태그 전체 교체·`content` 수정으로 대표 공연 카드가 빠지면 대표 공연을 비움. `coverConcertId`·`POST_CONCERT_TAG_HIDDEN`·`POST_COVER_CONCERT_NOT_TAGGED` 기준을 본문 공연 카드로 정정. 작성·수정 에러에 `POST_CONTENT_INVALID_FORMAT`(400) 추가, `INVALID_INPUT`의 "`entityTags` 10개 초과" 사유 제거. 작성 검사 순서 명시. 상세·목록 응답 `entityTags`가 본문 카드 등장 순서임을 명시
 - `spec/client/post-content.md` — 언급 카드 attrs 위반(필수 누락·타입 불일치·`TRACK` 외 `releaseGroupId` 값)과 고유 카드 10개 초과를 `POST_CONTENT_INVALID_FORMAT`으로 명시. `text` 외 노드의 `marks`는 BE가 지움(굵게 구간에 줄바꿈을 넣거나 줄바꿈이 포함된 구간에 굵게를 적용하면 에디터가 `hardBreak`에 마크를 붙이기 때문). 링크 `http`·`https` 접두어 대소문자 무관, 50,000자 JSON 길이는 정리 후 저장되는 JSON 기준, 본문 카드가 게시글 태그가 되고 응답 태그는 카드 등장 순서임을 명시
 - `spec/features.md` — POST-01 태그를 본문 언급 카드 기준으로 정정

@@ -103,8 +103,8 @@
 | 코드 | 상태 코드 | 설명 |
 |------|-----------|------|
 | `INVALID_INPUT` | 400 | `category`·`title`·`content` 누락, `title` 공백 또는 255자 초과 등 필드 검증 실패 |
-| `POST_CONTENT_INVALID_FORMAT` | 400 | `content`가 본문 스키마 위반(허용 밖 노드·마크, 언급 카드 attrs 위반, 고유 언급 카드 10개 초과 등. [post-content.md](../client/post-content.md) "허용 밖 내용 처리") |
-| `POST_CONTENT_TOO_LONG` | 400 | `content`에서 추출한 본문 텍스트가 10000자 초과, 또는 `content` JSON 자체가 50000자 초과 (글자 수 계산식은 [post-content.md](../client/post-content.md) "길이 제한") |
+| `CONTENT_INVALID_FORMAT` | 400 | `content`가 본문 스키마 위반(허용 밖 노드·마크, 언급 카드 attrs 위반, 고유 언급 카드 10개 초과 등. [post-content.md](../client/post-content.md) "허용 밖 내용 처리") |
+| `CONTENT_TOO_LONG` | 400 | `content`에서 추출한 본문 텍스트가 10000자 초과, 또는 `content` JSON 자체가 50000자 초과 (글자 수 계산식은 [post-content.md](../client/post-content.md) "길이 제한") |
 | `POST_CONCERT_TAG_HIDDEN` | 400 | 본문 공연 카드에 숨김 상태(`EXCLUDED`·`PENDING`) 공연이 포함됨 |
 | `POST_COVER_CONCERT_NOT_TAGGED` | 400 | `coverConcertId`가 본문 공연 카드에 없음 |
 | `USER_SUSPENDED` | 403 | 정지 중인 회원. 에러 응답에 `suspendedUntil`·`reason` 포함 ([auth-policy.md](../policy/auth-policy.md) "`USER_SUSPENDED` 응답 형식") |
@@ -113,7 +113,7 @@
 
 - BE가 본문의 언급 카드를 처음 나온 순서대로, 같은 (`entityType`, `entityId`)는 하나로 묶어 게시글 태그로 저장합니다. 요청 본문에 `entityTags`를 보내도 무시합니다.
 - 숨김 상태(`EXCLUDED`·`PENDING`) 공연은 태그할 수 없습니다. 그 밖에 카드가 가리키는 엔티티의 실존 여부는 검증하지 않으며, 존재하지 않는 엔티티 태그는 조회 시점에 응답에서 빠집니다.
-- 검사 순서는 본문 스키마(`POST_CONTENT_INVALID_FORMAT`) → 숨김 공연 → 대표 공연 → 길이(`POST_CONTENT_TOO_LONG`)입니다. 숨김 공연과 대표 공연이 둘 다 해당하면 `POST_CONCERT_TAG_HIDDEN`을 반환합니다.
+- 검사 순서는 본문 스키마(`CONTENT_INVALID_FORMAT`) → 길이(`CONTENT_TOO_LONG`) → 숨김 공연 → 대표 공연입니다. 숨김 공연과 대표 공연이 둘 다 해당하면 `POST_CONCERT_TAG_HIDDEN`을 반환합니다.
 - BE가 `content`에서 텍스트 노드만 추출해 검색 전용 `content_text` 컬럼을 서버 측에서 생성합니다. FE가 별도로 평문을 보낼 필요는 없습니다.
 - 본문 텍스트 길이(10000자)와 별개로 `content` JSON 자체의 길이(50000자)도 제한합니다 — 구조만 방대한 JSON으로 텍스트 길이 제한을 우회하는 것을 막기 위함입니다.
 
@@ -363,8 +363,8 @@
 | `POST_NOT_FOUND` | 404 | 존재하지 않는 게시글 |
 | `FORBIDDEN` | 403 | 작성자 본인이 아님 |
 | `INVALID_INPUT` | 400 | `title`이 공백뿐이거나 255자 초과 등 필드 검증 실패 |
-| `POST_CONTENT_INVALID_FORMAT` | 400 | `content` 변경 시 본문 스키마 위반 (POST와 같은 기준) |
-| `POST_CONTENT_TOO_LONG` | 400 | `content` 변경 시 본문 텍스트 10000자 초과 또는 `content` JSON 50000자 초과 (글자 수 계산식은 [post-content.md](../client/post-content.md) "길이 제한") |
+| `CONTENT_INVALID_FORMAT` | 400 | `content` 변경 시 본문 스키마 위반 (POST와 같은 기준) |
+| `CONTENT_TOO_LONG` | 400 | `content` 변경 시 본문 텍스트 10000자 초과 또는 `content` JSON 50000자 초과 (글자 수 계산식은 [post-content.md](../client/post-content.md) "길이 제한") |
 | `POST_CONCERT_TAG_HIDDEN` | 400 | 새로 추가한 공연 카드 또는 `coverConcertId`로 지정한 공연이 숨김 상태(`EXCLUDED`·`PENDING`) |
 | `POST_COVER_CONCERT_NOT_TAGGED` | 400 | `coverConcertId`가 최종 태그의 `CONCERT` 태그에 없음 |
 | `USER_SUSPENDED` | 403 | 정지 중인 회원. 에러 응답에 `suspendedUntil`·`reason` 포함 ([auth-policy.md](../policy/auth-policy.md) "`USER_SUSPENDED` 응답 형식") |
@@ -835,7 +835,7 @@
 |------|------|------|
 | `id` | Long | 공지사항 ID |
 | `title` | String | 제목 |
-| `content` | String | 본문 (plain text) |
+| `content` | Object | 본문 Tiptap JSON ([post-content.md](../client/post-content.md)). 숨김 상태이거나 없는 공연의 언급 카드는 빠집니다 |
 | `createdAt` | String | 작성일시 |
 | `updatedAt` | String | 수정일시 |
 
