@@ -73,8 +73,8 @@
 
 | 필드 | 타입 | 필수 | 설명 |
 |------|------|------|------|
-| `type` | String | Y | `ARTIST` \| `CONCERT` \| `SETLIST` |
-| `targetId` | Long | Y | 문의 대상 ID (아티스트 ID 또는 공연 ID) |
+| `type` | String | Y | `ARTIST` \| `CONCERT` \| `SETLIST` \| `DATA_REQUEST` \| `FEEDBACK` |
+| `targetId` | Long | 조건부 | 문의 대상 ID (아티스트 ID 또는 공연 ID). `ARTIST`·`CONCERT`·`SETLIST`는 필수, `DATA_REQUEST`·`FEEDBACK`은 생략(`null`) |
 | `title` | String | Y | 문의 제목 (최대 255자) |
 | `content` | String | Y | 문의 내용 |
 
@@ -95,8 +95,8 @@
 
 | 코드 | 상태 코드 | 설명 |
 |------|-----------|------|
-| `INQUIRY_ALREADY_PENDING` | 409 | 동일 `targetId`로 PENDING 상태 문의 존재 |
-| `TARGET_NOT_FOUND` | 404 | 존재하지 않는 대상 ID |
+| `INQUIRY_ALREADY_PENDING` | 409 | 동일 `targetId`로 PENDING 상태 문의 존재 (`ARTIST`·`CONCERT`·`SETLIST`만 해당) |
+| `TARGET_NOT_FOUND` | 404 | 존재하지 않는 대상 ID (`ARTIST`·`CONCERT`·`SETLIST`만 해당) |
 | `USER_SUSPENDED` | 403 | 정지 중인 회원. 에러 응답에 `suspendedUntil`·`reason` 포함 ([auth-policy.md](../policy/auth-policy.md) "`USER_SUSPENDED` 응답 형식") |
 
 ### 비고
@@ -104,6 +104,9 @@
 - 공연 정보 문의(INQ-01): `type=CONCERT`, `targetId=concertId`
 - 아티스트 정보 문의(INQ-02): `type=ARTIST`, `targetId=artistId`
 - 셋리스트 문의(INQ-03): `type=SETLIST`, `targetId=concertId`
+- 데이터 요청(INQ-05): `type=DATA_REQUEST`, `targetId` 없음
+- 피드백(INQ-06): `type=FEEDBACK`, `targetId` 없음
+- `DATA_REQUEST`·`FEEDBACK`은 대상 존재 검증과 PENDING 중복 제한을 하지 않는다 (`targetId`를 보내면 검증 없이 그대로 저장)
 
 ---
 
@@ -128,7 +131,7 @@
 | 필드 | 타입 | 설명 |
 |------|------|------|
 | `id` | Long | 문의 ID |
-| `type` | String | `ARTIST` \| `CONCERT` \| `SETLIST` |
+| `type` | String | `ARTIST` \| `CONCERT` \| `SETLIST` \| `DATA_REQUEST` \| `FEEDBACK` |
 | `title` | String | 문의 제목 |
 | `status` | String | `PENDING` \| `IN_PROGRESS` \| `RESOLVED` \| `REJECTED` |
 | `createdAt` | String | 등록일 (`YYYY-MM-DD`) |
@@ -199,7 +202,7 @@
 
 | 이름 | 타입 | 필수 | 설명 |
 |------|------|------|------|
-| `type` | String | Y | `ARTIST` \| `CONCERT` \| `SETLIST` |
+| `type` | String | Y | `ARTIST` \| `CONCERT` \| `SETLIST` \| `DATA_REQUEST` \| `FEEDBACK` |
 | `targetId` | Long | Y | 문의 대상 ID |
 
 ### 응답
@@ -216,4 +219,5 @@
 
 - `POST /api/inquiries` 호출 전 중복 등록 여부를 사전 확인하는 용도
 - `exists=true`이면 해당 사용자·유형·대상에 이미 PENDING 문의가 존재함
+- `DATA_REQUEST`·`FEEDBACK`은 항상 `exists=false` (중복 제한이 없어 사전 확인 불필요). 이 경우에도 `targetId`는 필수 파라미터
 
