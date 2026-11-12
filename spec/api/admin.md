@@ -522,7 +522,7 @@
 
 [페이지네이션 응답](_index.md#페이지네이션-응답) 형태. `content` 항목:
 
-`GET /api/inquiries/my` `content` 항목과 동일 구조에 아래 필드 추가:
+`GET /api/me/inquiries` `content` 항목과 동일 구조에 아래 필드 추가:
 
 | 필드 | 타입 | 설명 |
 |------|------|------|
