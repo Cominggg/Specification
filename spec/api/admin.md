@@ -513,7 +513,7 @@
 
 | 이름 | 타입 | 필수 | 기본값 | 설명 |
 |------|------|------|--------|------|
-| `type` | String | N | — | `ARTIST` \| `CONCERT` \| `SETLIST` |
+| `type` | String | N | — | `ARTIST` \| `CONCERT` \| `SETLIST` \| `DATA_REQUEST` \| `FEEDBACK` |
 | `status` | String | N | — | `PENDING` \| `IN_PROGRESS` \| `RESOLVED` \| `REJECTED` |
 | `page` | int | N | `0` | 페이지 번호 |
 | `size` | int | N | `20` | 페이지 크기 |
@@ -550,7 +550,7 @@
 | 필드 | 타입 | 설명 |
 |------|------|------|
 | `content` | String | 문의 내용 |
-| `targetId` | Long | 문의 대상 ID |
+| `targetId` | Long? | 문의 대상 ID. `DATA_REQUEST`·`FEEDBACK`은 `null` 가능 |
 
 ### 에러
 
