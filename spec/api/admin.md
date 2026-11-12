@@ -350,7 +350,7 @@
 | 코드 | 상태 코드 | 설명 |
 |------|-----------|------|
 | `CONCERT_NOT_FOUND` | 404 | 존재하지 않는 공연 |
-| `INVALID_INPUT` | 400 | `status` 누락 |
+| `INVALID_INPUT` | 400 | `status` 누락·허용 밖 값 |
 
 ### 비고
 
@@ -648,7 +648,7 @@
 |------|-----------|------|
 | `INQUIRY_NOT_FOUND` | 404 | 존재하지 않는 문의 |
 | `INVALID_INQUIRY_STATUS` | 400 | `status`에 `PENDING` 전달 |
-| `INVALID_INPUT` | 400 | `status` 누락 |
+| `INVALID_INPUT` | 400 | `status` 누락·허용 밖 값 |
 
 ---
 
@@ -689,7 +689,7 @@
 
 | 코드 | 상태 코드 | 설명 |
 |------|-----------|------|
-| `INVALID_INPUT` | 400 | 필수 필드 누락·공백, `version` 50자·`detailUrl` 500자 초과 |
+| `INVALID_INPUT` | 400 | 필수 필드 누락·공백, `type` 허용 밖 값, `version` 50자·`detailUrl` 500자 초과 |
 | `POLICY_VERSION_DUPLICATE` | 409 | 동일 `type`·`version`이 이미 등록된 경우 |
 
 ### 비고
@@ -933,7 +933,7 @@
 | `REPORT_NOT_FOUND` | 404 | 존재하지 않는 신고 |
 | `REPORT_TARGET_NOT_FOUND` | 404 | `suspend` 지정 시 신고 대상(게시글·댓글)이 없어 작성자를 찾을 수 없음 |
 | `USER_NOT_FOUND` | 404 | `suspend` 지정 시 대상 작성자가 탈퇴한 회원 |
-| `INVALID_INPUT` | 400 | `status` 누락, `suspend.days`가 지원하지 않는 값, `suspend.reason` 누락 |
+| `INVALID_INPUT` | 400 | `status` 누락·허용 밖 값, `suspend.days`가 지원하지 않는 값, `suspend.reason` 누락·허용 밖 값 |
 
 
 ### 비고
@@ -1028,7 +1028,7 @@
 
 | 코드 | 상태 코드 | 설명 |
 |------|-----------|------|
-| `INVALID_INPUT` | 400 | 지원하지 않는 `days` 값, `reason` 누락 |
+| `INVALID_INPUT` | 400 | 지원하지 않는 `days` 값, `reason` 누락·허용 밖 값 |
 | `USER_NOT_FOUND` | 404 | 존재하지 않거나 탈퇴한 회원 |
 
 ### 비고
