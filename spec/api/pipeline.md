@@ -203,7 +203,9 @@ Data 응답은 snake_case로 받아 BE 응답에서는 camelCase로 내보낸다
 
 | 코드 | 상태 코드 | 설명 |
 |------|-----------|------|
-| `ARTIST_NOT_FOUND` | 404 | Data 파이프라인 측에서 해당 아티스트를 찾을 수 없음 |
+| `PIPELINE_NOT_FOUND` | 404 | Data 파이프라인 측에서 해당 아티스트를 찾을 수 없음 |
+| `PIPELINE_CONFLICT` | 409 | 동일 아티스트 릴리즈 수집이 이미 처리 중 |
+| `PIPELINE_SERVER_ERROR` | 500 | Data 파이프라인 서버 오류 |
 | `PIPELINE_TIMEOUT` | 504 | Data 파이프라인 응답 지연 |
 
 ### 비고
