@@ -1,5 +1,13 @@
 ## 2026-11-12
 
+- `spec/api/_index.md` — Backend#142: 잘못된 입력의 500 응답을 400·409로 정정. 요청 본문을 읽을 수 없을 때(JSON 문법 오류·타입 불일치·enum 허용 밖 값) `INVALID_INPUT`(400) 공통 규칙 추가
+- `spec/api/auth.md` — Backend#142: 잘못된 입력의 500 응답을 400·409로 정정. `PUT /api/auth/me`에 `NICKNAME_REQUIRED`(400, 공백)·`NICKNAME_DUPLICATE`(409, 다른 회원 사용 중) 추가
+- `spec/api/my.md` — Backend#142: 잘못된 입력의 500 응답을 400·409로 정정. `POST /api/inquiries`에 `INVALID_INPUT`(400) 행 추가(`ARTIST`·`CONCERT`·`SETLIST`인데 `targetId` 누락, `type` 허용 밖 값 등)
+- `spec/api/calendar.md` — Backend#142: 잘못된 입력의 500 응답을 400·409로 정정. `GET /api/calendar` 에러 섹션 추가(`month` 1~12 범위 밖 `INVALID_INPUT`)
+- `spec/api/pipeline.md` — Backend#142: 잘못된 입력의 500 응답을 400·409로 정정. `POST /api/admin/data/collect/artists/{id}/releases`의 `ARTIST_NOT_FOUND`를 `PIPELINE_NOT_FOUND`로 교체, `PIPELINE_CONFLICT`(409)·`PIPELINE_SERVER_ERROR`(500) 추가
+- `spec/api/posts.md` — Backend#142: 잘못된 입력의 500 응답을 400·409로 정정. 게시글 작성·수정 `INVALID_INPUT`에 `category` 허용 밖 값 포함, `POST /api/reports`에 `INVALID_INPUT` 행 추가(`targetType`·`targetId`·`reason` 누락, `targetType`·`reason` 허용 밖 값)
+- `spec/api/admin.md` — Backend#142: 잘못된 입력의 500 응답을 400·409로 정정. 공연 상태 강제 변경·문의 상태 변경·신고 처리의 `status`, 정책 등록 `type`, 신고 처리 `suspend.reason`·회원 정지 `reason`의 `INVALID_INPUT` 설명에 허용 밖 값 포함
+
 - `spec/api/my.md` — 문의 유형 DATA_REQUEST·FEEDBACK 명세 반영(코드 기준 동기화). `POST /api/inquiries`의 `type` 5종·`targetId` 조건부(ARTIST·CONCERT·SETLIST만 필수), `INQUIRY_ALREADY_PENDING`·`TARGET_NOT_FOUND`는 대상 있는 유형만 해당, 비고에 데이터 요청(INQ-05)·피드백(INQ-06) 추가. `GET /api/me/inquiries` 응답 `type` 5종, `GET /api/me/inquiries/exists`의 `type` 5종·DATA_REQUEST·FEEDBACK은 항상 `exists=false`
 - `spec/api/admin.md` — 문의 유형 DATA_REQUEST·FEEDBACK 명세 반영(코드 기준 동기화). `GET /api/admin/inquiries`의 `type` 필터 5종, `GET /api/admin/inquiries/{id}` 응답 `targetId`는 DATA_REQUEST·FEEDBACK이면 `null` 가능
 - `spec/data/erd.md` — 문의 유형 DATA_REQUEST·FEEDBACK 명세 반영(코드 기준 동기화). `inquiry.target_id` NOT NULL 제거, 변경 이력에 V23 행 추가
