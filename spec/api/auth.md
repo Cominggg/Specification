@@ -325,7 +325,9 @@ Cookie에서 Refresh Token 자동 추출 (별도 바디 없음).
 
 | 코드 | 상태 코드 | 설명 |
 |------|-----------|------|
+| `NICKNAME_REQUIRED` | 400 | 닉네임이 공백 |
 | `NICKNAME_TOO_LONG` | 400 | 닉네임 20자 초과 |
+| `NICKNAME_DUPLICATE` | 409 | 다른 회원이 사용 중인 닉네임 (자신의 현재 닉네임과 같으면 통과) |
 | `USER_SUSPENDED` | 403 | 정지 중인 회원. 에러 응답에 `suspendedUntil`·`reason` 포함 ([auth-policy.md](../policy/auth-policy.md) "`USER_SUSPENDED` 응답 형식") |
 | `USER_NOT_FOUND` | 404 | 탈퇴한 회원(탈퇴 직후 다른 기기에 남은 Access Token으로 요청) |
 
