@@ -6,6 +6,8 @@
 - `spec/features.md` — 문의 유형 DATA_REQUEST·FEEDBACK 명세 반영(코드 기준 동기화). INQ-05 데이터 요청·INQ-06 피드백 추가, 중복 재등록 제한은 INQ-01~03만 해당으로 보완
 - `spec/policy/constraints.md` — 문의 유형 DATA_REQUEST·FEEDBACK 명세 반영(코드 기준 동기화). 문의 어뷰징 중복 1건 제한에서 데이터 요청·피드백 제외 명시
 - `spec/policy/ux-policy.md` — 문의 유형 DATA_REQUEST·FEEDBACK 명세 반영(코드 기준 동기화). 문의 등록 비로그인 행 대상에 INQ-05~06 추가
+- `spec/api/_index.md` — 전체 엔드포인트 목록의 문의 경로를 코드 기준으로 정정: `/api/inquiries/my` → `/api/me/inquiries`, `/api/inquiries/my/{id}` → `/api/me/inquiries/{id}`, 누락된 `GET /api/me/inquiries/exists`(PENDING 문의 존재 여부) 행 추가
+- `spec/api/admin.md` — `GET /api/admin/inquiries` 응답 설명의 참조 경로를 `GET /api/inquiries/my` → `GET /api/me/inquiries`로 정정
 
 ## 2026-11-11
 
