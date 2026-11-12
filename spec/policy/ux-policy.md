@@ -15,7 +15,7 @@
 | 셋리스트 미등록 | CON-05 셋리스트 | '아직 등록된 셋리스트가 없습니다.' empty state UI. setlist.fm 링크 제공 |
 | 셋리스트 미구현 기간 (CON-05 P2) | 공연 상세 — 공연완료 상태 | 셋리스트 탭 미표시. 공연 하단에 '셋리스트 정보 문의' 버튼(INQ-03) 노출 |
 | 팔로우 / 캘린더 — 비로그인 | ART-04, CAL-02 | 로그인 유도 모달 표시 (현재 URL을 redirect_uri로 포함) |
-| 문의 등록 — 비로그인 | INQ-01~03 | 로그인 유도 모달 표시 (현재 URL을 redirect_uri로 포함) |
+| 문의 등록 — 비로그인 | INQ-01~03, INQ-05~06 | 로그인 유도 모달 표시 (현재 URL을 redirect_uri로 포함) |
 | 문의 중복 등록 | INQ-01~03 | '이미 접수된 문의가 있습니다.' 토스트 메시지 표시. 동일 대상 ID로 PENDING 상태 문의 존재 시 |
 
 > React Query 도입 시 stale-while-revalidate 전략으로 캐시 fallback 처리 권장.
