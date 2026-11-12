@@ -157,8 +157,9 @@ ADMIN 전용 엔드포인트는 일반 사용자 접근 시 `403` 반환합니�
 |--------|------------|------|
 | GET | `/api/my/history` | 필요 |
 | POST | `/api/inquiries` | 필요 |
-| GET | `/api/inquiries/my` | 필요 |
-| GET | `/api/inquiries/my/{id}` | 필요 |
+| GET | `/api/me/inquiries` | 필요 |
+| GET | `/api/me/inquiries/{id}` | 필요 |
+| GET | `/api/me/inquiries/exists` | 필요 |
 
 ### 게시판
 | 메서드 | 엔드포인트 | 인증 |
