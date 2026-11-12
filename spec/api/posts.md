@@ -104,7 +104,7 @@
 
 | 코드 | 상태 코드 | 설명 |
 |------|-----------|------|
-| `INVALID_INPUT` | 400 | `category`·`title`·`content` 누락, `title` 공백 또는 255자 초과 등 필드 검증 실패 |
+| `INVALID_INPUT` | 400 | `category`·`title`·`content` 누락, `category` 허용 밖 값, `title` 공백 또는 255자 초과 등 필드 검증 실패 |
 | `CONTENT_INVALID_FORMAT` | 400 | `content`가 본문 스키마 위반(허용 밖 노드·마크, 언급 카드 attrs 위반, 고유 언급 카드 10개 초과 등. [post-content.md](../client/post-content.md) "허용 밖 내용 처리") |
 | `CONTENT_TOO_LONG` | 400 | `content`에서 추출한 본문 텍스트가 10000자 초과, 또는 `content` JSON 자체가 50000자 초과 (글자 수 계산식은 [post-content.md](../client/post-content.md) "길이 제한") |
 | `POST_CONCERT_TAG_HIDDEN` | 400 | 본문 공연 카드에 숨김 상태(`EXCLUDED`·`PENDING`) 공연이 포함됨 |
@@ -364,7 +364,7 @@
 |------|-----------|------|
 | `POST_NOT_FOUND` | 404 | 존재하지 않는 게시글 |
 | `FORBIDDEN` | 403 | 작성자 본인이 아님 |
-| `INVALID_INPUT` | 400 | `title`이 공백뿐이거나 255자 초과 등 필드 검증 실패 |
+| `INVALID_INPUT` | 400 | `category` 허용 밖 값, `title`이 공백뿐이거나 255자 초과 등 필드 검증 실패 |
 | `CONTENT_INVALID_FORMAT` | 400 | `content` 변경 시 본문 스키마 위반 (POST와 같은 기준) |
 | `CONTENT_TOO_LONG` | 400 | `content` 변경 시 본문 텍스트 10000자 초과 또는 `content` JSON 50000자 초과 (글자 수 계산식은 [post-content.md](../client/post-content.md) "길이 제한") |
 | `POST_CONCERT_TAG_HIDDEN` | 400 | 새로 추가한 공연 카드 또는 `coverConcertId`로 지정한 공연이 숨김 상태(`EXCLUDED`·`PENDING`) |
@@ -767,6 +767,7 @@
 
 | 코드 | 상태 코드 | 설명 |
 |------|-----------|------|
+| `INVALID_INPUT` | 400 | `targetType`·`targetId`·`reason` 누락, `targetType`·`reason` 허용 밖 값 |
 | `REPORT_DETAIL_REQUIRED` | 400 | `reason`이 `ETC`인데 `detail`이 비어 있음 |
 | `REPORT_TARGET_NOT_FOUND` | 404 | 신고 대상(게시글/댓글)이 존재하지 않음 |
 | `REPORT_ALREADY_EXISTS` | 409 | 동일 사용자가 동일 대상을 이미 신고함 |
