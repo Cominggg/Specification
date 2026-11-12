@@ -141,7 +141,7 @@ CREATE TABLE inquiry (
     id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     user_id bigint NOT NULL REFERENCES "user"(id),
     type varchar(20) NOT NULL,
-    target_id bigint NOT NULL,
+    target_id bigint,
     title varchar(255) NOT NULL,
     content text NOT NULL,
     status varchar(20) NOT NULL,
@@ -204,3 +204,4 @@ CREATE TABLE inquiry (
 | 2026-06-30 | setlist.attribution_url(text) 컬럼 추가 — setlist.fm 저작자 표시 URL 저장 (V21 마이그레이션) |
 | 2026-10-29 | user.profile_image_url 컬럼 제거 반영 — V20 마이그레이션에서 삭제됨, 개인정보처리방침 수집 항목에서도 제외 |
 | 2026-06-30 | concert_artist_candidate.matched_by 컬럼 제거 — title 단일 전략만 사용, write-only 고정값으로 의미 없음 (V22 마이그레이션) |
+| 2026-07-02 | inquiry.target_id nullable 변경, type에 DATA_REQUEST·FEEDBACK 추가 — 대상 없는 데이터 요청·피드백 문의 허용 (V23 마이그레이션) |
