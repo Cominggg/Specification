@@ -5,6 +5,9 @@ Base URL: `/api`
 인증 필요 엔드포인트는 `Authorization: Bearer {accessToken}` 헤더를 요구합니다.
 ADMIN 전용 엔드포인트는 일반 사용자 접근 시 `403` 반환합니다.
 
+인증 열 표기: `불필요`(비로그인 허용) · `필요`(USER·ADMIN) · `ADMIN` · `PENDING 전용`.
+가입 미완료(PENDING) 토큰은 `GET /api/auth/me`, `POST /api/auth/logout`·`/api/auth/app/logout`, `DELETE /api/auth/withdraw`, `POST /api/auth/register`만 호출할 수 있고, 그 외 `필요` 엔드포인트는 `403 FORBIDDEN`.
+
 ---
 
 ## 공통 규칙
@@ -17,7 +20,7 @@ ADMIN 전용 엔드포인트는 일반 사용자 접근 시 `403` 반환합니�
 | 필드명 | DB snake_case → 응답 camelCase 변환 |
 | `isFollowing` | 인증 요청 시 `user_follow_artist` 기준. 비인증 시 `false` |
 | `isInCalendar` | 인증 요청 시 `user_concert_calendar` 기준. 비인증 시 `false` |
-| `imageUrl` | `artist` 테이블에 이미지 컬럼 없음 — 항상 `null` 반환 |
+| `imageUrl` | `artist.image_url` 값. 이미지가 수집되지 않은 아티스트는 `null` |
 
 주요 DB 컬럼 → 응답 필드 매핑:
 
@@ -29,7 +32,6 @@ ADMIN 전용 엔드포인트는 일반 사용자 접근 시 `403` 반환합니�
 | `poster_url` | `posterUrl` |
 | `first_release_date` | `releaseDate` |
 | `cover_url` | `coverUrl` |
-| `profile_image_url` | `avatarUrl` |
 
 ---
 
@@ -68,15 +70,21 @@ ADMIN 전용 엔드포인트는 일반 사용자 접근 시 `403` 반환합니�
 
 `USER_SUSPENDED`(403)만 예외로 `suspendedUntil`(정지 종료 시각, 오프셋 없는 KST `yyyy-MM-ddTHH:mm:ss`, 영구 정지면 `null`)·`reason`(정지 사유 코드) 필드를 더한다([auth-policy.md](../policy/auth-policy.md) "`USER_SUSPENDED` 응답 형식"). 다른 에러는 위 형식을 유지한다.
 
+매핑되지 않은 경로는 에러 바디 없이 `404`만 반환한다(로그인 상태 기준. 비로그인이면 인증 단계에서 `401 UNAUTHORIZED`가 먼저 반환됨).
+
+쓰기 API(팔로우·별점·캘린더·게시글·댓글·신고·문의 등)는 탈퇴(INACTIVE)했거나 없는 회원의 토큰이면 `USER_NOT_FOUND`(404)를 반환한다. 엔드포인트별 에러 표에는 반복 기재하지 않는다.
+
 공통 HTTP 상태 코드:
 
-| 상태 코드 | 발생 조건 |
-|----------|---------|
-| `400` | 요청 파라미터·바디 유효성 오류 |
-| `401` | 인증 토큰 없음 또는 만료 |
-| `403` | 권한 없음 |
-| `404` | 리소스 없음 |
-| `409` | 중복 요청 |
+| 상태 코드 | 대표 code | 발생 조건 |
+|----------|----------|---------|
+| `400` | `INVALID_INPUT` 외 도메인 코드 | 요청 파라미터·바디 유효성 오류. `@Valid` 바디 오류·필수 파라미터 누락은 message에 `필드: 사유`가 담김 |
+| `401` | `UNAUTHORIZED` | 인증 필요 경로에 토큰 없음·만료·위조. 비로그인 허용 경로에서는 잘못된 토큰을 무시하고 비로그인으로 처리 |
+| `403` | `FORBIDDEN` | 권한 없음 (ADMIN 전용, PENDING 사용자의 일반 API 접근 등). 정지 회원은 `USER_SUSPENDED` |
+| `404` | 도메인 `*_NOT_FOUND` | 리소스 없음 |
+| `409` | 도메인 코드 | 중복 요청 |
+| `429` | `RATE_LIMIT_EXCEEDED` | IP 단위 요청 한도 초과 (전 엔드포인트) |
+| `500` | `INTERNAL_ERROR` | 서버 내부 오류 |
 
 ---
 
@@ -108,6 +116,13 @@ ADMIN 전용 엔드포인트는 일반 사용자 접근 시 `403` 반환합니�
 | DELETE | `/api/auth/withdraw` | 필요 |
 | GET | `/api/auth/me` | 필요 |
 | PUT | `/api/auth/me` | 필요 |
+| POST | `/api/auth/login/nonce` | 불필요 |
+| POST | `/api/auth/login/{provider}/token` | 불필요 |
+| POST | `/api/auth/app/refresh` | 불필요 |
+| POST | `/api/auth/app/logout` | 필요 |
+| POST | `/api/auth/register` | PENDING 전용 |
+| PATCH | `/api/auth/me/marketing` | 필요 |
+| GET | `/api/auth/check-nickname` | 불필요 |
 
 ### 아티스트
 | 메서드 | 엔드포인트 | 인증 |
@@ -124,9 +139,8 @@ ADMIN 전용 엔드포인트는 일반 사용자 접근 시 `403` 반환합니�
 | 메서드 | 엔드포인트 | 인증 |
 |--------|------------|------|
 | GET | `/api/concerts` | 불필요 |
-| GET | `/api/concerts/search` | 불필요 |
 | GET | `/api/concerts/popular` | 불필요 |
-| GET | `/api/concerts/following` | 필요 |
+| GET | `/api/concerts/ticketing` | 불필요 |
 | GET | `/api/concerts/stats` | 불필요 |
 | GET | `/api/concerts/{id}` | 불필요 |
 | GET | `/api/concerts/{id}/setlist` | 불필요 |
@@ -138,7 +152,6 @@ ADMIN 전용 엔드포인트는 일반 사용자 접근 시 `403` 반환합니�
 | 메서드 | 엔드포인트 | 인증 |
 |--------|------------|------|
 | GET | `/api/calendar` | 불필요 |
-| GET | `/api/calendar/my` | 필요 |
 | POST | `/api/calendar/{concertId}` | 필요 |
 | DELETE | `/api/calendar/{concertId}` | 필요 |
 
@@ -146,7 +159,6 @@ ADMIN 전용 엔드포인트는 일반 사용자 접근 시 `403` 반환합니�
 | 메서드 | 엔드포인트 | 인증 |
 |--------|------------|------|
 | GET | `/api/releases` | 불필요 |
-| GET | `/api/releases/search` | 불필요 |
 | GET | `/api/releases/{id}` | 불필요 |
 | PUT | `/api/releases/{id}/rating` | 필요 |
 | GET | `/api/releases/{id}/rating/me` | 필요 |
@@ -155,7 +167,8 @@ ADMIN 전용 엔드포인트는 일반 사용자 접근 시 `403` 반환합니�
 ### 마이페이지·문의
 | 메서드 | 엔드포인트 | 인증 |
 |--------|------------|------|
-| GET | `/api/my/history` | 필요 |
+| GET | `/api/me/concerts/upcoming` | 필요 |
+| GET | `/api/me/concerts/history` | 필요 |
 | POST | `/api/inquiries` | 필요 |
 | GET | `/api/me/inquiries` | 필요 |
 | GET | `/api/me/inquiries/{id}` | 필요 |
@@ -164,7 +177,7 @@ ADMIN 전용 엔드포인트는 일반 사용자 접근 시 `403` 반환합니�
 ### 게시판
 | 메서드 | 엔드포인트 | 인증 |
 |--------|------------|------|
-| GET | `/api/mentions/search` | 불필요 |
+| GET | `/api/mentions/search` | 필요 |
 | POST | `/api/posts` | 필요 |
 | GET | `/api/posts/{id}` | 불필요 |
 | GET | `/api/posts` | 불필요 |
@@ -189,13 +202,22 @@ ADMIN 전용 엔드포인트는 일반 사용자 접근 시 `403` 반환합니�
 ### 관리자 (ROLE_ADMIN)
 | 메서드 | 엔드포인트 | 인증 |
 |--------|------------|------|
+| GET | `/api/admin/artists` | ADMIN |
+| GET | `/api/admin/artists/{id}` | ADMIN |
 | PUT | `/api/admin/artists/{id}` | ADMIN |
+| GET | `/api/admin/concerts/excluded` | ADMIN |
 | GET | `/api/admin/concerts/pending` | ADMIN |
+| POST | `/api/admin/concerts` | ADMIN |
+| GET | `/api/admin/concerts/{id}` | ADMIN |
 | PUT | `/api/admin/concerts/{id}` | ADMIN |
 | PUT | `/api/admin/concerts/{id}/state` | ADMIN |
 | PUT | `/api/admin/concerts/{id}/approve` | ADMIN |
 | PUT | `/api/admin/concerts/{id}/reject` | ADMIN |
+| POST | `/api/admin/concerts/{id}/candidates` | ADMIN |
+| DELETE | `/api/admin/concerts/{id}/candidates/{artistId}` | ADMIN |
 | POST | `/api/admin/concerts/{id}/artists` | ADMIN |
+| DELETE | `/api/admin/concerts/{id}/artists/{artistId}` | ADMIN |
+
 | GET | `/api/admin/inquiries` | ADMIN |
 | GET | `/api/admin/inquiries/{id}` | ADMIN |
 | PATCH | `/api/admin/inquiries/{id}/status` | ADMIN |
