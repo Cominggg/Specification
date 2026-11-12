@@ -1,3 +1,12 @@
+## 2026-11-12
+
+- `spec/api/my.md` — 문의 유형 DATA_REQUEST·FEEDBACK 명세 반영(코드 기준 동기화). `POST /api/inquiries`의 `type` 5종·`targetId` 조건부(ARTIST·CONCERT·SETLIST만 필수), `INQUIRY_ALREADY_PENDING`·`TARGET_NOT_FOUND`는 대상 있는 유형만 해당, 비고에 데이터 요청(INQ-05)·피드백(INQ-06) 추가. `GET /api/me/inquiries` 응답 `type` 5종, `GET /api/me/inquiries/exists`의 `type` 5종·DATA_REQUEST·FEEDBACK은 항상 `exists=false`
+- `spec/api/admin.md` — 문의 유형 DATA_REQUEST·FEEDBACK 명세 반영(코드 기준 동기화). `GET /api/admin/inquiries`의 `type` 필터 5종, `GET /api/admin/inquiries/{id}` 응답 `targetId`는 DATA_REQUEST·FEEDBACK이면 `null` 가능
+- `spec/data/erd.md` — 문의 유형 DATA_REQUEST·FEEDBACK 명세 반영(코드 기준 동기화). `inquiry.target_id` NOT NULL 제거, 변경 이력에 V23 행 추가
+- `spec/features.md` — 문의 유형 DATA_REQUEST·FEEDBACK 명세 반영(코드 기준 동기화). INQ-05 데이터 요청·INQ-06 피드백 추가, 중복 재등록 제한은 INQ-01~03만 해당으로 보완
+- `spec/policy/constraints.md` — 문의 유형 DATA_REQUEST·FEEDBACK 명세 반영(코드 기준 동기화). 문의 어뷰징 중복 1건 제한에서 데이터 요청·피드백 제외 명시
+- `spec/policy/ux-policy.md` — 문의 유형 DATA_REQUEST·FEEDBACK 명세 반영(코드 기준 동기화). 문의 등록 비로그인 행 대상에 INQ-05~06 추가
+
 ## 2026-11-11
 
 - `spec/api/admin.md`, `spec/api/posts.md` — 공지사항 `content`를 평문(String)에서 게시글과 같은 Tiptap JSON(Object)으로 변경(Cominggg/Backend#135). `POST·PATCH /api/admin/notices`에 `CONTENT_INVALID_FORMAT`·`CONTENT_TOO_LONG`(400) 추가, `POST`에 `INVALID_INPUT` 행 추가. `GET /api/notices/{id}`는 숨김·없는 공연 카드를 빼고, 관리자 상세는 저장된 본문을 그대로 줌
