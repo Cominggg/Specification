@@ -12,7 +12,7 @@
 
 | 이름 | 타입 | 필수 | 기본값 | 설명 |
 |------|------|------|--------|------|
-| `q` | String | N | — | 검색어 (공연명·아티스트명·아티스트 alias 대소문자 무관 부분 일치). 생략·공백이면 텍스트 조건 없이 나머지 필터만 적용 |
+| `q` | String | N | — | 검색어 (공연명·아티스트명·아티스트 정렬명(sortName)·아티스트 alias 대소문자 무관 부분 일치). 생략·공백이면 텍스트 조건 없이 나머지 필터만 적용 |
 | `status` | String[] | N | — | `UPCOMING` \| `ONGOING` \| `ENDED` \| `CANCELLED`. 여러 값은 반복 파라미터로 전달 (`status=UPCOMING&status=ONGOING`) — 그중 하나에 해당하는 공연 반환(OR). 단일 값도 그대로 사용 가능 |
 | `inCalendar` | Boolean | N | — | `true`이면 내 캘린더에 추가한 공연만 반환 (인증 필요, 미인증 시 빈 페이지) |
 | `followedOnly` | Boolean | N | — | `true`이면 팔로우한 아티스트의 공연만 반환 (미인증·팔로잉 없으면 빈 페이지) |
@@ -35,7 +35,7 @@
 | `artists[].koreanName` | String? | 한글 표기명 (없으면 `null`) |
 | `title` | String | 공연명 |
 | `startDate` | String | 시작일 (`YYYY-MM-DD`) |
-| `endDate` | String? | 종료일 (`YYYY-MM-DD`) |
+| `endDate` | String | 종료일 (`YYYY-MM-DD`) |
 | `venue` | String | 공연장명 |
 | `status` | String | `UPCOMING` \| `ONGOING` \| `ENDED` \| `CANCELLED` |
 | `isInCalendar` | Boolean | 내 캘린더 추가 여부 (비인증 시 `false`) |
@@ -103,7 +103,7 @@
 
 ### 비고
 
-- BE 반환 건수: 상위 10건 (`view_count` 내림차순)
+- BE 반환 건수: 상위 10건. 정렬: 상태 우선순위(`UPCOMING`·`ONGOING` → `ENDED` → `CANCELLED`) 후 `view_count` 내림차순. `EXCLUDED`·`PENDING`은 제외
 - 홈 캐러셀: 상위 5건 FE 슬라이싱
 - 홈 "인기 공연" 섹션: desktop 3건 / mobile 6건 FE 슬라이싱
 
@@ -194,7 +194,7 @@
 | `artists[].koreanName` | String? | 한글 표기명 (없으면 `null`) |
 | `title` | String | 공연명 |
 | `startDate` | String | 시작일 (`YYYY-MM-DD`) |
-| `endDate` | String? | 종료일 (`YYYY-MM-DD`) |
+| `endDate` | String | 종료일 (`YYYY-MM-DD`) |
 | `venue` | String | 공연장명 |
 | `status` | String | `UPCOMING` \| `ONGOING` \| `ENDED` \| `CANCELLED` |
 | `price` | String? | 가격 정보 |
@@ -235,7 +235,7 @@
 
 | 코드 | 상태 코드 | 설명 |
 |------|-----------|------|
-| `CONCERT_NOT_FOUND` | 404 | 존재하지 않는 공연 |
+| `CONCERT_NOT_FOUND` | 404 | 존재하지 않는 공연, 또는 `EXCLUDED`·`PENDING` 상태 공연 |
 
 ### 비고
 
@@ -319,7 +319,9 @@
 
 | 코드 | 상태 코드 | 설명 |
 |------|-----------|------|
-| `INVALID_RATING_SCORE` | 400 | `score`가 0.5~5.0 범위를 벗어나거나 0.5 단위가 아닌 경우 |
+| `INVALID_INPUT` | 400 | `score` 누락이거나 0.5~5.0 범위를 벗어난 경우 |
+| `INVALID_RATING_SCORE` | 400 | `score`가 0.5 단위가 아닌 경우 |
+
 | `CONCERT_NOT_ENDED` | 400 | 공연 상태가 `ENDED`(공연완료)가 아닌 경우 |
 | `RATING_TARGET_NOT_FOUND` | 404 | 존재하지 않는 공연 |
 | `UNAUTHORIZED` | 401 | 비인증 요청 |

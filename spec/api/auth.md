@@ -18,6 +18,12 @@
 
 OAuth 제공자 로그인 페이지로 302 리다이렉트.
 
+### 에러
+
+| 코드 | 상태 코드 | 설명 |
+|------|-----------|------|
+| `INVALID_INPUT` | 400 | 지원하지 않는 provider (`google`·`kakao` 외) |
+
 ---
 
 ## GET /api/auth/callback/{provider}
@@ -70,6 +76,68 @@ Refresh Token을 HttpOnly Cookie에 설정한 뒤 아래 URL로 302 리다이렉
 
 ---
 
+## POST /api/auth/login/nonce
+
+**용도**: 앱 소셜 로그인(Google·Apple)용 1회용 nonce를 발급합니다.
+
+### 요청
+
+별도 바디 없음.
+
+### 응답
+
+| 필드 | 타입 | 설명 |
+|------|------|------|
+| `nonce` | String | 1회용 nonce (Base64URL). 5분 안에 한 번만 사용 가능 |
+
+### 비고
+
+- Google·Apple SDK 로그인 요청에 이 값을 nonce로 넣어야 하며, ID Token의 `nonce` 클레임이 미발급·만료·재사용이면 `POST /api/auth/login/{provider}/token`이 `SOCIAL_TOKEN_INVALID`
+
+---
+
+## POST /api/auth/login/{provider}/token
+
+**용도**: 앱이 소셜 SDK로 받은 토큰을 검증해 로그인하고 Access/Refresh Token을 발급합니다.
+
+### 요청
+
+**Path Parameters**
+
+| 이름 | 타입 | 필수 | 설명 |
+|------|------|------|------|
+| `provider` | String | Y | `google` \| `kakao` \| `apple` |
+
+**Content-Type**: `application/json`
+
+| 필드 | 타입 | 필수 | 설명 |
+|------|------|------|------|
+| `token` | String | Y | Google ID Token \| Kakao Access Token \| Apple identityToken |
+| `authorizationCode` | String | 조건부 | `apple`일 때 필수 |
+
+### 응답
+
+| 필드 | 타입 | 설명 |
+|------|------|------|
+| `accessToken` | String | Access Token |
+| `refreshToken` | String | Refresh Token (새 기기 세션) |
+| `isNewUser` | Boolean | `true`: PENDING 역할(회원가입 완료 필요) / `false`: 기존 사용자 |
+
+### 에러
+
+| 코드 | 상태 코드 | 설명 |
+|------|-----------|------|
+| `INVALID_INPUT` | 400 | 지원하지 않는 provider, `apple`인데 `authorizationCode` 누락, `token` 공백 |
+| `SOCIAL_TOKEN_INVALID` | 401 | 소셜 토큰 검증 실패, nonce 불일치·재사용, Apple authorizationCode와 identityToken 사용자 불일치 |
+| `USER_SUSPENDED` | 403 | 정지 중인 회원. 에러 응답에 `suspendedUntil`·`reason` 포함 ([auth-policy.md](../policy/auth-policy.md) "`USER_SUSPENDED` 응답 형식") |
+| `SOCIAL_PROVIDER_UNAVAILABLE` | 502 | 소셜 제공자 일시 장애 |
+
+### 비고
+
+- Google·Apple은 `POST /api/auth/login/nonce`로 받은 nonce가 토큰에 담겨 있어야 한다
+
+---
+
 ## POST /api/auth/refresh
 
 **용도**: Refresh Token으로 Access Token을 재발급합니다.
@@ -102,6 +170,40 @@ Cookie에서 Refresh Token 자동 추출 (별도 바디 없음).
 
 ---
 
+## POST /api/auth/app/refresh
+
+**용도**: 앱에서 Refresh Token으로 Access Token을 재발급합니다.
+
+### 요청
+
+**Content-Type**: `application/json`
+
+| 필드 | 타입 | 필수 | 설명 |
+|------|------|------|------|
+| `refreshToken` | String | Y | Refresh Token |
+
+### 응답
+
+| 필드 | 타입 | 설명 |
+|------|------|------|
+| `accessToken` | String | 새 Access Token |
+| `refreshToken` | String | 회전된 새 Refresh Token (이전 값은 즉시 사용 불가) |
+
+### 에러
+
+| 코드 | 상태 코드 | 설명 |
+|------|-----------|------|
+| `INVALID_INPUT` | 400 | `refreshToken` 누락·공백 |
+| `REFRESH_TOKEN_EXPIRED` | 401 | Refresh Token 만료 — 재로그인 필요 |
+| `REFRESH_TOKEN_INVALID` | 401 | 유효하지 않은 Refresh Token |
+| `USER_SUSPENDED` | 403 | 정지된 회원. 에러 응답에 `suspendedUntil`(영구 정지면 `null`)·`reason` 포함 |
+
+### 비고
+
+- 회전·재사용 감지 규칙은 `POST /api/auth/refresh`와 같다
+
+---
+
 ## POST /api/auth/logout
 
 **용도**: 로그아웃 처리 및 토큰을 무효화합니다. **(인증 필요)**
@@ -120,6 +222,29 @@ Cookie에서 Refresh Token 자동 추출 (별도 바디 없음).
 - Refresh Token Cookie가 없거나 유효하지 않아도 `200 OK` (세션은 TTL 만료로 정리)
 - 현재 Access Token 블랙리스트 등록
 - Refresh Token Cookie 삭제
+
+---
+
+## POST /api/auth/app/logout
+
+**용도**: 앱 로그아웃 처리. **(인증 필요 — USER·ADMIN·PENDING)**
+
+### 요청
+
+**Content-Type**: `application/json` (바디 선택)
+
+| 필드 | 타입 | 필수 | 설명 |
+|------|------|------|------|
+| `refreshToken` | String | N | 현재 기기 세션의 Refresh Token |
+
+### 응답
+
+`200 OK` (바디 없음)
+
+### 비고
+
+- 현재 Access Token 블랙리스트 등록
+- `refreshToken`이 본인 세션이면 그 세션만 삭제. 없거나 유효하지 않아도 `200 OK` (세션은 TTL 만료로 정리)
 
 ---
 
@@ -216,7 +341,7 @@ Cookie에서 Refresh Token 자동 추출 (별도 바디 없음).
 
 | 필드 | 타입 | 필수 | 설명 |
 |------|------|------|------|
-| `agreedMarketing` | Boolean | Y | 마케팅 수신 동의 여부 |
+| `agreedMarketing` | Boolean | Y | 마케팅 수신 동의 여부. 필드를 생략하면 검증 에러 없이 `false`로 처리된다 |
 
 ### 응답
 
@@ -257,10 +382,9 @@ Cookie에서 Refresh Token 자동 추출 (별도 바디 없음).
 
 | 코드 | 상태 코드 | 설명 |
 |------|-----------|------|
-| `TERMS_NOT_AGREED` | 400 | 필수 약관 미동의 |
-| `NICKNAME_REQUIRED` | 400 | 닉네임 미입력 |
-| `NICKNAME_TOO_LONG` | 400 | 닉네임 20자 초과 |
-| `BIRTH_YEAR_REQUIRED` | 400 | 출생연도 미입력 |
+| `INVALID_INPUT` | 400 | 닉네임 누락·공백·20자 초과, `birthYear` 누락, `agreedTerms`·`agreedPrivacy` 누락(`null`) |
+| `TERMS_NOT_AGREED` | 400 | `agreedTerms` 또는 `agreedPrivacy`가 `false` |
+
 | `NICKNAME_DUPLICATE` | 409 | 닉네임 중복 |
 | `USER_SUSPENDED` | 403 | 정지 중인 회원. 에러 응답에 `suspendedUntil`·`reason` 포함 ([auth-policy.md](../policy/auth-policy.md) "`USER_SUSPENDED` 응답 형식") |
 | `USER_NOT_FOUND` | 404 | 탈퇴한 회원(탈퇴 직후 다른 기기에 남은 Access Token으로 요청) |

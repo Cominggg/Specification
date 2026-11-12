@@ -29,7 +29,8 @@
 | `artists[].koreanName` | String? | 한글 표기명 (`locale=ko` alias, 없으면 `null`) |
 | `title` | String | 공연명 |
 | `startDate` | String | 공연 시작일 (`YYYY-MM-DD`) |
-| `endDate` | String? | 공연 종료일 (`YYYY-MM-DD`) |
+| `endDate` | String | 공연 종료일 (`YYYY-MM-DD`) |
+
 | `status` | String | `UPCOMING` \| `ONGOING` \| `ENDED` \| `CANCELLED` |
 | `posterUrl` | String? | 포스터 이미지 URL |
 | `venue` | String | 공연장명 |

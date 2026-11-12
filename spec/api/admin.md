@@ -53,9 +53,13 @@
 |------|------|------|
 | `id` | Long | 아티스트 ID |
 | `name` | String | 아티스트명 |
+| `imageUrl` | String? | 아티스트 이미지 URL |
 | `aliases.ja` | String[] | 일본어 alias 목록 (없으면 `[]`) |
 | `aliases.en` | String[] | 영어 alias 목록 (없으면 `[]`) |
 | `aliases.ko` | String[] | 한국어 alias 목록 (없으면 `[]`) |
+| `links` | Object[] | 외부 링크 목록 (없으면 `[]`) |
+| `links[].type` | String | 링크 종류 (아티스트당 type 중복 불가) |
+| `links[].url` | String | 링크 URL |
 
 ### 에러
 
@@ -87,6 +91,10 @@
 | `aliases.ja` | String[] | N | 일본어 alias 목록. 빈 배열 `[]` 전달 시 전체 삭제, 배열 전달 시 교체 |
 | `aliases.en` | String[] | N | 영어 alias 목록. 빈 배열 `[]` 전달 시 전체 삭제, 배열 전달 시 교체 |
 | `aliases.ko` | String[] | N | 한국어 alias 목록. 빈 배열 `[]` 전달 시 전체 삭제, 배열 전달 시 교체 |
+| `imageUrl` | String | N | 이미지 URL. 생략·`null`이면 변경 없음, 빈 문자열 `""`이면 삭제 |
+| `links` | Object[] | N | 외부 링크 목록. 생략·`null`이면 변경 없음, 배열 전달 시 전체 교체(`[]`이면 전체 삭제) |
+| `links[].type` | String | Y | 링크 종류 (배열 안에서 중복 불가) |
+| `links[].url` | String | Y | 링크 URL |
 
 ### 응답
 
@@ -97,6 +105,7 @@
 | 코드 | 상태 코드 | 설명 |
 |------|-----------|------|
 | `ARTIST_NOT_FOUND` | 404 | 존재하지 않는 아티스트 |
+| `INVALID_INPUT` | 400 | `links[]`의 `type`·`url` 공백, 또는 `type` 중복 |
 
 ### 비고
 
@@ -134,6 +143,7 @@
 | `artists` | Object[] | 연결된 아티스트 목록 |
 | `artists[].artistId` | Long | 아티스트 ID |
 | `artists[].name` | String | 아티스트명 |
+| `artists[].koreanName` | String? | 한국어 alias (ko alias가 없으면 `null`) |
 
 ### 비고
 
@@ -173,7 +183,47 @@
 | `candidates` | Object[] | 후보 아티스트 목록 |
 | `candidates[].artistId` | Long | 아티스트 ID |
 | `candidates[].name` | String | 아티스트명 |
-| `candidates[].matchedBy` | String | 매칭 방법 (`prfcast` / `prfnm` / `manual`) |
+| `candidates[].koreanName` | String? | 한국어 alias (ko alias가 없으면 `null`) |
+
+---
+
+## POST /api/admin/concerts
+
+**용도**: KOPIS 연동 없이 공연을 직접 등록합니다. 상태는 날짜로 계산합니다(`today < startDate` → `UPCOMING`, `today ≤ endDate` → `ONGOING`, 그 외 `ENDED`). 아티스트는 매핑하지 않으므로 `POST /api/admin/concerts/{id}/artists`로 따로 연결합니다.
+
+### 요청
+
+**Request Body** (`application/json`)
+
+| 필드 | 타입 | 필수 | 설명 |
+|------|------|------|------|
+| `title` | String | Y | 공연명 (공백 불가) |
+| `cast` | String | N | 출연진 |
+| `startDate` | String | Y | 시작일 (`YYYY-MM-DD`) |
+| `endDate` | String | Y | 종료일 (`YYYY-MM-DD`) |
+| `venueName` | String | Y | 공연장명 (공백 불가) |
+| `posterUrl` | String | N | 포스터 이미지 URL |
+| `imageUrls` | String[] | N | 상세 이미지 URL 목록 (배열 순서대로 저장) |
+| `price` | String | N | 가격 정보 |
+| `ticketOpenAt` | String | N | 티켓 오픈 일시 (`yyyy-MM-ddTHH:mm:ss`) |
+| `bookingLinks` | Object[] | N | 예매처 링크 목록 |
+| `bookingLinks[].name` | String | Y | 예매처 이름 |
+| `bookingLinks[].url` | String | Y | 예매처 URL |
+
+### 응답
+
+`201 Created`
+
+```json
+{ "concertId": 1 }
+```
+
+### 에러
+
+| 코드 | 상태 코드 | 설명 |
+|------|-----------|------|
+| `INVALID_INPUT` | 400 | 필수 필드 누락·공백, `bookingLinks[]`의 `name`·`url` 공백 |
+| `CONCERT_ALREADY_EXISTS` | 409 | `title`·`startDate`·`endDate`가 모두 같은 공연이 이미 있음 |
 
 ---
 
@@ -208,6 +258,11 @@
 | `bookingLinks` | Object[] | 예매처 링크 목록 |
 | `bookingLinks[].name` | String | 예매처 이름 |
 | `bookingLinks[].url` | String | 예매처 URL |
+| `artists` | Object[] | 확정 매핑(`concert_artist`) 아티스트 목록 (PENDING 공연의 후보는 포함하지 않음) |
+| `artists[].artistId` | Long | 아티스트 ID |
+| `artists[].name` | String | 아티스트명 |
+| `artists[].koreanName` | String? | 한국어 alias |
+| `imageUrls` | String[] | 상세 이미지 URL 목록 (저장 순서, 없으면 `[]`) |
 
 ### 에러
 
@@ -243,6 +298,7 @@
 | `endDate` | String | N | 종료일 (`YYYY-MM-DD`) |
 | `venueName` | String | N | 공연장명 |
 | `posterUrl` | String | N | 포스터 이미지 URL |
+| `imageUrls` | String[] | N | 상세 이미지 URL 목록. `null`이면 기존 유지, 배열 전달 시 전체 교체(`[]`이면 전체 삭제) |
 | `price` | String | N | 가격 정보 |
 | `ticketOpenAt` | String? | N | 티켓 오픈 일시 (ISO 8601 datetime, 예: `2026-06-20T10:00:00`). `null` 또는 필드 생략 시 기존 값이 `null`로 초기화됨 (다른 필드와 달리 null-reset 지원) |
 | `bookingLinks` | Object[] | N | 예매처 링크 목록. `null`이면 기존 링크 유지, `[]`이면 전체 삭제 |
@@ -258,6 +314,7 @@
 | 코드 | 상태 코드 | 설명 |
 |------|-----------|------|
 | `CONCERT_NOT_FOUND` | 404 | 존재하지 않는 공연 |
+| `INVALID_INPUT` | 400 | `bookingLinks[]`의 `name`·`url` 공백 |
 
 ### 비고
 
@@ -293,10 +350,12 @@
 | 코드 | 상태 코드 | 설명 |
 |------|-----------|------|
 | `CONCERT_NOT_FOUND` | 404 | 존재하지 않는 공연 |
+| `INVALID_INPUT` | 400 | `status` 누락 |
 
 ### 비고
 
-- `EXCLUDED` → `UPCOMING` / `ONGOING`으로 복원 시 연결된 아티스트의 `is_coming` 자동 갱신
+- 변경 전 또는 변경 후 상태가 `UPCOMING`·`ONGOING`이면 연결된 아티스트(`concert_artist`)의 `is_coming`을 다른 활성 공연 존재 여부로 재계산
+- `reason`은 현재 저장·기록되지 않음
 
 ---
 
@@ -397,7 +456,7 @@
 
 ### 비고
 
-- PENDING 전용. 확정 공연(UPCOMING·ONGOING·ENDED·EXCLUDED)에는 `POST /api/admin/concerts/{id}/artists` 사용
+- PENDING 전용. 확정 공연(PENDING 외 모든 상태: UPCOMING·ONGOING·ENDED·CANCELLED·EXCLUDED)에는 `POST /api/admin/concerts/{id}/artists` 사용
 
 ---
 
@@ -435,7 +494,7 @@
 
 ## POST /api/admin/concerts/{id}/artists
 
-**용도**: 확정 공연(UPCOMING·ONGOING·ENDED·EXCLUDED)에 아티스트를 직접 매핑합니다. `concert_artist`에 바로 저장합니다.
+**용도**: 확정 공연(PENDING 외 모든 상태: UPCOMING·ONGOING·ENDED·CANCELLED·EXCLUDED)에 아티스트를 직접 매핑합니다. `concert_artist`에 바로 저장합니다.
 
 ### 요청
 
@@ -472,7 +531,7 @@
 
 ## DELETE /api/admin/concerts/{id}/artists/{artistId}
 
-**용도**: 확정 공연(UPCOMING·ONGOING·ENDED·EXCLUDED)에서 아티스트 매핑을 제거합니다.
+**용도**: 확정 공연(PENDING 외 모든 상태: UPCOMING·ONGOING·ENDED·CANCELLED·EXCLUDED)에서 아티스트 매핑을 제거합니다.
 
 ### 요청
 
@@ -588,143 +647,12 @@
 | 코드 | 상태 코드 | 설명 |
 |------|-----------|------|
 | `INQUIRY_NOT_FOUND` | 404 | 존재하지 않는 문의 |
+| `INVALID_INQUIRY_STATUS` | 400 | `status`에 `PENDING` 전달 |
+| `INVALID_INPUT` | 400 | `status` 누락 |
 
 ---
 
-## GET /api/admin/data/search/artists
-
-**용도**: Data 파이프라인에서 아티스트를 이름으로 검색합니다. MBID 기반 수집 트리거 전 대상을 확인하는 용도입니다.
-
-### 요청
-
-**Query Parameters**
-
-| 이름 | 타입 | 필수 | 설명 |
-|------|------|------|------|
-| `name` | String | Y | 검색할 아티스트명 |
-
-### 응답
-
-`200 OK` — 배열
-
-| 필드 | 타입 | 설명 |
-|------|------|------|
-| `mbid` | String | MusicBrainz ID |
-| `name` | String | 아티스트명 |
-| `country` | String? | 국가 코드 |
-| `type` | String? | 아티스트 유형 (`Person` / `Group` 등) |
-| `url` | String? | MusicBrainz 아티스트 페이지 URL |
-
----
-
-## GET /api/admin/data/search/concerts
-
-**용도**: Data 파이프라인에서 공연을 제목으로 검색합니다. KOPIS ID 기반 수집 트리거 전 대상을 확인하는 용도입니다.
-
-### 요청
-
-**Query Parameters**
-
-| 이름 | 타입 | 필수 | 설명 |
-|------|------|------|------|
-| `title` | String | Y | 검색할 공연명 |
-
-### 응답
-
-`200 OK` — 배열
-
-| 필드 | 타입 | 설명 |
-|------|------|------|
-| `kopisId` | String | KOPIS 공연 ID |
-| `title` | String | 공연명 |
-| `startDate` | String | 시작일 (`YYYY-MM-DD`) |
-| `endDate` | String | 종료일 (`YYYY-MM-DD`) |
-| `venue` | String? | 공연장명 |
-| `url` | String? | KOPIS 공연 상세 URL |
-
----
-
-## POST /api/admin/data/collect/artists
-
-**용도**: MBID를 지정해 Data 파이프라인의 아티스트 수집을 트리거합니다.
-
-### 요청
-
-**Request Body** (`application/json`)
-
-| 필드 | 타입 | 필수 | 설명 |
-|------|------|------|------|
-| `mbid` | String | Y | MusicBrainz ID |
-
-### 응답
-
-`200 OK` (바디 없음)
-
----
-
-## POST /api/admin/data/collect/concerts
-
-**용도**: KOPIS ID를 지정해 Data 파이프라인의 공연 수집을 트리거합니다.
-
-### 요청
-
-**Request Body** (`application/json`)
-
-| 필드 | 타입 | 필수 | 설명 |
-|------|------|------|------|
-| `kopisId` | String | Y | KOPIS 공연 ID |
-
-### 응답
-
-`200 OK` (바디 없음)
-
----
-
-## POST /api/admin/data/collect/artists/{id}/releases
-
-**용도**: 특정 아티스트의 릴리즈 수집을 Data 파이프라인에 트리거합니다.
-
-### 요청
-
-**Path Parameters**
-
-| 이름 | 타입 | 필수 | 설명 |
-|------|------|------|------|
-| `id` | Long | Y | 아티스트 ID |
-
-### 응답
-
-`200 OK` (바디 없음)
-
-### 에러
-
-| 코드 | 상태 코드 | 설명 |
-|------|-----------|------|
-| `ARTIST_NOT_FOUND` | 404 | Data 파이프라인 측에서 아티스트를 찾지 못한 경우 |
-
----
-
-## POST /api/admin/data/collect/concerts/{id}/setlist
-
-**용도**: 특정 공연의 셋리스트 수집을 Data 파이프라인에 트리거합니다.
-
-### 요청
-
-**Path Parameters**
-
-| 이름 | 타입 | 필수 | 설명 |
-|------|------|------|------|
-| `id` | Long | Y | 공연 ID |
-
-### 응답
-
-`200 OK` (바디 없음)
-
-### 에러
-
-| 코드 | 상태 코드 | 설명 |
-|------|-----------|------|
-| `CONCERT_NOT_FOUND` | 404 | Data 파이프라인 측에서 공연을 찾지 못한 경우 |
+> Data 파이프라인 연동 엔드포인트(`/api/admin/data/**`)는 [pipeline.md](pipeline.md) 참고.
 
 ---
 
@@ -761,6 +689,7 @@
 
 | 코드 | 상태 코드 | 설명 |
 |------|-----------|------|
+| `INVALID_INPUT` | 400 | 필수 필드 누락·공백, `version` 50자·`detailUrl` 500자 초과 |
 | `POLICY_VERSION_DUPLICATE` | 409 | 동일 `type`·`version`이 이미 등록된 경우 |
 
 ### 비고
@@ -873,7 +802,7 @@
 
 | 필드 | 타입 | 필수 | 설명 |
 |------|------|------|------|
-| `title` | String | N | 생략·`null`이면 기존 값 유지 |
+| `title` | String | N | 생략·`null`이면 기존 값 유지. 공백만은 불가, 최대 255자 |
 | `content` | Object | N | 본문 Tiptap JSON. 생략·`null`이면 기존 값 유지. 작성과 같은 기준으로 검증 |
 | `active` | Boolean | N | 생략·`null`이면 기존 값 유지 |
 
@@ -888,6 +817,7 @@
 | `NOTICE_NOT_FOUND` | 404 | 존재하지 않는 공지사항 |
 | `CONTENT_INVALID_FORMAT` | 400 | `content` 변경 시 본문 스키마 위반 (작성과 같은 기준) |
 | `CONTENT_TOO_LONG` | 400 | `content` 변경 시 본문 텍스트 10000자 초과 또는 `content` JSON 50000자 초과 |
+| `INVALID_INPUT` | 400 | `title`이 공백만이거나 255자 초과 |
 
 ---
 
@@ -1003,7 +933,8 @@
 | `REPORT_NOT_FOUND` | 404 | 존재하지 않는 신고 |
 | `REPORT_TARGET_NOT_FOUND` | 404 | `suspend` 지정 시 신고 대상(게시글·댓글)이 없어 작성자를 찾을 수 없음 |
 | `USER_NOT_FOUND` | 404 | `suspend` 지정 시 대상 작성자가 탈퇴한 회원 |
-| `INVALID_INPUT` | 400 | `suspend.days`가 지원하지 않는 값, `suspend.reason` 누락 |
+| `INVALID_INPUT` | 400 | `status` 누락, `suspend.days`가 지원하지 않는 값, `suspend.reason` 누락 |
+
 
 ### 비고
 

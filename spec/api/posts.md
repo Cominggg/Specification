@@ -4,7 +4,7 @@
 
 ## GET /api/mentions/search
 
-**용도**: 게시글 작성 시 본문 내 공연·아티스트·음악(발매·트랙) 인라인 멘션(`/공연 요네즈` 등) 자동완성을 위한 엔티티 검색입니다. 무한 스크롤 방식입니다.
+**용도**: 게시글 작성 시 본문 내 공연·아티스트·음악(발매·트랙) 인라인 멘션(`/공연 요네즈` 등) 자동완성을 위한 엔티티 검색입니다. 무한 스크롤 방식입니다. 인증이 필요합니다(USER·ADMIN).
 
 ### 요청
 
@@ -46,12 +46,14 @@
 
 | 코드 | 상태 코드 | 설명 |
 |------|-----------|------|
-| `INVALID_INPUT` | 400 | `q` 공백·누락, `page` 음수, `limit` 범위(1~20) 초과 |
+| `INVALID_INPUT` | 400 | `type` 누락·허용 밖 값, `q` 공백·누락, `page` 음수, `limit` 범위(1~20) 초과 |
 
 ### 비고
 
 - `RELEASE`는 `release_group`(앨범·싱글·EP 단위) 기준이며, `TRACK`은 앨범 내 개별 트랙 단위입니다. 두 타입은 서로 다른 멘션 대상으로 분리되어 있습니다.
-- 무한 스크롤 조회를 위해 각 타입 모두 `id` 오름차순을 tie-breaker로 사용해 페이지 간 정렬을 안정적으로 유지합니다.
+- 정렬: `CONCERT`는 시작일 내림차순(`startDate DESC, id DESC`), `ARTIST`·`RELEASE`·`TRACK`은 `id` 오름차순입니다. 모든 타입에서 `id`가 tie-breaker라 페이지 간 정렬이 안정적입니다.
+- 매치는 대소문자 무시 부분 일치입니다. `CONCERT`는 공연명, `ARTIST`는 이름·정렬용 이름(`sortName`)·별칭, `RELEASE`·`TRACK`은 제목이 대상입니다.
+- `CONCERT`는 숨김 상태(`EXCLUDED`·`PENDING`) 공연을 결과에서 제외합니다.
 - `CONCERT`: `subtitle` = `"{startDate} · {venue}"`, `thumbnailUrl` = `posterUrl`
 - `ARTIST`: `subtitle` = `null`, `thumbnailUrl` = `artist.imageUrl`
 - `RELEASE`: `subtitle` = 아티스트명(`artist_id` join), `thumbnailUrl` = `coverUrl`
@@ -113,7 +115,7 @@
 
 - BE가 본문의 언급 카드를 처음 나온 순서대로, 같은 (`entityType`, `entityId`)는 하나로 묶어 게시글 태그로 저장합니다. 요청 본문에 `entityTags`를 보내도 무시합니다.
 - 숨김 상태(`EXCLUDED`·`PENDING`) 공연은 태그할 수 없습니다. 그 밖에 카드가 가리키는 엔티티의 실존 여부는 검증하지 않으며, 존재하지 않는 엔티티 태그는 조회 시점에 응답에서 빠집니다.
-- 검사 순서는 본문 스키마(`CONTENT_INVALID_FORMAT`) → 길이(`CONTENT_TOO_LONG`) → 숨김 공연 → 대표 공연입니다. 숨김 공연과 대표 공연이 둘 다 해당하면 `POST_CONCERT_TAG_HIDDEN`을 반환합니다.
+- 검사 순서는 본문 스키마(`CONTENT_INVALID_FORMAT`) → 길이(`CONTENT_TOO_LONG`) → 고유 언급 카드 10개 초과(`CONTENT_INVALID_FORMAT`) → 숨김 공연 → 대표 공연입니다. 숨김 공연과 대표 공연이 둘 다 해당하면 `POST_CONCERT_TAG_HIDDEN`을 반환합니다.
 - BE가 `content`에서 텍스트 노드만 추출해 검색 전용 `content_text` 컬럼을 서버 측에서 생성합니다. FE가 별도로 평문을 보낼 필요는 없습니다.
 - 본문 텍스트 길이(10000자)와 별개로 `content` JSON 자체의 길이(50000자)도 제한합니다 — 구조만 방대한 JSON으로 텍스트 길이 제한을 우회하는 것을 막기 위함입니다.
 
@@ -489,12 +491,13 @@
 
 | 코드 | 상태 코드 | 설명 |
 |------|-----------|------|
-| `INVALID_INPUT` | 400 | `sort`가 `recommend`\|`latest` 외의 값 |
+| `INVALID_INPUT` | 400 | `type`이 허용 밖 값, `sort`가 `recommend`\|`latest` 외의 값, `page` 음수, `size` 범위(1~100) 초과 |
 
 ### 비고
 
 - `type`+`id`에 해당하는 엔티티 존재 여부는 검증하지 않습니다. 존재하지 않는 엔티티를 조회해도 404가 아닌, 빈 `content` 배열과 함께 200이 반환됩니다.
 - `type=CONCERT`이고 공연이 숨김 상태(`EXCLUDED`·`PENDING`)이면 빈 `content` 배열(`totalElements=0`, `totalPages=0`)과 함께 200을 반환합니다.
+- `type=RELEASE`이면 해당 발매를 직접 태그한 게시글에 더해, 그 발매에 속한 트랙을 `TRACK`으로 태그한 게시글도 함께 반환합니다(트랙 링크가 앨범 상세로 귀결되기 때문). `type=TRACK`은 그 트랙을 태그한 게시글만 반환합니다.
 
 ---
 
@@ -549,7 +552,7 @@
 
 ### 응답
 
-[페이지네이션 응답](_index.md#페이지네이션-응답) 형태. `content` 항목(`Comment`, 최상위 댓글만 페이지네이션 대상 — `replies`는 매 항목에 전체 포함):
+[페이지네이션 응답](_index.md#페이지네이션-응답) 형태. `content` 항목(`Comment`, 최상위 댓글만 페이지네이션 대상 — `replies`는 매 항목에 전체 포함). 최상위 댓글은 작성일시 오름차순(같으면 `id` 오름차순)입니다:
 
 | 필드 | 타입 | 설명 |
 |------|------|------|
@@ -642,7 +645,7 @@
 |------|-----------|------|
 | `INVALID_INPUT` | 400 | `content` 공백·누락 또는 500자 초과 |
 | `POST_NOT_FOUND` | 404 | 존재하지 않는 게시글 |
-| `COMMENT_NOT_FOUND` | 404 | `parentCommentId`에 해당하는 댓글이 존재하지 않음 |
+| `COMMENT_NOT_FOUND` | 404 | `parentCommentId`에 해당하는 댓글이 없거나 다른 게시글의 댓글임 |
 | `INVALID_REPLY_DEPTH` | 400 | `parentCommentId`가 이미 답글(최상위 댓글이 아님)인 경우 — 2단계 이상 중첩 금지 |
 | `USER_SUSPENDED` | 403 | 정지 중인 회원. 에러 응답에 `suspendedUntil`·`reason` 포함 ([auth-policy.md](../policy/auth-policy.md) "`USER_SUSPENDED` 응답 형식") |
 
@@ -697,7 +700,7 @@
 
 | 코드 | 상태 코드 | 설명 |
 |------|-----------|------|
-| `COMMENT_NOT_FOUND` | 404 | 존재하지 않는 댓글 |
+| `COMMENT_NOT_FOUND` | 404 | 존재하지 않거나 삭제된 댓글 |
 | `ALREADY_LIKED` | 409 | 이미 좋아요한 댓글 |
 | `USER_SUSPENDED` | 403 | 정지 중인 회원. 에러 응답에 `suspendedUntil`·`reason` 포함 ([auth-policy.md](../policy/auth-policy.md) "`USER_SUSPENDED` 응답 형식") |
 
@@ -727,7 +730,7 @@
 
 | 코드 | 상태 코드 | 설명 |
 |------|-----------|------|
-| `COMMENT_NOT_FOUND` | 404 | 존재하지 않는 댓글 |
+| `COMMENT_NOT_FOUND` | 404 | 존재하지 않거나 삭제된 댓글 |
 | `NOT_LIKED` | 400 | 좋아요하지 않은 댓글 |
 | `USER_SUSPENDED` | 403 | 정지 중인 회원. 에러 응답에 `suspendedUntil`·`reason` 포함 ([auth-policy.md](../policy/auth-policy.md) "`USER_SUSPENDED` 응답 형식") |
 
@@ -835,7 +838,8 @@
 |------|------|------|
 | `id` | Long | 공지사항 ID |
 | `title` | String | 제목 |
-| `content` | Object | 본문 Tiptap JSON ([post-content.md](../client/post-content.md)). 숨김 상태이거나 없는 공연의 언급 카드는 빠집니다 |
+| `content` | Object | 본문 Tiptap JSON ([post-content.md](../client/post-content.md)). 공연 멘션 노드(`entityMentionCard`·`entityMentionChip`) 중 숨김 상태(`EXCLUDED`·`PENDING`)이거나 없는 공연, `attrs.entityId`가 정수가 아닌 노드는 빠집니다(DB 본문은 그대로) |
+
 | `createdAt` | String | 작성일시 |
 | `updatedAt` | String | 수정일시 |
 

@@ -24,6 +24,8 @@
 - `endDate >= 오늘`인 항목만 반환 — UPCOMING·ONGOING 공연 모두 포함
 - `type`은 항상 `"CONCERT"` (저장된 공연 기준, 티켓팅 항목 없음)
 - `isInCalendar`는 항상 `true`
+- 기본 정렬: `startDate` 오름차순
+- PENDING·EXCLUDED 공연은 캘린더에 담겨 있어도 제외
 
 ---
 
@@ -52,14 +54,17 @@
 | `artists[].name` | String | 아티스트명 |
 | `artists[].koreanName` | String? | 한글 표기명 (`locale=ko` alias, 없으면 `null`) |
 | `title` | String | 공연명 |
-| `startDate` | String | 시작일 |
-| `endDate` | String? | 종료일 |
+| `startDate` | String | 시작일 (`YYYY-MM-DD`) |
+| `endDate` | String | 종료일 (`YYYY-MM-DD`) |
 | `venue` | String | 공연장명 |
 | `status` | String | 공연 상태 |
 
 ### 비고
 
 - `endDate < 오늘`인 항목만 반환 (BE 필터링)
+- 기본 정렬: `startDate` 내림차순
+- PENDING·EXCLUDED 공연은 캘린더에 담겨 있어도 제외
+
 
 ---
 

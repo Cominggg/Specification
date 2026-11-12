@@ -12,7 +12,7 @@
 
 | 이름 | 타입 | 필수 | 기본값 | 설명 |
 |------|------|------|--------|------|
-| `name` | String | N | — | 이름 검색어 (부분 일치, 아티스트명 및 alias 포함) |
+| `name` | String | N | — | 이름 검색어 (부분 일치, 아티스트명·정렬명(sortName)·alias 포함) |
 | `isComing` | Boolean | N | — | `true`/`false`이면 예정 내한 공연 여부(`is_coming`)로 필터. 미전달 시 전체 조회 |
 | `following` | Boolean | N | — | `true`이면 팔로잉 아티스트만 조회. 미인증 또는 팔로잉 없으면 빈 페이지 반환 |
 | `page` | int | N | `0` | 페이지 번호 (0-based) |
@@ -27,6 +27,7 @@
 |------|------|------|
 | `id` | Long | 아티스트 ID |
 | `name` | String | 아티스트명 |
+| `koreanName` | String? | 한글 표기명 (`artist_alias` 중 `locale=ko`, 여러 개면 id가 가장 작은 것. 없으면 `null`) |
 | `imageUrl` | String? | 프로필 이미지 URL |
 | `hasUpcomingConcert` | Boolean | 예정 내한 공연 여부 (`artist.is_coming`) |
 | `isFollowing` | Boolean | 팔로우 여부 (비인증 시 `false`) |
@@ -39,6 +40,7 @@
     {
       "id": 1,
       "name": "YOASOBI",
+      "koreanName": null,
       "imageUrl": null,
       "hasUpcomingConcert": true,
       "isFollowing": false,
@@ -64,7 +66,7 @@
 - `name`, `isComing`, `following` 세 파라미터는 모두 독립적으로 조합 가능
 - `following=true` 시 인증 없거나 팔로잉 아티스트가 없으면 빈 페이지 반환
 - 검색어 변경 시 FE에서 `page=0`으로 초기화
-- `name` 검색은 `artist.name` 및 `artist_alias.name` 모두 포함 (대소문자 무시)
+- `name` 검색은 `artist.name`, `artist.sort_name`, `artist_alias.name` 모두 포함 (대소문자 무시)
 - `sort=followerCount`는 팔로워 수 기준 전용 집계 쿼리로 처리되어 `sortName`과 동시에 적용할 수 없음 (동시 지정 시 400)
 
 ---
@@ -87,10 +89,11 @@
 |------|------|------|
 | `id` | Long | 아티스트 ID |
 | `name` | String | 아티스트명 |
+| `koreanName` | String? | 한글 표기명 (`locale=ko` alias, 여러 개면 id가 가장 작은 것. 없으면 `null`) |
 | `imageUrl` | String? | 프로필 이미지 URL |
 | `hasUpcomingConcert` | Boolean | 예정 내한 공연 여부 |
 | `isFollowing` | Boolean | 팔로우 여부 (비인증 시 `false`) |
-| `followersCount` | int | 팔로워 수 (`user_follow_artist` COUNT) |
+| `followersCount` | long | 팔로워 수 (`user_follow_artist` COUNT) |
 | `links` | Object[] | 외부 링크 목록 |
 | `links[].id` | String | 링크 타입 식별자 (`artist_url.type`) |
 | `links[].label` | String | 표시 이름 (예: `"Spotify"`) |
@@ -100,6 +103,7 @@
 {
   "id": 1,
   "name": "YOASOBI",
+  "koreanName": null,
   "imageUrl": null,
   "hasUpcomingConcert": true,
   "isFollowing": false,
@@ -152,7 +156,7 @@
 | `id` | Long | 공연 ID |
 | `title` | String | 공연명 |
 | `startDate` | String | 시작일 |
-| `endDate` | String? | 종료일 |
+| `endDate` | String | 종료일 (`YYYY-MM-DD`) |
 | `venue` | String | 공연장명 |
 | `status` | String | `UPCOMING` \| `ONGOING` \| `ENDED` \| `CANCELLED` |
 
@@ -160,6 +164,7 @@
 
 | 코드 | 상태 코드 | 설명 |
 |------|-----------|------|
+| `INVALID_INPUT` | 400 | `tab`이 `all`·`upcoming`·`past` 외의 값인 경우 |
 | `ARTIST_NOT_FOUND` | 404 | 존재하지 않는 아티스트 |
 
 ### 비고
@@ -185,9 +190,10 @@
 
 | 이름 | 타입 | 필수 | 기본값 | 설명 |
 |------|------|------|--------|------|
-| `type` | String | N | — | `Album` \| `Single` (복수 허용) |
+| `type` | String | N | — | 릴리즈 타입 필터 (복수 허용, 예: `type=Album&type=Single`). 값 검증 없음 — 일치하지 않는 값은 빈 결과. 미전달 시 전체 타입 |
 | `page` | int | N | `0` | 페이지 번호 |
 | `size` | int | N | `10` | 페이지 크기 |
+| `sort` | String | N | `firstReleaseDate,desc` | 정렬 기준 (`필드명,방향`) |
 
 ### 응답
 
@@ -197,7 +203,7 @@
 |------|------|------|
 | `id` | Long | 릴리즈 ID |
 | `title` | String | 앨범·싱글 타이틀 |
-| `type` | String | `Album` \| `Single` |
+| `type` | String? | 릴리즈 타입 (`Album`·`Single` 또는 기타, 없으면 `null`) |
 | `releaseDate` | String? | 발매일 |
 | `coverUrl` | String? | 커버 이미지 URL |
 | `spotifyId` | String? | Spotify 릴리즈 ID (`release_group.spotify_id`) |
@@ -263,8 +269,7 @@
 
 | 코드 | 상태 코드 | 설명 |
 |------|-----------|------|
-| `ARTIST_NOT_FOUND` | 404 | 존재하지 않는 아티스트 |
-| `NOT_FOLLOWING` | 400 | 팔로우하지 않은 아티스트 |
+| `NOT_FOLLOWING` | 400 | 팔로우하지 않은 아티스트 (존재하지 않는 아티스트 ID 포함) |
 | `USER_SUSPENDED` | 403 | 정지 중인 회원. 에러 응답에 `suspendedUntil`·`reason` 포함 ([auth-policy.md](../policy/auth-policy.md) "`USER_SUSPENDED` 응답 형식") |
 
 ---
@@ -285,9 +290,11 @@
 |------|------|------|
 | `id` | Long | 아티스트 ID |
 | `name` | String | 아티스트명 |
+| `koreanName` | String? | 한글 표기명 (`locale=ko` alias, 없으면 `null`) |
 | `imageUrl` | String? | 프로필 이미지 URL |
 | `hasUpcomingConcert` | Boolean | 예정 내한 공연 여부 |
 | `isFollowing` | Boolean | 팔로우 여부 (항상 `true`) |
+
 
 ### 비고
 

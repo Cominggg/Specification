@@ -4,6 +4,17 @@
 
 BE는 `DataPipelineClient`(WebClient)를 통해 Data 파이프라인 내부 API를 호출하며, `X-Internal-Secret` 헤더로 인증합니다.
 
+| BE 엔드포인트 | Data 내부 호출 |
+|---|---|
+| `GET /api/admin/data/search/artists` | `GET /search/artists?name=` |
+| `GET /api/admin/data/search/concerts` | `GET /search/concerts?title=` |
+| `POST /api/admin/data/collect/artists` | `POST /collect/artist` `{"mbid"}` |
+| `POST /api/admin/data/collect/concerts` | `POST /collect/concert` `{"kopis_id"}` |
+| `POST /api/admin/data/collect/artists/{id}/releases` | `POST /collect/artist/{id}/releases` |
+| `POST /api/admin/data/collect/concerts/{id}/setlist` | `POST /collect/concert/{id}/setlist` |
+
+Data 응답은 snake_case로 받아 BE 응답에서는 camelCase로 내보낸다.
+
 ---
 
 ## GET /api/admin/data/search/artists
@@ -29,6 +40,13 @@ BE는 `DataPipelineClient`(WebClient)를 통해 Data 파이프라인 내부 API�
 | `country` | String? | 국가 코드 |
 | `type` | String? | `Person` \| `Group` 등 |
 | `url` | String? | MusicBrainz 아티스트 페이지 URL |
+
+### 에러
+
+| 코드 | 상태 코드 | 설명 |
+|------|-----------|------|
+| `INVALID_INPUT` | 400 | `name` 누락 |
+| `PIPELINE_TIMEOUT` | 504 | Data 파이프라인 응답 지연 |
 
 ### 비고
 
@@ -61,6 +79,13 @@ BE는 `DataPipelineClient`(WebClient)를 통해 Data 파이프라인 내부 API�
 | `endDate` | String | 종료일 (`YYYY-MM-DD`) |
 | `venue` | String? | 공연장명 |
 | `url` | String? | KOPIS 공연 상세 URL |
+
+### 에러
+
+| 코드 | 상태 코드 | 설명 |
+|------|-----------|------|
+| `INVALID_INPUT` | 400 | `title` 누락 |
+| `PIPELINE_TIMEOUT` | 504 | Data 파이프라인 응답 지연 |
 
 ### 비고
 
@@ -101,8 +126,11 @@ BE는 `DataPipelineClient`(WebClient)를 통해 Data 파이프라인 내부 API�
 
 | 코드 | 상태 코드 | 설명 |
 |------|-----------|------|
+| `INVALID_INPUT` | 400 | `mbid` 누락·공백 |
 | `PIPELINE_NOT_FOUND` | 404 | MusicBrainz에 해당 MBID 없음 |
-| `PIPELINE_CONFLICT` | 409 | 동일 리소스 수집이 이미 처리 중 |
+| `PIPELINE_CONFLICT` | 409 | 같은 MBID 수집이 이미 처리 중 (BE 락 또는 Data 응답 409) |
+| `PIPELINE_SERVER_ERROR` | 500 | Data 파이프라인 서버 오류 |
+| `PIPELINE_TIMEOUT` | 504 | Data 파이프라인 응답 지연 |
 
 ### 비고
 
@@ -141,8 +169,11 @@ BE는 `DataPipelineClient`(WebClient)를 통해 Data 파이프라인 내부 API�
 
 | 코드 | 상태 코드 | 설명 |
 |------|-----------|------|
+| `INVALID_INPUT` | 400 | `kopisId` 누락·공백 |
 | `PIPELINE_NOT_FOUND` | 404 | KOPIS에 해당 ID 없음 |
 | `PIPELINE_CONFLICT` | 409 | 동일 리소스 수집이 이미 처리 중 |
+| `PIPELINE_SERVER_ERROR` | 500 | Data 파이프라인 서버 오류 |
+| `PIPELINE_TIMEOUT` | 504 | Data 파이프라인 응답 지연 |
 
 ### 비고
 
@@ -173,6 +204,7 @@ BE는 `DataPipelineClient`(WebClient)를 통해 Data 파이프라인 내부 API�
 | 코드 | 상태 코드 | 설명 |
 |------|-----------|------|
 | `ARTIST_NOT_FOUND` | 404 | Data 파이프라인 측에서 해당 아티스트를 찾을 수 없음 |
+| `PIPELINE_TIMEOUT` | 504 | Data 파이프라인 응답 지연 |
 
 ### 비고
 
@@ -214,6 +246,9 @@ BE는 `DataPipelineClient`(WebClient)를 통해 Data 파이프라인 내부 API�
 |------|-----------|------|
 | `PIPELINE_NOT_FOUND` | 404 | 해당 공연 또는 셋리스트를 찾을 수 없음 |
 | `PIPELINE_CONFLICT` | 409 | 동일 리소스 수집이 이미 처리 중 |
+| `PIPELINE_SERVER_ERROR` | 500 | Data 파이프라인 서버 오류 |
+| `PIPELINE_TIMEOUT` | 504 | Data 파이프라인 응답 지연 |
+
 
 ### 비고
 

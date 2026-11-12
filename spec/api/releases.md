@@ -12,7 +12,7 @@
 
 | 이름 | 타입 | 필수 | 기본값 | 설명 |
 |------|------|------|--------|------|
-| `q` | String | N | — | 검색어 (릴리즈명·트랙명·아티스트명·alias 대소문자 무관 부분 일치). 생략·공백이면 텍스트 조건 없이 나머지 필터만 적용 |
+| `q` | String | N | — | 검색어 (릴리즈명·트랙명·아티스트명·아티스트 정렬명(sortName)·alias 대소문자 무관 부분 일치). 생략·공백이면 텍스트 조건 없이 나머지 필터만 적용 |
 | `artistId` | Long | N | — | 특정 아티스트 필터 |
 | `type` | String | N | — | `Album` \| `Single`. 그 외 값 → 400. 생략 시 전체 타입 |
 | `following` | Boolean | N | — | `true`이면 팔로우 아티스트 릴리즈만 반환. 미인증이면 빈 페이지 반환 |
@@ -30,7 +30,7 @@
 | `artistName` | String | 아티스트명 |
 | `artistKoreanName` | String? | 아티스트 한글 표기명 (`locale=ko` alias, 없으면 `null`) |
 | `title` | String | 타이틀 |
-| `type` | String | `Album` \| `Single` 또는 기타 |
+| `type` | String? | `Album` \| `Single` 또는 기타, 없으면 `null` |
 | `releaseDate` | String? | 발매일 |
 | `spotifyId` | String? | Spotify 릴리즈 ID (`release_group.spotify_id`) |
 | `averageRating` | Double? | 평균 별점 (0.5~5.0, 소수 첫째 자리 반올림). 등록된 별점이 없으면 `null` |
@@ -68,7 +68,7 @@
 ### 비고
 
 - 정렬: `releaseDate` DESC NULLS LAST 고정 (발매일 없는 항목은 항상 마지막)
-- 검색 대상(`q`): 릴리즈명, 수록 트랙명, 아티스트명, 아티스트 alias (대소문자 무시 부분 일치)
+- 검색 대상(`q`): 릴리즈명, 수록 트랙명, 아티스트명, 아티스트 정렬명(sortName), 아티스트 alias (대소문자 무시 부분 일치)
 - `q`·`artistId`·`type`·`following`은 모두 조합 가능. `following=true`이면 `artistId` 필터는 무시되고 `q`·`type`은 그대로 적용
 - 홈 "새 앨범·싱글" 섹션: `size=8`로 재사용
 - 기존 `GET /api/releases/search`(음악 검색)는 이 엔드포인트로 통합되어 제거됨 — `q` 파라미터로 대체
@@ -94,7 +94,7 @@
 |------|------|------|
 | `id` | Long | 릴리즈 ID |
 | `title` | String | 타이틀 |
-| `type` | String | 릴리즈 타입 |
+| `type` | String? | 릴리즈 타입 (`Album` \| `Single` 또는 기타, 없으면 `null`) |
 | `releaseDate` | String? | 발매일 |
 | `coverUrl` | String? | 커버 이미지 URL |
 | `label` | String? | 레이블 |
@@ -175,7 +175,9 @@
 
 | 코드 | 상태 코드 | 설명 |
 |------|-----------|------|
-| `INVALID_RATING_SCORE` | 400 | `score`가 0.5~5.0 범위를 벗어나거나 0.5 단위가 아닌 경우 |
+| `INVALID_INPUT` | 400 | `score` 누락이거나 0.5~5.0 범위를 벗어난 경우 |
+| `INVALID_RATING_SCORE` | 400 | `score`가 0.5 단위가 아닌 경우 |
+
 | `RATING_TARGET_NOT_FOUND` | 404 | 존재하지 않는 릴리즈 |
 | `UNAUTHORIZED` | 401 | 비인증 요청 |
 | `USER_SUSPENDED` | 403 | 정지 중인 회원. 에러 응답에 `suspendedUntil`·`reason` 포함 ([auth-policy.md](../policy/auth-policy.md) "`USER_SUSPENDED` 응답 형식") |
