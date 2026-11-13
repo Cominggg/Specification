@@ -4,7 +4,7 @@
 
 ## GET /api/mentions/search
 
-**용도**: 게시글 작성 시 본문 내 공연·아티스트·음악(발매·트랙) 인라인 멘션(`/공연 요네즈` 등) 자동완성을 위한 엔티티 검색입니다. 무한 스크롤 방식입니다. 인증이 필요합니다(USER·ADMIN).
+**용도**: 게시글 작성 시 본문 내 공연·아티스트·음악(발매·트랙) 인라인 멘션(`/공연 요네즈` 등) 자동완성을 위한 엔티티 검색입니다. `type`이 하나면 그 종류만 무한 스크롤로, 여러 종류이거나 생략하면 종류를 섞은 상위 `limit`개를 반환합니다. 인증이 필요합니다(USER·ADMIN).
 
 ### 요청
 
@@ -12,10 +12,10 @@
 
 | 이름 | 타입 | 필수 | 기본값 | 설명 |
 |------|------|------|--------|------|
-| `type` | String | Y | — | `CONCERT` \| `ARTIST` \| `RELEASE` \| `TRACK` |
+| `type` | String[] | N | 전 종류 | `CONCERT` \| `ARTIST` \| `RELEASE` \| `TRACK`. 여러 값은 `type=CONCERT,ARTIST` 또는 `type=CONCERT&type=ARTIST`. 생략하면 4종 전부 |
 | `q` | String | Y | — | 검색어. 공백·누락 시 400 |
-| `page` | int | N | `0` | 페이지 번호 |
-| `limit` | int | N | `20` | 페이지 크기. 최대 `20` |
+| `page` | int | N | `0` | 페이지 번호. 여러 종류 검색에서는 `0`만 허용 |
+| `limit` | int | N | `20` | 페이지 크기(1~20). 여러 종류 검색에서는 전 종류 합산 개수 |
 
 ### 응답
 
@@ -46,12 +46,15 @@
 
 | 코드 | 상태 코드 | 설명 |
 |------|-----------|------|
-| `INVALID_INPUT` | 400 | `type` 누락·허용 밖 값, `q` 공백·누락, `page` 음수, `limit` 범위(1~20) 초과 |
+| `INVALID_INPUT` | 400 | `type` 허용 밖 값, `q` 공백·누락, `page` 음수, `limit` 범위(1~20) 초과, 여러 종류 검색에서 `page`가 `0`이 아님 |
 
 ### 비고
 
 - `RELEASE`는 `release_group`(앨범·싱글·EP 단위) 기준이며, `TRACK`은 앨범 내 개별 트랙 단위입니다. 두 타입은 서로 다른 멘션 대상으로 분리되어 있습니다.
-- 정렬: `CONCERT`는 시작일 내림차순(`startDate DESC, id DESC`), `ARTIST`·`RELEASE`·`TRACK`은 `id` 오름차순입니다. 모든 타입에서 `id`가 tie-breaker라 페이지 간 정렬이 안정적입니다.
+- 단일 `type`(같은 값 중복 포함)이면 기존과 동일하게 해당 종류만 페이지 단위로 검색합니다(하위 호환).
+- 여러 종류(`type` 2개 이상 또는 생략)면 종류별 상위 `limit`개를 합친 뒤 정렬해 `limit`개를 반환합니다. 정렬: `title`이 `q`로 시작(대소문자 무시)하는 항목 먼저 → `CONCERT`·`ARTIST`·`RELEASE`·`TRACK` 순 → 종류 안에서는 아래 단일 종류 정렬 그대로.
+- 여러 종류 검색의 응답도 페이지네이션 형태를 유지하지만 `page=0`, `size=limit`, `totalElements`=반환 개수, `totalPages`=결과가 없으면 `0` 아니면 `1`로 고정됩니다. 다음 페이지가 없으므로 클라이언트는 `content`만 사용합니다.
+- 정렬(종류별): `CONCERT`는 시작일 내림차순(`startDate DESC, id DESC`), `ARTIST`·`RELEASE`·`TRACK`은 `id` 오름차순입니다. 모든 타입에서 `id`가 tie-breaker라 페이지 간 정렬이 안정적입니다.
 - 매치는 대소문자 무시 부분 일치입니다. `CONCERT`는 공연명, `ARTIST`는 이름·정렬용 이름(`sortName`)·별칭, `RELEASE`·`TRACK`은 제목이 대상입니다.
 - `CONCERT`는 숨김 상태(`EXCLUDED`·`PENDING`) 공연을 결과에서 제외합니다.
 - `CONCERT`: `subtitle` = `"{startDate} · {venue}"`, `thumbnailUrl` = `posterUrl`
