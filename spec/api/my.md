@@ -2,6 +2,52 @@
 
 ---
 
+## GET /api/me/summary
+
+**용도**: MY 첫 화면에 필요한 숫자(팔로잉 아티스트·예정 공연·다녀온 공연·처리 중 문의)와 다음 공연 1건을 한 번에 조회합니다. **(인증 필요)**
+
+### 요청
+
+파라미터 없음.
+
+### 응답
+
+| 필드 | 타입 | 설명 |
+|------|------|------|
+| `followingCount` | long | 팔로잉 아티스트 수. `GET /api/artists?following=true`의 `totalElements`와 같은 조건 |
+| `upcomingCount` | long | 예정·진행 중 공연 수. `GET /api/me/concerts/upcoming`의 `totalElements`와 같은 조건 |
+| `nextConcert` | Object? | 예정·진행 중 공연 중 `startDate` 오름차순 첫 항목. `GET /api/me/concerts/upcoming` `content` 항목과 동일 구조(식별자 필드 `concertId`, `posterUrl` 포함). 없으면 `null` |
+| `historyCount` | long | 다녀온 공연 수. `GET /api/me/concerts/history`의 `totalElements`와 같은 조건 |
+| `inProgressInquiryCount` | long | 처리 중 문의 수. `GET /api/me/inquiries?status=IN_PROGRESS`의 `totalElements`와 같은 조건 |
+
+```json
+{
+  "followingCount": 12,
+  "upcomingCount": 3,
+  "nextConcert": {
+    "concertId": 1,
+    "type": "CONCERT",
+    "artists": [{ "id": 2, "name": "Kenshi Yonezu", "koreanName": "요네즈 켄시" }],
+    "title": "요네즈 켄시 KOREA LIVE 2026",
+    "startDate": "2026-11-14",
+    "endDate": "2026-11-15",
+    "status": "UPCOMING",
+    "posterUrl": "https://...",
+    "venue": "KSPO DOME",
+    "isInCalendar": true,
+    "ticketOpenAt": null
+  },
+  "historyCount": 8,
+  "inProgressInquiryCount": 1
+}
+```
+
+### 비고
+
+- 각 숫자는 대응하는 목록 API와 같은 조건(오늘 기준, PENDING·EXCLUDED 공연 제외)으로 센다. 목록 API를 `size=1`로 호출해 `totalElements`를 읽던 용도를 대체한다
+
+---
+
 ## GET /api/me/concerts/upcoming
 
 **용도**: 내 캘린더에 저장한 공연 중 아직 종료되지 않은 공연 목록을 조회합니다. **(인증 필요)**
@@ -57,6 +103,7 @@
 | `startDate` | String | 시작일 (`YYYY-MM-DD`) |
 | `endDate` | String | 종료일 (`YYYY-MM-DD`) |
 | `venue` | String | 공연장명 |
+| `posterUrl` | String? | 공연 포스터 URL (없으면 `null`) |
 | `status` | String | 공연 상태 |
 
 ### 비고
