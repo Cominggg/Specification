@@ -1,3 +1,9 @@
+## 2026-11-13
+
+- `spec/api/my.md` — Backend#147: `GET /api/me/summary`(MY 요약: `followingCount`·`upcomingCount`·`nextConcert`·`historyCount`·`inProgressInquiryCount`) 섹션 추가, `GET /api/me/concerts/history` 응답에 `posterUrl`(nullable) 추가
+- `spec/api/posts.md` — Backend#147: `GET /api/mentions/search`의 `type`을 선택·다중값으로 변경(생략 시 전 종류, 단일 type은 기존 동작). 여러 종류 검색의 `limit` 합산·`page=0`만 허용·접두 일치 우선 정렬·고정 페이지 값 명시, `type` 누락 400 제거
+- `spec/api/_index.md` — Backend#147: 전체 엔드포인트 목록에 `GET /api/me/summary` 추가
+
 ## 2026-11-12
 
 - `spec/api/_index.md` — Backend#142: 잘못된 입력의 500 응답을 400·409로 정정. 요청 본문을 읽을 수 없을 때(JSON 문법 오류·타입 불일치·enum 허용 밖 값) `INVALID_INPUT`(400) 공통 규칙 추가
