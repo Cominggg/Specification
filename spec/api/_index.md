@@ -169,6 +169,7 @@ ADMIN 전용 엔드포인트는 일반 사용자 접근 시 `403` 반환합니�
 ### 마이페이지·문의
 | 메서드 | 엔드포인트 | 인증 |
 |--------|------------|------|
+| GET | `/api/me/summary` | 필요 |
 | GET | `/api/me/concerts/upcoming` | 필요 |
 | GET | `/api/me/concerts/history` | 필요 |
 | POST | `/api/inquiries` | 필요 |
