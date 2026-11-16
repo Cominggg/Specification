@@ -261,9 +261,9 @@
 | 필드 | 타입 | 설명 |
 |------|------|------|
 | `tracks` | Object[] | 트랙 목록 (없으면 `[]`) |
-| `tracks[].order` | int | 순서 (`setlist_track.position`) |
-| `tracks[].title` | String | 곡명 (`setlist_track.song_name`) |
-| `sourceUrl` | String? | setlist.fm 원본 URL (`setlist.attribution_url`). 셋리스트 데이터 미존재 시 `null` |
+| `tracks[].order` | int | 순서. 세트(본공연·앙코르)를 이어 1부터 매김 |
+| `tracks[].title` | String | 곡명 (setlist.fm `song.name`) |
+| `sourceUrl` | String? | setlist.fm 셋리스트 페이지 URL (setlist.fm 응답의 `url`, attribution 링크). 매칭된 셋리스트가 없거나 setlist.fm에서 삭제된 경우·응답에 `url`이 없는 경우 `null` |
 
 ```json
 {
@@ -280,10 +280,17 @@
 | 코드 | 상태 코드 | 설명 |
 |------|-----------|------|
 | `CONCERT_NOT_FOUND` | 404 | 존재하지 않는 공연 |
+| `SETLIST_TEMPORARILY_UNAVAILABLE` | 503 | 캐시가 없고 setlist.fm 조회에 실패 (429·5xx·404 외 4xx 응답, 타임아웃 3초, 연결 실패). 메시지: "셋리스트를 일시적으로 불러올 수 없습니다. 잠시 후 다시 시도해주세요." |
 
 ### 비고
 
-- `sourceUrl`이 `null`인 경우(셋리스트 데이터 없음) FE는 `https://www.setlist.fm/`으로 폴백
+- 데이터 출처: 트랙을 DB에 저장하지 않고 요청 시점에 setlist.fm API(`GET /rest/1.0/setlist/{setlistId}`)를 조회한다 (setlist.fm API Terms §3: 단기 캐시 외 보관 금지)
+  - `setlist` 테이블은 공연↔`setlist_fm_id` 매칭 용도로만 쓰며, 같은 공연에 여러 건이면 `collected_at`이 가장 최신인 1건을 사용
+  - 조회 결과는 Redis에 `setlist_fm_id` 기준으로 12시간 캐시한다 (키 `SETLIST_FM:{setlistFmId}`). 캐시 적중 시 setlist.fm을 호출하지 않음
+  - setlist.fm 호출은 재시도 없이 타임아웃 3초
+- 매칭된 셋리스트가 없으면 `200` + `{"tracks": [], "sourceUrl": null}`
+- setlist.fm에서 삭제된 셋리스트(404)도 `200` + `{"tracks": [], "sourceUrl": null}`이며, 이 빈 결과도 12시간 캐시한다
+- `sourceUrl`이 `null`이면 클라이언트는 `https://www.setlist.fm/`(홈)으로 대체해 출처를 표시한다 (API Terms §4 attribution)
 
 ---
 
