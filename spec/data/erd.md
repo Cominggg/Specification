@@ -319,8 +319,8 @@ CREATE INDEX idx_rating_target ON rating (target_type, target_id);
 | `concert_artist` | 공연-아티스트 매핑 (어드민 승인 후 확정된 관계) |
 | `concert_artist_candidate` | 파이프라인 매칭 후 관리자 검토 대기 후보 (승인 시 concert_artist로 이동, 거절 시 concert=EXCLUDED). 어드민 수동 추가·삭제 가능 |
 | `user_concert_calendar` | 유저 공연 일정 저장 |
-| `setlist` | setlist.fm 수집 셋리스트 (Data 소유) |
-| `setlist_track` | 셋리스트 트랙 목록 (Data 소유) |
+| `setlist` | 공연↔setlist.fm 셋리스트 ID 매칭 (Data 소유). BE는 `concert_id`별 최신 `collected_at` 1건의 `setlist_fm_id`만 사용하고 트랙은 요청 시 setlist.fm에서 조회. `attribution_url` 컬럼은 삭제 예정 (Data#96 배포 후 V47 마이그레이션) |
+| `setlist_track` | 셋리스트 트랙 목록 (Data 소유). BE 미사용, 삭제 예정 (Data#96 배포 후 V47 마이그레이션) |
 | `release_group` | 앨범·싱글·EP (MusicBrainz 또는 Spotify 기반) (Data 소유) |
 | `track` | 릴리즈 트랙 (MusicBrainz 또는 Spotify 기반) (Data 소유) |
 | `inquiry` | 유저 문의 |
