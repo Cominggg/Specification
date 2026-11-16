@@ -120,3 +120,4 @@ services:
 | `CORS_ALLOWED_ORIGINS` | 허용 오리진 |
 | `OAUTH2_REDIRECT_BASE_URI` | OAuth2 콜백 기본 URI |
 | `DATA_PIPELINE_SECRET` | 내부 서비스 인증 |
+| `SETLISTFM_API_KEY` | setlist.fm API 키 — BE 셋리스트 실시간 조회용 (`be.env`로 주입, `setlist-fm.api-key`) |
