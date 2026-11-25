@@ -101,6 +101,7 @@ ADMIN 전용 엔드포인트는 일반 사용자 접근 시 `403` 반환합니�
 | 음악 발매 | [releases.md](releases.md) |
 | 마이페이지·문의 | [my.md](my.md) |
 | 게시판 | [posts.md](posts.md) |
+| 앱 | [app.md](app.md) |
 | 관리자 | [admin.md](admin.md) |
 | Data 파이프라인 연동 | [pipeline.md](pipeline.md) |
 
@@ -201,6 +202,11 @@ ADMIN 전용 엔드포인트는 일반 사용자 접근 시 `403` 반환합니�
 | POST | `/api/reports` | 필요 |
 | GET | `/api/notices` | 불필요 |
 | GET | `/api/notices/{id}` | 불필요 |
+
+### 앱
+| 메서드 | 엔드포인트 | 인증 |
+|--------|------------|------|
+| GET | `/api/app/version` | 불필요 |
 
 ### 관리자 (ROLE_ADMIN)
 | 메서드 | 엔드포인트 | 인증 |
