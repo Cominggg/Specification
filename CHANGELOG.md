@@ -1,3 +1,8 @@
+## 2026-11-25
+
+- `spec/api/app.md` — Backend#152: 앱 전용 API 문서 신규. `GET /api/app/version?platform={ANDROID|IOS}`(인증 불필요, 응답 `minVersionCode`) 추가, 누락·허용 밖 값(대소문자 구분) `INVALID_INPUT`(400), versionCode 규칙(`MAJOR*10000 + MINOR*100 + PATCH`)·환경 변수 `APP_MIN_VERSION_CODE_ANDROID`(기본 10000)·`APP_MIN_VERSION_CODE_IOS`(기본 0)로 관리
+- `spec/api/_index.md` — Backend#152: 도메인별 문서에 `app.md` 링크, 전체 엔드포인트 목록에 `GET /api/app/version`(불필요) 추가
+
 ## 2026-11-16
 
 - `spec/api/concerts.md` — Backend#151: `GET /api/concerts/{id}/setlist` 데이터 출처를 DB 저장 트랙에서 요청 시점 setlist.fm API 조회 + Redis 12시간 캐시로 변경(응답 형태 유지). `sourceUrl`은 setlist.fm 응답 `url` 그대로(없으면 `null` → 클라이언트가 setlist.fm 홈으로 대체), 매칭 없음·setlist.fm 삭제(404)는 200 빈 결과(404 빈 결과도 캐시), `SETLIST_TEMPORARILY_UNAVAILABLE`(503) 추가
