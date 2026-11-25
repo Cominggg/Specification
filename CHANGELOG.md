@@ -2,6 +2,9 @@
 
 - `spec/api/app.md` — Backend#152: 앱 전용 API 문서 신규. `GET /api/app/version?platform={ANDROID|IOS}`(인증 불필요, 응답 `minVersionCode`) 추가, 누락·허용 밖 값(대소문자 구분) `INVALID_INPUT`(400), versionCode 규칙(`MAJOR*10000 + MINOR*100 + PATCH`)·환경 변수 `APP_MIN_VERSION_CODE_ANDROID`(기본 10000)·`APP_MIN_VERSION_CODE_IOS`(기본 0)로 관리
 - `spec/api/_index.md` — Backend#152: 도메인별 문서에 `app.md` 링크, 전체 엔드포인트 목록에 `GET /api/app/version`(불필요) 추가
+- `spec/legal/privacy-policy.md` — App#35: Android 앱 출시에 맞춰 v1.2 본문(시행일 2026-12-02·버전 유지)에 Firebase Analytics·Crashlytics 반영. 제1조 앱 자동 수집 항목·수집 방법, 제2조 4호 앱 오류 분석, 제3조 앱 자동 수집 정보 보유 기간, 제5조 Google LLC(Firebase) 처리 위탁과 개인정보의 국외 이전(미국, Analytics 2개월·Crashlytics 90일), 제8조 제목을 "쿠키 등 자동 수집 장치의 운영 및 거부"로 바꾸고 앱 "사용 통계 수집" 스위치 거부 방법(3·4항) 추가
+- `spec/legal/terms-of-service.md` — App#35: v1.2 제2조 1호 "서비스" 정의에 웹 및 모바일 앱 명시
+- 웹 정책 화면(Frontend#190 `src/constants/policy.js`)에 같은 문장으로 반영
 
 ## 2026-11-16
 
