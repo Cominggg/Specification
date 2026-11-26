@@ -1,3 +1,7 @@
+## 2026-11-26
+
+- `spec/api/app.md` — App#35: 비고에 앱 동작 추가 — 시작 시 1회 조회, 조회 실패 시 업데이트를 요구하지 않고 계속 사용
+
 ## 2026-11-25
 
 - `spec/api/app.md` — Backend#152: 앱 전용 API 문서 신규. `GET /api/app/version?platform={ANDROID|IOS}`(인증 불필요, 응답 `minVersionCode`) 추가, 누락·허용 밖 값(대소문자 구분) `INVALID_INPUT`(400), versionCode 규칙(`MAJOR*10000 + MINOR*100 + PATCH`)·환경 변수 `APP_MIN_VERSION_CODE_ANDROID`(기본 10000)·`APP_MIN_VERSION_CODE_IOS`(기본 0)로 관리
